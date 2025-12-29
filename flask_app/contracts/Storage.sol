@@ -1,0 +1,259 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Operations{
+    // --- Initial Paddy records ---
+    uint256 public nextPaddyRecordId;
+    mapping(uint256 => string) public paddyRecordUserId;
+    mapping(uint256 => string) public paddyRecordPaddyType;
+    mapping(uint256 => uint256) public paddyRecordQuantity;
+    mapping(uint256 => uint256) public paddyRecordDate;
+
+    // --- Damage records ---
+    uint256 public nextDamageId;
+    mapping(uint256 => string) public damageUserId;
+    mapping(uint256 => string) public damagePaddyType;
+    mapping(uint256 => uint256) public damageQuantity;
+    mapping(uint256 => uint256) public damageDateTimestamp;
+    mapping(uint256 => string) public damageReason;
+
+    // --- Transaction tracking ---
+    uint256 public nextTxId;
+    mapping(uint256 => string) public txFromParty;
+    mapping(uint256 => string) public txToParty;
+    mapping(uint256 => string) public txProductType;
+    mapping(uint256 => uint256) public txQuantity;
+    mapping(uint256 => uint256) public txTimestamp;
+    mapping(uint256 => bool) public txStatus;
+
+    // Optional indexes for traceability per actor
+    mapping(string => uint256[]) public sentTxs;    // sender name -> txIds
+    mapping(string => uint256[]) public receivedTxs; // receiver name -> txIds
+
+    // --- Events ---
+    event InitialPaddyRecorded(
+        uint256 indexed recordId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 date
+    );
+
+    event DamageRecorded(
+        uint256 indexed damageId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string reason
+    );
+    
+    // Log for off-chain traceability
+    event TransactionRecorded(
+        uint256 indexed txId,
+        string indexed fromParty,
+        string indexed toParty,
+        string productType,
+        uint256 quantity,
+        uint256 timestamp,
+        bool status
+    );
+
+    // --- Update Events ---
+    event InitialPaddyUpdated(
+        uint256 indexed recordId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 date
+    );
+
+    // --- Save Initial Paddy Record ---
+    function saveInitialPaddyRecord(
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 date
+    ) external returns (uint256) {
+        uint256 recordId = nextPaddyRecordId;
+        if (recordId == 0) {
+            recordId = 1;
+            nextPaddyRecordId = 2;
+        } else {
+            nextPaddyRecordId = recordId + 1;
+        }
+
+        paddyRecordUserId[recordId] = userId;
+        paddyRecordPaddyType[recordId] = paddyType;
+        paddyRecordQuantity[recordId] = quantity;
+        paddyRecordDate[recordId] = date;
+
+        emit InitialPaddyRecorded(
+            recordId,
+            userId,
+            paddyType,
+            quantity,
+            date
+        );
+
+        return recordId;
+    }
+
+    // --- Save Bulk Initial Paddy Records ---
+    function saveBulkInitialPaddyRecords(
+        string calldata userId,
+        string[] calldata paddyTypes,
+        uint256[] calldata quantities,
+        uint256[] calldata dates
+    ) external returns (uint256[] memory) {
+        require(paddyTypes.length == quantities.length && quantities.length == dates.length, "Array lengths must match");
+        require(paddyTypes.length > 0, "Must provide at least one record");
+
+        uint256[] memory recordIds = new uint256[](paddyTypes.length);
+
+        for (uint256 i = 0; i < paddyTypes.length; i++) {
+            uint256 recordId = nextPaddyRecordId;
+            if (recordId == 0) {
+                recordId = 1;
+                nextPaddyRecordId = 2;
+            } else {
+                nextPaddyRecordId = recordId + 1;
+            }
+
+            paddyRecordUserId[recordId] = userId;
+            paddyRecordPaddyType[recordId] = paddyTypes[i];
+            paddyRecordQuantity[recordId] = quantities[i];
+            paddyRecordDate[recordId] = dates[i];
+
+            recordIds[i] = recordId;
+
+            emit InitialPaddyRecorded(
+                recordId,
+                userId,
+                paddyTypes[i],
+                quantities[i],
+                dates[i]
+            );
+        }
+
+        return recordIds;
+    }
+
+    // --- Transaction recording ---
+    function recordTransaction(
+        string calldata fromParty,
+        string calldata toParty,
+        string calldata productType,
+        uint256 quantity,
+        bool status
+    ) external returns (uint256) {
+        uint256 txId = nextTxId;
+        // initialize nextTxId if zero (start at 1)
+        if (txId == 0) {
+            txId = 1;
+            nextTxId = 2;
+        } else {
+            nextTxId = txId + 1;
+        }
+
+        txFromParty[txId] = fromParty;
+        txToParty[txId] = toParty;
+        txProductType[txId] = productType;
+        txQuantity[txId] = quantity;
+        txTimestamp[txId] = block.timestamp;
+        txStatus[txId] = status;
+
+        sentTxs[fromParty].push(txId);
+        receivedTxs[toParty].push(txId);
+
+        emit TransactionRecorded(txId, fromParty, toParty, productType, quantity, block.timestamp, status);
+
+        return txId;
+    }
+
+    // --- Record Damage ---
+    function recordDamage(
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string calldata reason
+    ) external returns (uint256) {
+        uint256 damageId = nextDamageId;
+        if (damageId == 0) {
+            damageId = 1;
+            nextDamageId = 2;
+        } else {
+            nextDamageId = damageId + 1;
+        }
+
+        damageUserId[damageId] = userId;
+        damagePaddyType[damageId] = paddyType;
+        damageQuantity[damageId] = quantity;
+        damageDateTimestamp[damageId] = damageDate;
+        damageReason[damageId] = reason;
+
+        emit DamageRecorded(
+            damageId,
+            userId,
+            paddyType,
+            quantity,
+            damageDate,
+            reason
+        );
+
+        return damageId;
+    }
+
+    // --- Getters ---
+    function getInitialPaddyRecord(uint256 recordId) external view returns (
+        string memory userId,
+        string memory paddyType,
+        uint256 quantity,
+        uint256 date
+    ) {
+        require(recordId > 0 && recordId < nextPaddyRecordId, "Invalid record ID");
+        return (
+            paddyRecordUserId[recordId],
+            paddyRecordPaddyType[recordId],
+            paddyRecordQuantity[recordId],
+            paddyRecordDate[recordId]
+        );
+    }
+
+    function getTransaction(uint256 txId) external view returns (
+        string memory fromParty,
+        string memory toParty,
+        string memory productType,
+        uint256 quantity,
+        uint256 timestamp,
+        bool status
+    ) {
+        require(txId > 0 && txId < nextTxId, "Invalid tx ID");
+        return (
+            txFromParty[txId],
+            txToParty[txId],
+            txProductType[txId],
+            txQuantity[txId],
+            txTimestamp[txId],
+            txStatus[txId]
+        );
+    }
+
+    function getDamage(uint256 damageId) external view returns (
+        string memory userId,
+        string memory paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string memory reason
+    ) {
+        require(damageId > 0 && damageId < nextDamageId, "Invalid damage ID");
+        return (
+            damageUserId[damageId],
+            damagePaddyType[damageId],
+            damageQuantity[damageId],
+            damageDateTimestamp[damageId],
+            damageReason[damageId]
+        );
+    }
+}

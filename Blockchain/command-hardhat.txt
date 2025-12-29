@@ -1,0 +1,4 @@
+npm install
+npx hardhat node
+npx hardhat ignition deploy ignition/modules/Counter.ts --network localhost
+ 

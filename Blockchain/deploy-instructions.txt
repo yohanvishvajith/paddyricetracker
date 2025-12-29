@@ -1,0 +1,20 @@
+# Two Independent Blockchain Nodes Setup
+
+## Terminal 1: UserAccounts Blockchain (Port 8545)
+cd d:\prototype\Blockchain
+npx hardhat node --port 8545
+
+## Terminal 2: Operations Blockchain (Port 8546)
+cd d:\prototype\Blockchain
+npx hardhat node --port 8546
+
+## Terminal 3: Deploy UserAccounts to Node 1
+cd d:\prototype\Blockchain
+npx hardhat ignition deploy ignition/modules/UserAccounts.ts --network accounts
+
+## Terminal 3: Deploy Operations to Node 2
+cd d:\prototype\Blockchain
+npx hardhat ignition deploy ignition/modules/Operations.ts --network operations
+
+## Export ABIs
+npx hardhat run scripts/export-abi.ts

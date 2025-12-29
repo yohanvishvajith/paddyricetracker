@@ -1,0 +1,522 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Operations{
+    // --- Initial Paddy records ---
+    uint256 public nextPaddyRecordId;
+    mapping(uint256 => string) public paddyRecordUserId;
+    mapping(uint256 => string) public paddyRecordPaddyType;
+    mapping(uint256 => uint256) public paddyRecordQuantity;
+    mapping(uint256 => uint256) public paddyRecordDate;
+
+    // --- Damage records ---
+    uint256 public nextDamageId;
+    mapping(uint256 => string) public damageUserId;
+    mapping(uint256 => string) public damagePaddyType;
+    mapping(uint256 => uint256) public damageQuantity;
+    mapping(uint256 => uint256) public damageDateTimestamp;
+    mapping(uint256 => string) public damageReason;
+
+    // --- Transaction tracking ---
+    uint256 public nextTxId;
+    mapping(uint256 => string) public txFromParty;
+    mapping(uint256 => string) public txToParty;
+    mapping(uint256 => string) public txProductType;
+    mapping(uint256 => uint256) public txQuantity;
+    mapping(uint256 => uint256) public txTimestamp;
+    mapping(uint256 => bool) public txStatus;
+
+    // Optional indexes for traceability per actor
+    mapping(string => uint256[]) public sentTxs;    // sender name -> txIds
+    mapping(string => uint256[]) public receivedTxs; // receiver name -> txIds
+
+    // --- Rice Damage records ---
+    uint256 public nextRiceDamageId;
+    mapping(uint256 => string) public riceDamageUserId;
+    mapping(uint256 => string) public riceDamageRiceType;
+    mapping(uint256 => uint256) public riceDamageQuantity;
+    mapping(uint256 => uint256) public riceDamageDateTimestamp;
+    mapping(uint256 => string) public riceDamageReason;
+
+    // --- Rice Transaction tracking ---
+    uint256 public nextRiceTxId;
+    mapping(uint256 => string) public riceTxFromParty;
+    mapping(uint256 => string) public riceTxToParty;
+    mapping(uint256 => string) public riceTxRiceType;
+    mapping(uint256 => uint256) public riceTxQuantity;
+    mapping(uint256 => uint256) public riceTxTimestamp;
+    mapping(uint256 => bool) public riceTxStatus;
+
+    // Optional indexes for traceability per actor for rice
+    mapping(string => uint256[]) public sentRiceTxs;    // sender name -> txIds
+    mapping(string => uint256[]) public receivedRiceTxs; // receiver name -> txIds
+
+    // --- Milling records ---
+    uint256 public nextMillingId;
+    mapping(uint256 => string) public millingMillerId;
+    mapping(uint256 => string) public millingPaddyType;
+    mapping(uint256 => uint256) public millingInputQty;
+    mapping(uint256 => uint256) public millingOutputQty;
+    mapping(uint256 => uint256) public millingDate;
+
+    // --- Events ---
+    event InitialPaddyRecorded(
+        uint256 indexed recordId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 date
+    );
+
+    event DamageRecorded(
+        uint256 indexed damageId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string reason
+    );
+    
+    // Log for off-chain traceability
+    event TransactionRecorded(
+        uint256 indexed txId,
+        string indexed fromParty,
+        string indexed toParty,
+        string productType,
+        uint256 quantity,
+        uint256 timestamp,
+        bool status
+    );
+
+    event RiceDamageRecorded(
+        uint256 indexed damageId,
+        string userId,
+        string riceType,
+        uint256 quantity,
+        uint256 damageDate,
+        string reason
+    );
+
+    event RiceTransactionRecorded(
+        uint256 indexed txId,
+        string indexed fromParty,
+        string indexed toParty,
+        string riceType,
+        uint256 quantity,
+        uint256 timestamp,
+        bool status
+    );
+
+    event MillingRecorded(
+        uint256 indexed millingId,
+        string millerId,
+        string paddyType,
+        uint256 inputQty,
+        uint256 outputQty,
+        uint256 date
+    );
+
+    // --- Update Events ---
+    event InitialPaddyUpdated(
+        uint256 indexed recordId,
+        string userId,
+        string paddyType,
+        uint256 quantity,
+        uint256 date
+    );
+
+    
+
+    
+
+    
+
+    
+
+    event MillingUpdated(
+        uint256 indexed millingId,
+        string millerId,
+        string paddyType,
+        uint256 inputQty,
+        uint256 outputQty,
+        uint256 date
+    );
+
+    // --- Save Initial Paddy Record ---
+    function saveInitialPaddyRecord(
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 date
+    ) external returns (uint256) {
+        uint256 recordId = nextPaddyRecordId;
+        if (recordId == 0) {
+            recordId = 1;
+            nextPaddyRecordId = 2;
+        } else {
+            nextPaddyRecordId = recordId + 1;
+        }
+
+        paddyRecordUserId[recordId] = userId;
+        paddyRecordPaddyType[recordId] = paddyType;
+        paddyRecordQuantity[recordId] = quantity;
+        paddyRecordDate[recordId] = date;
+
+        emit InitialPaddyRecorded(
+            recordId,
+            userId,
+            paddyType,
+            quantity,
+            date
+        );
+
+        return recordId;
+    }
+
+    // --- Save Bulk Initial Paddy Records ---
+    function saveBulkInitialPaddyRecords(
+        string calldata userId,
+        string[] calldata paddyTypes,
+        uint256[] calldata quantities,
+        uint256[] calldata dates
+    ) external returns (uint256[] memory) {
+        require(paddyTypes.length == quantities.length && quantities.length == dates.length, "Array lengths must match");
+        require(paddyTypes.length > 0, "Must provide at least one record");
+
+        uint256[] memory recordIds = new uint256[](paddyTypes.length);
+
+        for (uint256 i = 0; i < paddyTypes.length; i++) {
+            uint256 recordId = nextPaddyRecordId;
+            if (recordId == 0) {
+                recordId = 1;
+                nextPaddyRecordId = 2;
+            } else {
+                nextPaddyRecordId = recordId + 1;
+            }
+
+            paddyRecordUserId[recordId] = userId;
+            paddyRecordPaddyType[recordId] = paddyTypes[i];
+            paddyRecordQuantity[recordId] = quantities[i];
+            paddyRecordDate[recordId] = dates[i];
+
+            recordIds[i] = recordId;
+
+            emit InitialPaddyRecorded(
+                recordId,
+                userId,
+                paddyTypes[i],
+                quantities[i],
+                dates[i]
+            );
+        }
+
+        return recordIds;
+    }
+
+    // --- Update Initial Paddy Record ---
+    function updateInitialPaddyRecord(
+        uint256 recordId,
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 date
+    ) external {
+        require(recordId > 0 && recordId < nextPaddyRecordId, "Invalid record ID");
+
+        paddyRecordUserId[recordId] = userId;
+        paddyRecordPaddyType[recordId] = paddyType;
+        paddyRecordQuantity[recordId] = quantity;
+        paddyRecordDate[recordId] = date;
+
+        emit InitialPaddyUpdated(
+            recordId,
+            userId,
+            paddyType,
+            quantity,
+            date
+        );
+    }
+
+    // --- Transaction recording ---
+    function recordTransaction(
+        string calldata fromParty,
+        string calldata toParty,
+        string calldata productType,
+        uint256 quantity,
+        bool status
+    ) external returns (uint256) {
+        uint256 txId = nextTxId;
+        // initialize nextTxId if zero (start at 1)
+        if (txId == 0) {
+            txId = 1;
+            nextTxId = 2;
+        } else {
+            nextTxId = txId + 1;
+        }
+
+        txFromParty[txId] = fromParty;
+        txToParty[txId] = toParty;
+        txProductType[txId] = productType;
+        txQuantity[txId] = quantity;
+        txTimestamp[txId] = block.timestamp;
+        txStatus[txId] = status;
+
+        sentTxs[fromParty].push(txId);
+        receivedTxs[toParty].push(txId);
+
+        emit TransactionRecorded(txId, fromParty, toParty, productType, quantity, block.timestamp, status);
+
+        return txId;
+    }
+
+    // --- Update Transaction ---
+    function updateTransaction(
+        uint256 txId,
+        string calldata fromParty,
+        string calldata toParty,
+        string calldata productType,
+        uint256 quantity,
+        bool status
+    ) external {
+        require(txId > 0 && txId < nextTxId, "Invalid transaction ID");
+
+        txFromParty[txId] = fromParty;
+        txToParty[txId] = toParty;
+        txProductType[txId] = productType;
+        txQuantity[txId] = quantity;
+        txTimestamp[txId] = block.timestamp;
+        txStatus[txId] = status;
+    }
+
+    // --- Record Damage ---
+    function recordDamage(
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string calldata reason
+    ) external returns (uint256) {
+        uint256 damageId = nextDamageId;
+        if (damageId == 0) {
+            damageId = 1;
+            nextDamageId = 2;
+        } else {
+            nextDamageId = damageId + 1;
+        }
+
+        damageUserId[damageId] = userId;
+        damagePaddyType[damageId] = paddyType;
+        damageQuantity[damageId] = quantity;
+        damageDateTimestamp[damageId] = damageDate;
+        damageReason[damageId] = reason;
+
+        emit DamageRecorded(
+            damageId,
+            userId,
+            paddyType,
+            quantity,
+            damageDate,
+            reason
+        );
+
+        return damageId;
+    }
+
+    // --- Update Damage ---
+    function updateDamage(
+        uint256 damageId,
+        string calldata userId,
+        string calldata paddyType,
+        uint256 quantity,
+        uint256 damageDate,
+        string calldata reason
+    ) external {
+        require(damageId > 0 && damageId < nextDamageId, "Invalid damage ID");
+
+        damageUserId[damageId] = userId;
+        damagePaddyType[damageId] = paddyType;
+        damageQuantity[damageId] = quantity;
+        damageDateTimestamp[damageId] = damageDate;
+        damageReason[damageId] = reason;
+
+    }
+
+   
+
+   
+
+    // --- Rice Transaction recording ---
+    function recordRiceTransaction(
+        string calldata fromParty,
+        string calldata toParty,
+        string calldata riceType,
+        uint256 quantity,
+        bool status
+    ) external returns (uint256) {
+        uint256 txId = nextRiceTxId;
+        // initialize nextRiceTxId if zero (start at 1)
+        if (txId == 0) {
+            txId = 1;
+            nextRiceTxId = 2;
+        } else {
+            nextRiceTxId = txId + 1;
+        }
+
+        riceTxFromParty[txId] = fromParty;
+        riceTxToParty[txId] = toParty;
+        riceTxRiceType[txId] = riceType;
+        riceTxQuantity[txId] = quantity;
+        riceTxTimestamp[txId] = block.timestamp;
+        riceTxStatus[txId] = status;
+
+        sentRiceTxs[fromParty].push(txId);
+        receivedRiceTxs[toParty].push(txId);
+
+        emit RiceTransactionRecorded(txId, fromParty, toParty, riceType, quantity, block.timestamp, status);
+
+        return txId;
+    }
+
+    // --- Update Rice Transaction ---
+    function updateRiceTransaction(
+        uint256 txId,
+        string calldata fromParty,
+        string calldata toParty,
+        string calldata riceType,
+        uint256 quantity,
+        bool status
+    ) external {
+        require(txId > 0 && txId < nextRiceTxId, "Invalid rice transaction ID");
+
+        riceTxFromParty[txId] = fromParty;
+        riceTxToParty[txId] = toParty;
+        riceTxRiceType[txId] = riceType;
+        riceTxQuantity[txId] = quantity;
+        riceTxTimestamp[txId] = block.timestamp;
+
+        riceTxStatus[txId] = status;
+    }
+
+   
+
+ 
+
+    // --- Record Rice Damage ---
+    function recordRiceDamage(
+        string calldata userId,
+        string calldata riceType,
+        uint256 quantity,
+        uint256 damageDate,
+        string calldata reason
+    ) external returns (uint256) {
+        uint256 damageId = nextRiceDamageId;
+        if (damageId == 0) {
+            damageId = 1;
+            nextRiceDamageId = 2;
+        } else {
+            nextRiceDamageId = damageId + 1;
+        }
+
+        riceDamageUserId[damageId] = userId;
+        riceDamageRiceType[damageId] = riceType;
+        riceDamageQuantity[damageId] = quantity;
+        riceDamageDateTimestamp[damageId] = damageDate;
+        riceDamageReason[damageId] = reason;
+
+        emit RiceDamageRecorded(
+            damageId,
+            userId,
+            riceType,
+            quantity,
+            damageDate,
+            reason
+        );
+
+        return damageId;
+    }
+
+    // --- Update Rice Damage ---
+    function updateRiceDamage(
+        uint256 damageId,
+        string calldata userId,
+        string calldata riceType,
+        uint256 quantity,
+        uint256 damageDate,
+        string calldata reason
+    ) external {
+        require(damageId > 0 && damageId < nextRiceDamageId, "Invalid rice damage ID");
+
+        riceDamageUserId[damageId] = userId;
+        riceDamageRiceType[damageId] = riceType;
+        riceDamageQuantity[damageId] = quantity;
+        riceDamageDateTimestamp[damageId] = damageDate;
+        riceDamageReason[damageId] = reason;
+
+    }
+
+    
+
+    // --- Record Milling ---
+    function recordMilling(
+        string calldata millerId,
+        string calldata paddyType,
+        uint256 inputQty,
+        uint256 outputQty,
+        uint256 date
+    ) external returns (uint256) {
+        uint256 millingId = nextMillingId;
+        if (millingId == 0) {
+            millingId = 1;
+            nextMillingId = 2;
+        } else {
+            nextMillingId = millingId + 1;
+        }
+
+        millingMillerId[millingId] = millerId;
+        millingPaddyType[millingId] = paddyType;
+        millingInputQty[millingId] = inputQty;
+        millingOutputQty[millingId] = outputQty;
+        millingDate[millingId] = date;
+
+        emit MillingRecorded(
+            millingId,
+            millerId,
+            paddyType,
+            inputQty,
+            outputQty,
+            date
+        );
+
+        return millingId;
+    }
+
+    // --- Update Milling ---
+    function updateMilling(
+        uint256 millingId,
+        string calldata millerId,
+        string calldata paddyType,
+        uint256 inputQty,
+        uint256 outputQty,
+        uint256 date
+    ) external {
+        require(millingId > 0 && millingId < nextMillingId, "Invalid milling ID");
+
+        millingMillerId[millingId] = millerId;
+        millingPaddyType[millingId] = paddyType;
+        millingInputQty[millingId] = inputQty;
+        millingOutputQty[millingId] = outputQty;
+        millingDate[millingId] = date;
+
+        emit MillingUpdated(
+            millingId,
+            millerId,
+            paddyType,
+            inputQty,
+            outputQty,
+            date
+        );
+    }
+    
+}
+    
+

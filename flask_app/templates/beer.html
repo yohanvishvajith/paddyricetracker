@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beer Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+      }
+      .top-bar {
+        background: linear-gradient(90deg, #4caf50, #2e7d32);
+        color: white;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .top-bar h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .top-bar .logout {
+        background: white;
+        color: #2e7d32;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      @media (min-width: 768px) {
+        .container {
+          padding: 40px;
+        }
+      }
+      @media (min-width: 1024px) {
+        .container {
+          padding: 60px;
+        }
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #ccc;
+      }
+      .tabs button {
+        background: white;
+        border: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 8px 8px 0 0;
+        transition: background 0.3s;
+      }
+      .tabs button.active {
+        background: #4caf50;
+        color: white;
+      }
+      .tab-content {
+        display: none;
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .tab-content.active {
+        display: block;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      form label {
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+      }
+      form input,
+      form select {
+        margin-top: 4px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      form button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      form button:hover {
+        background: #388e3c;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      table thead {
+        background: #4caf50;
+        color: white;
+      }
+      table th,
+      table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      table tbody tr:hover {
+        background: #f1f1f1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <h1>Beer Dashboard</h1>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+      <div class="tabs">
+        <button class="active" onclick="openTab(event, 'purchases')">
+          Purchases
+        </button>
+        <button onclick="openTab(event, 'history')">History</button>
+      </div>
+
+      <!-- Purchases Tab -->
+      <div id="purchases" class="tab-content active">
+        <h2>Purchase Rice</h2>
+        <form id="purchase-form">
+          <label>
+            Purchase From Type
+            <select name="sourceType" id="source-type" required>
+              <option value="">Select Source Type</option>
+              <option value="Miller">Miller</option>
+              <option value="Wholesaler">Wholesaler</option>
+            </select>
+          </label>
+          <label>
+            Select Supplier
+            <select name="supplierId" id="supplier-select" required>
+              <option value="">First select source type</option>
+            </select>
+          </label>
+          <label>
+            Rice Type
+            <select name="riceType" required>
+              <option value="">Loading rice types...</option>
+            </select>
+          </label>
+          <label>
+            Quantity (kg)
+            <input type="number" name="quantity" step="0.01" required />
+          </label>
+          <label>
+            Price (per kg)
+            <input type="number" name="price" step="0.01" />
+          </label>
+          <button type="submit">Purchase Rice</button>
+        </form>
+      </div>
+
+      <!-- Damage tab removed -->
+
+      <!-- History Tab -->
+      <div id="history" class="tab-content">
+        <h2>Transaction History</h2>
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Rice Type</th>
+              <th>Quantity (kg)</th>
+              <th>Price (per kg)</th>
+              <th>Block ID</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- View Transaction Modal -->
+    <div
+      id="viewTransactionModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 24px;
+          border-radius: 8px;
+          max-width: 500px;
+          width: 90%;
+        "
+      >
+        <h3>Transaction Details</h3>
+        <p><strong>From:</strong> <span id="viewTxFrom"></span></p>
+        <p><strong>To:</strong> <span id="viewTxTo"></span></p>
+        <p><strong>Type:</strong> <span id="viewTxType"></span></p>
+        <p><strong>Quantity:</strong> <span id="viewTxQuantity"></span> kg</p>
+        <p><strong>Price:</strong> <span id="viewTxPrice"></span></p>
+        <p><strong>Date:</strong> <span id="viewTxDate"></span></p>
+        <p>
+          <strong>Block Hash:</strong>
+          <span
+            id="viewTxBlockHash"
+            style="word-break: break-all; font-size: 11px"
+          ></span>
+        </p>
+        <p>
+          <strong>Block Number:</strong> <span id="viewTxBlockNumber"></span>
+        </p>
+        <p>
+          <strong>Transaction Hash:</strong>
+          <span
+            id="viewTxHash"
+            style="word-break: break-all; font-size: 11px"
+          ></span>
+        </p>
+        <button
+          onclick="document.getElementById('viewTransactionModal').style.display='none'"
+          style="
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 16px;
+          "
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      let loggedInUser = null;
+      let paddyMap = {}; // id/name map for paddy types
+
+      // Get logged in user from server session
+      async function getCurrentUser() {
+        try {
+          const response = await fetch("/api/me");
+          if (!response.ok) {
+            window.location.href = "/";
+            return null;
+          }
+          const data = await response.json();
+          if (!data.ok) {
+            window.location.href = "/";
+            return null;
+          }
+          return { user_code: data.user_id };
+        } catch (err) {
+          console.error(err);
+          window.location.href = "/";
+          return null;
+        }
+      }
+
+      function openTab(evt, tabName) {
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((c) => (c.style.display = "none"));
+        const tabs = document.querySelectorAll(".tabs button");
+        tabs.forEach((t) => t.classList.remove("active"));
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.add("active");
+
+        // Load data when switching tabs
+        if (tabName === "purchases") {
+          loadPurchases();
+        } else if (tabName === "history") {
+          loadHistory();
+        }
+      }
+
+      function logout() {
+        sessionStorage.clear();
+        window.location.href = "/";
+      }
+
+      // Handle source type change to populate supplier dropdown
+      document
+        .getElementById("source-type")
+        .addEventListener("change", async function (e) {
+          const sourceType = e.target.value;
+          const supplierSelect = document.getElementById("supplier-select");
+          supplierSelect.innerHTML = '<option value="">Loading...</option>';
+
+          if (!sourceType) {
+            supplierSelect.innerHTML =
+              '<option value="">First select source type</option>';
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `/api/users/by_type?type=${sourceType}`
+            );
+            if (!response.ok) throw new Error("Failed to fetch suppliers");
+            const suppliers = await response.json();
+
+            if (suppliers.length === 0) {
+              supplierSelect.innerHTML =
+                '<option value="">No suppliers available</option>';
+              return;
+            }
+
+            supplierSelect.innerHTML =
+              '<option value="">Select Supplier</option>';
+            suppliers.forEach((s) => {
+              const option = document.createElement("option");
+              // fall back to id if user_code is not available
+              option.value = s.id || s.user_code || "";
+              option.textContent = s.user_code
+                ? `${s.user_code} - ${s.full_name}`
+                : s.full_name || s.id || "Unknown";
+              supplierSelect.appendChild(option);
+            });
+          } catch (err) {
+            console.error(err);
+            alert("Error loading suppliers");
+            supplierSelect.innerHTML =
+              '<option value="">Error loading suppliers</option>';
+          }
+        });
+
+      // Purchase Form Submit
+      document
+        .getElementById("purchase-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const sourceType = formData.get("sourceType");
+          const supplierId = formData.get("supplierId");
+          const riceTypeId = formData.get("riceType");
+          const riceTypeName = paddyMap[riceTypeId] || riceTypeId;
+          const quantity = parseFloat(formData.get("quantity"));
+          const price = formData.get("price");
+          const payload = {
+            from: supplierId,
+            to: loggedInUser.user_code,
+            type: riceTypeName,
+            quantity: quantity,
+            price: price ? parseFloat(price) : null,
+            datetime: new Date().toISOString(),
+          };
+
+          try {
+            const response = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error("Failed to record purchase");
+            alert("Purchase recorded successfully!");
+            e.target.reset();
+            document.getElementById("supplier-select").innerHTML =
+              '<option value="">First select source type</option>';
+            loadPurchases();
+          } catch (err) {
+            console.error(err);
+            alert("Error recording purchase");
+          }
+        });
+
+      // Damage feature removed from UI
+
+      async function loadPurchases() {
+        try {
+          const response = await fetch(
+            `/api/transactions?user=${loggedInUser.user_code}&type=Purchase`
+          );
+          if (!response.ok) throw new Error("Failed to load purchases");
+          const data = await response.json();
+
+          const table = document.querySelector("#purchase-table");
+          if (!table) return; // Purchase history removed from UI
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          tbody.innerHTML = "";
+          data.forEach((t) => {
+            const row = tbody.insertRow();
+            const fromUser = (t["from"] || t.from_user || "") + "";
+            const label =
+              fromUser && fromUser.startsWith("MIL") ? "Miller" : "Wholesaler";
+            row.innerHTML = `
+              <td>${new Date(t.date).toLocaleDateString()}</td>
+              <td>${label}</td>
+              <td>${fromUser}</td>
+              <td>${paddyMap[t.paddy_type] || t.paddy_type}</td>
+              <td>${t.quantity}</td>
+            `;
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // loadDamages removed (feature not shown in UI)
+
+      function viewTransaction(transaction) {
+        document.getElementById("viewTxFrom").textContent =
+          transaction.from || "N/A";
+        document.getElementById("viewTxTo").textContent =
+          transaction.to || "N/A";
+        document.getElementById("viewTxType").textContent =
+          transaction.type || "N/A";
+        document.getElementById("viewTxQuantity").textContent =
+          transaction.quantity || 0;
+        document.getElementById("viewTxPrice").textContent = transaction.price
+          ? Number(transaction.price).toFixed(2)
+          : "-";
+        document.getElementById("viewTxDate").textContent = transaction.datetime
+          ? new Date(transaction.datetime).toLocaleString()
+          : "N/A";
+        document.getElementById("viewTxBlockHash").textContent =
+          transaction.block_hash || "Not available";
+        document.getElementById("viewTxBlockNumber").textContent =
+          transaction.block_number || "Not available";
+        document.getElementById("viewTxHash").textContent =
+          transaction.transaction_hash || "Not available";
+        document.getElementById("viewTransactionModal").style.display = "flex";
+      }
+
+      async function revertTransaction(id, from, type, quantity, price) {
+        if (
+          !confirm(
+            `Revert purchase of ${quantity} kg ${type} from ${from}? This will create a reversal with status=0.`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const payload = {
+            from: from,
+            to: loggedInUser.user_code,
+            type: type,
+            quantity: quantity,
+            price: price,
+            datetime: new Date().toISOString(),
+            status: 0, // Revert transaction
+          };
+
+          const response = await fetch("/api/transactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+          if (response.ok && result.ok) {
+            alert("Purchase reverted successfully");
+            loadHistory(); // Reload history
+          } else {
+            alert("Error: " + (result.error || "Failed to revert purchase"));
+          }
+        } catch (err) {
+          console.error("Failed to revert purchase:", err);
+          alert("Network error: " + err.message);
+        }
+      }
+
+      async function loadHistory() {
+        try {
+          const response = await fetch(
+            `/api/transactions?user=${loggedInUser.user_code}`
+          );
+          if (!response.ok) throw new Error("Failed to load history");
+          const data = await response.json();
+
+          const tbody = document.querySelector("#history-table tbody");
+          tbody.innerHTML = "";
+          data.forEach((t) => {
+            const toUser = (t["to"] || t.to_user || "") + "";
+            const fromUser = (t["from"] || t.from_user || "") + "";
+            const isRelated =
+              toUser === loggedInUser.user_code ||
+              fromUser === loggedInUser.user_code;
+            if (!isRelated) return; // show only related transactions
+
+            // Only show revert button for purchases (where user is recipient) and status is not already 0
+            const isPurchase = toUser === loggedInUser.user_code;
+            const isRevert = t.status === 0;
+            const showRevertBtn = isPurchase && !isRevert;
+
+            const row = tbody.insertRow();
+            const dateValue = t.datetime || t.date;
+            const blockIdDisplay = t.block_hash
+              ? t.block_hash.substring(0, 10) + "..."
+              : "Not available";
+            const priceDisplay = t.price ? Number(t.price).toFixed(2) : "-";
+
+            const viewBtn = `<button class="btn" style="background:#ff9800; color:#fff; padding:4px 8px; font-size:12px; margin-right:5px;" onclick='viewTransaction(${JSON.stringify(
+              t
+            ).replace(/'/g, "&#39;")})'>View</button>`;
+
+            const revertBtn = showRevertBtn
+              ? `<button class="btn" style="background:#ef4444; color:#fff; padding:4px 8px; font-size:12px;" onclick="revertTransaction(${
+                  t.id
+                }, '${t.from}', '${t.type}', ${t.quantity}, ${
+                  t.price || 0
+                })">↩️ Revert</button>`
+              : "";
+
+            row.innerHTML = `
+              <td>${
+                dateValue ? new Date(dateValue).toLocaleDateString() : "N/A"
+              }</td>
+              <td>${t.type}</td>
+              <td>${t.quantity}</td>
+              <td>${priceDisplay}</td>
+              <td title="${t.block_hash || ""}">${blockIdDisplay}</td>
+              <td>${viewBtn}${revertBtn}</td>
+            `;
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // Initial load: fetch paddy types then load user and purchases
+      (async function () {
+        try {
+          const ptRes = await fetch("/api/paddy_types");
+          if (ptRes.ok) {
+            const pts = await ptRes.json();
+            pts.forEach((p) => {
+              paddyMap[p.id] = p.name;
+            });
+            // populate all riceType selects (purchase + damage forms)
+            const selects = document.querySelectorAll(
+              'select[name="riceType"]'
+            );
+            selects.forEach((sel) => {
+              sel.innerHTML = '<option value="">Select Rice Type</option>';
+              pts.forEach((p) => {
+                const opt = document.createElement("option");
+                opt.value = p.id; // use id as value
+                opt.textContent = p.name;
+                sel.appendChild(opt);
+              });
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to load paddy types", err);
+          // leave selects as-is
+        }
+
+        loggedInUser = await getCurrentUser();
+        if (loggedInUser) {
+          loadPurchases();
+        }
+      })();
+    </script>
+  </body>
+</html>

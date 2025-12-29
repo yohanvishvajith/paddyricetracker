@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collecter - Sri Lanka Rice Supply Chain</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">Collecter Dashboard</h1>
+      <nav class="tabs" aria-label="Collecter tabs">
+        <ul>
+          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
+          <li class="tab"><a href="#" data-index="1">Damage</a></li>
+          <li class="tab"><a href="#" data-index="2">History</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="panel" id="purchases-panel">
+        <h2>Record Purchase</h2>
+
+        <div class="card">
+          <form id="purchaseForm">
+            <label for="purchaseFromType">Purchase From</label>
+            <select id="purchaseFromType" required>
+              <option value="Farmer">Farmer</option>
+              <option value="Collecter">Collecter</option>
+            </select>
+
+            <label for="sourceSelect">Source</label>
+            <select id="sourceSelect" required>
+              <option value="">Loading...</option>
+            </select>
+
+            <label for="paddyType">Paddy Type</label>
+            <select id="paddyType" required>
+              <option value="">Select paddy type</option>
+              <option value="Samba">Samba</option>
+              <option value="Nadu">Nadu</option>
+              <option value="Keeri Samba">Keeri Samba</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <label for="qty">Quantity (kg)</label>
+            <input id="qty" type="number" min="0" step="0.01" required />
+
+            <label for="price">Price (per kg)</label>
+            <input id="price" type="number" min="0" step="0.01" />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Save Purchase</button>
+              <a href="/" class="btn">Back to home</a>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="purchasesTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Source</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="damage-panel" hidden>
+        <h2>Record Damage</h2>
+
+        <div class="card">
+          <form id="damageForm">
+            <label for="damagePaddyType">Paddy Type</label>
+            <select id="damagePaddyType" required>
+              <option value="">Select paddy type</option>
+            </select>
+
+            <label for="damageQty">Damaged Quantity (kg)</label>
+            <input id="damageQty" type="number" min="0" step="0.01" required />
+
+            <label for="damageReason">Reason</label>
+            <textarea
+              id="damageReason"
+              rows="3"
+              placeholder="Describe the reason for damage"
+              required
+            ></textarea>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Record Damage</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Damages</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="damagesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="history-panel" hidden>
+        <h2>Purchases History</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Source</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Simple client-side purchases storage for the collecter dashboard.
+      // It fetches users from /api/users and populates the Source select
+      // depending on the selected Purchase From type (Farmer or Miller).
+
+      let users = [];
+      let purchases = [];
+      let currentUser = null;
+
+      function qs(sel) {
+        return document.querySelector(sel);
+      }
+
+      function escapeHtml(s) {
+        if (s === null || s === undefined) return "";
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      async function fetchUsers() {
+        try {
+          const res = await fetch("/api/users");
+          if (!res.ok) throw new Error("Failed to load users");
+          const data = await res.json();
+          users = Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch users:", e);
+          users = [];
+        }
+      }
+
+      // Fetch available paddy types from server
+      async function fetchPaddyTypes() {
+        try {
+          const res = await fetch("/api/paddy_types");
+          if (!res.ok) throw new Error("Failed to load paddy types");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch paddy types:", e);
+          return [];
+        }
+      }
+
+      async function fetchCurrentUser() {
+        try {
+          const res = await fetch("/api/me");
+          if (!res.ok) return null;
+          const j = await res.json();
+          return j && j.ok ? j : null;
+        } catch (e) {
+          console.error("Could not fetch current user", e);
+          return null;
+        }
+      }
+
+      async function fetchServerTransactions(to) {
+        try {
+          const q = encodeURIComponent(to || "");
+          const url = to ? `/api/transactions?to=${q}` : "/api/transactions";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load transactions");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch transactions:", e);
+          return [];
+        }
+      }
+
+      function userTypeOf(u) {
+        return u.user_type || u.type || u.role || u.userType || "";
+      }
+
+      function userLabel(u) {
+        return (
+          (u.full_name ||
+            u.name ||
+            u.collecter_name ||
+            u.collector_name ||
+            u.display_name ||
+            "") +
+          " (" +
+          (u.user_code || u.code || u.id || "") +
+          ")"
+        );
+      }
+
+      function populateSourceSelect(fromType) {
+        const sel = qs("#sourceSelect");
+        sel.innerHTML = "";
+        const matches = users.filter(
+          (u) => (userTypeOf(u) || "").toLowerCase() === fromType.toLowerCase()
+        );
+        if (matches.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "No " + fromType + "s found";
+          sel.appendChild(opt);
+          return;
+        }
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select " + fromType;
+        sel.appendChild(placeholder);
+        matches.forEach((u) => {
+          const o = document.createElement("option");
+          o.value = u.id || u._id || u.user_code || u.code || "";
+          o.textContent = userLabel(u);
+          o.dataset.full = u.full_name || u.name || "";
+          sel.appendChild(o);
+        });
+      }
+
+      // load transactions for this user from server
+      async function loadServerTransactions() {
+        if (!currentUser) return;
+        try {
+          const res = await fetch(
+            `/api/transactions?to=${encodeURIComponent(currentUser.user_id)}`
+          );
+          if (!res.ok) throw new Error("Failed to load transactions");
+          const rows = await res.json();
+          purchases = rows.map((r) => ({
+            id: "srv-" + r.id,
+            when: r.datetime || r.created_at,
+            fromType: "",
+            sourceId: r["from"],
+            sourceName: String(r["from"]),
+            paddyType: r.type || "",
+            qty: Number(r.quantity) || 0,
+            price: r.price ? Number(r.price) : null,
+            tx_id: r.id,
+            block_hash: r.block_hash || null,
+            block_number: r.block_number || null,
+            transaction_hash: r.transaction_hash || null,
+          }));
+        } catch (e) {
+          console.error("Could not fetch transactions", e);
+          purchases = [];
+        }
+      }
+
+      function renderTables() {
+        const pBody = qs("#purchasesTable tbody");
+        const hBody = qs("#historyTable tbody");
+        pBody.innerHTML = "";
+        hBody.innerHTML = "";
+
+        // Show last 10 in purchases table
+        const recent = purchases.slice().reverse().slice(0, 10);
+        recent.forEach((r) => {
+          const tr = document.createElement("tr");
+          const hashDisplay = r.block_hash
+            ? String(r.block_hash).slice(0, 12) + "..."
+            : "Not available";
+          const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+          tr.innerHTML = `<td>${escapeHtml(
+            new Date(r.when).toLocaleString()
+          )}</td>
+                          <td>${escapeHtml(r.sourceName)}</td>
+                          <td>${escapeHtml(r.paddyType)}</td>
+                          <td>${escapeHtml(r.qty)}</td>
+                          <td>${escapeHtml(priceDisplay)}</td>
+                          <td>${escapeHtml(hashDisplay)}</td>
+                          <td>
+                            <button class="btn view-purchase-btn" data-id="${escapeHtml(
+                              r.id
+                            )}" data-txid="${escapeHtml(
+            r.tx_id || ""
+          )}" data-sourceid="${escapeHtml(
+            r.sourceId
+          )}" data-source="${escapeHtml(
+            r.sourceName
+          )}" data-paddy="${escapeHtml(r.paddyType)}" data-qty="${escapeHtml(
+            r.qty
+          )}" data-price="${escapeHtml(priceDisplay)}" data-when="${escapeHtml(
+            r.when
+          )}" data-blockhash="${escapeHtml(
+            r.block_hash || ""
+          )}" data-blocknumber="${escapeHtml(
+            r.block_number || ""
+          )}" data-txhash="${escapeHtml(
+            r.transaction_hash || ""
+          )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                            <button class="btn revert-purchase-btn" data-id="${escapeHtml(
+                              r.id
+                            )}" data-txid="${escapeHtml(
+            r.tx_id || ""
+          )}" data-qty="${escapeHtml(r.qty)}" data-paddy="${escapeHtml(
+            r.paddyType
+          )}" data-from="${escapeHtml(r.sourceId)}" data-price="${escapeHtml(
+            r.price || 0
+          )}" style="padding:4px 8px; background:#ef4444; color:#fff;">↩️ Revert</button>
+                          </td>`;
+          pBody.appendChild(tr);
+        });
+
+        purchases
+          .slice()
+          .reverse()
+          .forEach((r) => {
+            const tr = document.createElement("tr");
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+            tr.innerHTML = `<td>${escapeHtml(
+              new Date(r.when).toLocaleString()
+            )}</td>
+                          <td>${escapeHtml(r.sourceName)}</td>
+                          <td>${escapeHtml(r.paddyType)}</td>
+                          <td>${escapeHtml(r.qty)}</td>
+                          <td>${escapeHtml(priceDisplay)}</td>
+                          <td>${escapeHtml(hashDisplay)}</td>
+                          <td>
+                            <button class="btn view-purchase-btn" data-id="${escapeHtml(
+                              r.id
+                            )}" data-txid="${escapeHtml(
+              r.tx_id || ""
+            )}" data-sourceid="${escapeHtml(
+              r.sourceId
+            )}" data-source="${escapeHtml(
+              r.sourceName
+            )}" data-paddy="${escapeHtml(r.paddyType)}" data-qty="${escapeHtml(
+              r.qty
+            )}" data-price="${escapeHtml(
+              priceDisplay
+            )}" data-when="${escapeHtml(r.when)}" data-blockhash="${escapeHtml(
+              r.block_hash || ""
+            )}" data-blocknumber="${escapeHtml(
+              r.block_number || ""
+            )}" data-txhash="${escapeHtml(
+              r.transaction_hash || ""
+            )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                          </td>`;
+            hBody.appendChild(tr);
+          });
+      }
+
+      function setupTabs() {
+        const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+        const panels = [
+          qs("#purchases-panel"),
+          qs("#damage-panel"),
+          qs("#history-panel"),
+        ];
+        tabs.forEach((tab, i) => {
+          tab.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            tabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            panels.forEach((p) => (p.hidden = true));
+            panels[i].hidden = false;
+          });
+        });
+      }
+
+      async function init() {
+        setupTabs();
+        // fetch authenticated user from server-side session
+        const me = await fetchCurrentUser();
+        if (!me) {
+          window.location = "/";
+          return;
+        }
+        currentUser = me;
+        await fetchUsers();
+        // populate paddy types select from server
+        const types = await fetchPaddyTypes();
+        const pSel = qs("#paddyType");
+        pSel.innerHTML = "";
+        const ph = document.createElement("option");
+        ph.value = "";
+        ph.textContent = "Select paddy type";
+        pSel.appendChild(ph);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          pSel.appendChild(o);
+        });
+
+        // Populate damage paddy type dropdown
+        const damagePaddyTypeSel = qs("#damagePaddyType");
+        damagePaddyTypeSel.innerHTML = "";
+        const damagePh = document.createElement("option");
+        damagePh.value = "";
+        damagePh.textContent = "Select paddy type";
+        damagePaddyTypeSel.appendChild(damagePh);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          damagePaddyTypeSel.appendChild(o);
+        });
+
+        const fromSel = qs("#purchaseFromType");
+        populateSourceSelect(fromSel.value);
+        // Load server transactions for this user
+        await loadServerTransactions();
+        renderTables();
+
+        fromSel.addEventListener("change", (e) =>
+          populateSourceSelect(e.target.value)
+        );
+
+        qs("#purchaseForm").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const fromType = qs("#purchaseFromType").value;
+          const srcSel = qs("#sourceSelect");
+          const sourceId = srcSel.value;
+          const sourceName = srcSel.selectedOptions[0]
+            ? srcSel.selectedOptions[0].textContent
+            : "";
+          const paddyType = qs("#paddyType").value;
+          const qty = qs("#qty").value;
+          const price = qs("#price").value;
+          if (!sourceId || !paddyType || !qty) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          // OTP Verification - Get farmer's phone number
+          let farmerPhone = "";
+          // Try multiple ways to find the farmer
+          const farmer = users.find(
+            (u) => String(u.id) === String(sourceId) || 
+                   String(u.user_code) === String(sourceId) || 
+                   String(u.code) === String(sourceId)
+          );
+          
+          if (farmer) {
+            farmerPhone = farmer.contact_number || farmer.phone || farmer.mobile || "";
+          }
+
+          // Show OTP verification modal
+          const lastDigits =
+            farmerPhone && farmerPhone.length >= 4 ? farmerPhone.slice(-4) : "0000";
+
+          // Store purchase data temporarily
+          window.pendingPurchaseData = {
+            fromType,
+            sourceId,
+            sourceName,
+            paddyType,
+            qty,
+            price,
+          };
+
+          // Show OTP modal
+          const otpModal = document.getElementById("otp-verification-modal");
+          document.getElementById("otp-phone-digits").textContent = lastDigits;
+          document.getElementById("otp-input-field").value = "";
+          otpModal.removeAttribute("hidden");
+          otpModal.setAttribute("aria-hidden", "false");
+          document.getElementById("otp-input-field").focus();
+        });
+
+        // Handle OTP verification form submission
+        document
+          .getElementById("otp-verification-form")
+          .addEventListener("submit", (ev) => {
+            ev.preventDefault();
+
+            const otpInput = document.getElementById("otp-input-field").value;
+            const otpModal = document.getElementById("otp-verification-modal");
+
+            // Verify OTP
+            if (otpInput !== "123456") {
+              alert("Invalid OTP. Purchase cancelled.");
+              otpModal.setAttribute("hidden", "");
+              otpModal.setAttribute("aria-hidden", "true");
+              return;
+            }
+
+            // OTP verified, close modal and proceed with purchase
+            otpModal.setAttribute("hidden", "");
+            otpModal.setAttribute("aria-hidden", "true");
+
+            const data = window.pendingPurchaseData;
+            const rec = {
+              id:
+                Date.now().toString(36) +
+                Math.random().toString(36).slice(2, 6),
+              when: new Date().toISOString(),
+              fromType: data.fromType,
+              sourceId: data.sourceId,
+              sourceName: data.sourceName,
+              paddyType: data.paddyType,
+              qty: Number(data.qty),
+              price: data.price ? Number(data.price) : null,
+              to: currentUser ? currentUser.user_id : null,
+            };
+
+            // POST the transaction to the server
+            (async () => {
+              try {
+                const payload = {
+                  from: rec.sourceId,
+                  to: rec.to,
+                  type: rec.paddyType,
+                  quantity: rec.qty,
+                  price: rec.price,
+                  datetime: rec.when,
+                };
+                const resp = await fetch("/api/transactions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+                const j = await resp.json().catch(() => ({}));
+                if (!resp.ok) {
+                  alert(
+                    "Failed to save transaction: " +
+                      (j.error || resp.statusText)
+                  );
+                  return;
+                }
+                rec.tx_id = j.id;
+                // refresh from server to show authoritative data
+                await loadServerTransactions();
+                renderTables();
+                qs("#purchaseForm").reset();
+                populateSourceSelect(data.fromType);
+                // reset paddyType to placeholder
+                const pSel2 = qs("#paddyType");
+                if (pSel2) pSel2.selectedIndex = 0;
+                alert("Purchase recorded successfully!");
+              } catch (err) {
+                console.error("Error saving transaction", err);
+                alert("Error saving transaction");
+              }
+            })();
+          });
+
+        renderTables();
+
+        // Damage form handler
+        qs("#damageForm").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const paddyType = qs("#damagePaddyType").value;
+          const qty = qs("#damageQty").value;
+          const reason = qs("#damageReason").value;
+          if (!paddyType || !qty || !reason) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          // POST the damage to the server
+          (async () => {
+            try {
+              const payload = {
+                user_id: currentUser ? currentUser.user_id : null,
+                paddy_type: paddyType,
+                quantity: qty,
+                reason: reason,
+                damage_date: new Date().toISOString(),
+              };
+              const resp = await fetch("/api/damages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert(
+                  "Failed to record damage: " + (j.error || resp.statusText)
+                );
+                return;
+              }
+              // refresh from server
+              await renderDamageTable();
+              qs("#damageForm").reset();
+              alert("Damage recorded successfully");
+            } catch (err) {
+              console.error("Error recording damage", err);
+              alert("Error recording damage");
+            }
+          })();
+        });
+
+        renderDamageTable();
+      }
+
+      async function renderDamageTable() {
+        const dBody = qs("#damagesTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = currentUser ? currentUser.user_id : null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}`
+            : "/api/damages";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load damages");
+          const damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const hashDisplay = d.block_hash
+              ? String(d.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const kind = d.kind || "paddy";
+            tr.innerHTML = `<td>${escapeHtml(
+              new Date(displayDate).toLocaleString()
+            )}</td>
+                          <td>${escapeHtml(d.paddy_type)}</td>
+                          <td>${escapeHtml(d.quantity)}</td>
+                          <td>${escapeHtml(d.reason)}</td>
+                          <td>${escapeHtml(hashDisplay)}</td>
+                          <td>
+                            <button class="btn view-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" data-kind="${escapeHtml(
+              kind
+            )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                            <button class="btn revert-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" data-kind="${escapeHtml(
+              kind
+            )}" data-qty="${escapeHtml(
+              d.quantity
+            )}" data-paddy-type="${escapeHtml(
+              d.paddy_type
+            )}" data-user-id="${escapeHtml(
+              d.user_id
+            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+                          </td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load damages:", e);
+        }
+      }
+
+      // Event delegation for purchase view/update buttons + modal close
+      document.addEventListener("click", async function (e) {
+        // Close view modal
+        if (e.target && e.target.id === "close-view-purchase") {
+          const m = document.getElementById("view-purchase-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+          return;
+        }
+
+        // View purchase
+        if (e.target && e.target.classList.contains("view-purchase-btn")) {
+          const id = e.target.dataset.id;
+          const txid = e.target.dataset.txid;
+          const source = e.target.dataset.source || "";
+          const paddy = e.target.dataset.paddy || "";
+          const qty = e.target.dataset.qty || "";
+          const when = e.target.dataset.when || "";
+          const blockhash = e.target.dataset.blockhash || "";
+          const blocknumber = e.target.dataset.blocknumber || "";
+          const txhash = e.target.dataset.txhash || "";
+          const sourceId = e.target.dataset.sourceid || "";
+
+          // Get farmer's phone number
+          let farmerPhone = "";
+          const farmer = users.find(
+            (u) => (u.id || u.user_code || u.code) === sourceId
+          );
+          if (farmer && farmer.contact_number) {
+            farmerPhone = farmer.contact_number;
+          }
+
+          // Show OTP verification popup
+          const lastDigits =
+            farmerPhone.length >= 4 ? farmerPhone.slice(-4) : "****";
+          const otpInput = prompt(
+            `OTP sent to the farmer's phone ending with ${lastDigits}.\n\nPlease enter the OTP received from the farmer:`
+          );
+
+          // Verify OTP
+          if (otpInput === null) {
+            // User cancelled
+            return;
+          }
+
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Access denied.");
+            return;
+          }
+
+          // OTP verified, show the purchase details
+          const vmodal = document.getElementById("view-purchase-modal");
+          if (vmodal) {
+            document.getElementById("view-purchase-when").textContent =
+              new Date(when).toLocaleString();
+            document.getElementById("view-purchase-source").textContent =
+              source;
+            document.getElementById("view-purchase-paddy").textContent = paddy;
+            document.getElementById("view-purchase-qty").textContent = qty;
+            document.getElementById("view-purchase-txid").textContent =
+              txid || "N/A";
+            document.getElementById("view-purchase-blockhash").textContent =
+              blockhash || "Not available";
+            document.getElementById("view-purchase-blocknumber").textContent =
+              blocknumber || "Not available";
+            document.getElementById("view-purchase-txhash").textContent =
+              txhash || "Not available";
+            vmodal.removeAttribute("hidden");
+            vmodal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        // Revert purchase: create reversal with status=0
+        if (e.target && e.target.classList.contains("revert-purchase-btn")) {
+          const txid = e.target.dataset.txid;
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+          const paddy = e.target.dataset.paddy || "";
+          const from = e.target.dataset.from || "";
+          const price = parseFloat(e.target.dataset.price) || 0;
+
+          if (
+            !confirm(
+              `Revert purchase of ${qty} kg ${paddy} from ${from}? This will create a reversal with status=0.`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const to = currentUser ? currentUser.user_id : "";
+            const payload = {
+              from: from,
+              to: to,
+              type: paddy,
+              quantity: qty,
+              price: price,
+              datetime: new Date().toISOString(),
+              status: 0, // Revert transaction
+            };
+
+            const res = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok && result.ok) {
+              alert("Purchase reverted successfully");
+              await loadServerTransactions();
+              renderTables();
+            } else {
+              alert("Error: " + (result.error || "Failed to revert purchase"));
+            }
+          } catch (err) {
+            console.error("Failed to revert purchase:", err);
+            alert("Network error: " + err.message);
+          }
+          return;
+        }
+
+        // View damage
+        if (e.target && e.target.classList.contains("view-damage-btn")) {
+          const id = e.target.dataset.id;
+          const kind = e.target.dataset.kind || "";
+          try {
+            const res = await fetch(
+              `/api/damages/${encodeURIComponent(id)}?kind=${encodeURIComponent(
+                kind
+              )}`
+            );
+            if (!res.ok) throw new Error("Failed to load damage");
+            const d = await res.json();
+            const vmodal = document.getElementById("view-damage-modal");
+            if (vmodal) {
+              document.getElementById("view-damage-when").textContent =
+                new Date(d.damage_date || d.created_at || "").toLocaleString();
+              document.getElementById("view-damage-paddy").textContent =
+                d.paddy_type || "";
+              document.getElementById("view-damage-qty").textContent =
+                d.quantity || "";
+              document.getElementById("view-damage-reason").textContent =
+                d.reason || "";
+              document.getElementById("view-damage-blockhash").textContent =
+                d.block_hash || "Not available";
+              document.getElementById("view-damage-blocknumber").textContent =
+                d.block_number || "Not available";
+              document.getElementById("view-damage-txhash").textContent =
+                d.transaction_hash || "Not available";
+              vmodal.removeAttribute("hidden");
+              vmodal.setAttribute("aria-hidden", "false");
+            }
+          } catch (err) {
+            console.error("Failed to load damage record", err);
+            alert("Failed to load damage record");
+          }
+        }
+
+        // Update purchase: open update modal (replaces prompt)
+        if (e.target && e.target.classList.contains("update-purchase-btn")) {
+          const id = e.target.dataset.id;
+          const txid = e.target.dataset.txid;
+          const oldQty = parseFloat(e.target.dataset.qty) || 0;
+          const paddy = e.target.dataset.paddy || "";
+
+          const umodal = document.getElementById("update-purchase-modal");
+          if (umodal) {
+            document.getElementById("update-purchase-id").value = id || "";
+            document.getElementById("update-purchase-txid").value = txid || "";
+            document.getElementById("update-purchase-paddy").textContent =
+              paddy;
+            document.getElementById("update-purchase-qty").value = oldQty;
+            umodal.removeAttribute("hidden");
+            umodal.setAttribute("aria-hidden", "false");
+          } else {
+            // fallback to prompt if modal missing
+            const input = prompt(
+              `Update quantity for ${paddy} (current: ${oldQty} kg):`,
+              String(oldQty)
+            );
+            if (input === null) return; // cancelled
+            const newQty = parseFloat(input);
+            if (isNaN(newQty) || newQty < 0) {
+              alert("Invalid quantity");
+              return;
+            }
+            // update locally
+            purchases = purchases.map((p) => {
+              if (p.id === id || String(p.tx_id) === String(txid)) {
+                return Object.assign({}, p, { qty: newQty });
+              }
+              return p;
+            });
+            renderTables();
+          }
+        }
+
+        // Revert damage: create new damage record with reason "revert"
+        if (e.target && e.target.classList.contains("revert-damage-btn")) {
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+          const paddyType = e.target.dataset.paddyType || "";
+          const userId =
+            e.target.dataset.userId || (currentUser ? currentUser.user_id : "");
+          const kind = e.target.dataset.kind || "paddy";
+
+          console.log("Revert data:", {
+            qty,
+            paddyType,
+            userId,
+            kind,
+            currentUser,
+          });
+
+          if (!userId) {
+            alert("Error: User ID not available. Please refresh the page.");
+            return;
+          }
+
+          if (!paddyType) {
+            alert("Error: Paddy type not available.");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Revert damage of ${qty} kg ${paddyType}? This will create a new record with reason "revert".`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            // Create new damage record with reason "revert"
+            const payload = {
+              user_id: userId,
+              paddy_type: paddyType,
+              quantity: qty,
+              reason: "revert",
+              kind: kind,
+              damage_date: new Date().toISOString(),
+            };
+
+            console.log("Sending revert payload:", payload);
+
+            const res = await fetch("/api/damages", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            console.log("Response status:", res.status);
+            const result = await res.json();
+            console.log("Response body:", result);
+
+            if (res.ok && result.ok) {
+              alert("Damage reverted successfully. New record created.");
+              await renderDamageTable();
+            } else {
+              alert("Error: " + (result.error || "Failed to revert damage"));
+            }
+          } catch (err) {
+            console.error("Failed to revert damage:", err);
+            alert("Network error during revert: " + err.message);
+          }
+          return;
+        }
+
+        // Legacy fallback for old update logic (keeping for compatibility)
+        if (e.target && e.target.classList.contains("update-damage-btn")) {
+          const id = e.target.dataset.id;
+          const kind = e.target.dataset.kind || "";
+          const oldQty = parseFloat(e.target.dataset.qty) || 0;
+          const reason = e.target.dataset.reason || "";
+
+          const umodal = document.getElementById("update-damage-modal");
+          if (umodal) {
+            document.getElementById("update-damage-id").value = id || "";
+            document.getElementById("update-damage-kind").value = kind || "";
+            document.getElementById("update-damage-paddy").textContent =
+              kind || "";
+            document.getElementById("update-damage-qty").value = oldQty;
+            document.getElementById("update-damage-reason").value = reason;
+            umodal.removeAttribute("hidden");
+            umodal.setAttribute("aria-hidden", "false");
+          } else {
+            const input = prompt(
+              `Update damaged quantity (current: ${oldQty}):`,
+              String(oldQty)
+            );
+            if (input === null) return;
+            const newQty = parseFloat(input);
+            if (isNaN(newQty) || newQty < 0) {
+              alert("Invalid quantity");
+              return;
+            }
+            // local update fallback
+            const rows = Array.from(
+              document.querySelectorAll("#damagesTable tbody tr")
+            );
+            for (const tr of rows) {
+              const btn = tr.querySelector(
+                ".view-damage-btn, .update-damage-btn"
+              );
+              if (!btn) continue;
+              if (String(btn.dataset.id) === String(id)) {
+                const cells = tr.children;
+                if (cells && cells.length >= 5)
+                  cells[2].textContent = String(newQty);
+                break;
+              }
+            }
+          }
+        }
+      });
+
+      // Update / close handlers for damage modals
+      document.addEventListener("click", function (e) {
+        if (e.target && e.target.id === "close-view-damage") {
+          const m = document.getElementById("view-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-update-damage") {
+          const m = document.getElementById("update-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+      });
+
+      document.addEventListener("submit", async function (e) {
+        if (!(e.target && e.target.id === "update-damage-form")) return;
+        e.preventDefault();
+        const id = document.getElementById("update-damage-id").value || "";
+        const kind = document.getElementById("update-damage-kind").value || "";
+        const qtyEl = document.getElementById("update-damage-qty");
+        const reasonEl = document.getElementById("update-damage-reason");
+        const newQty = parseFloat(qtyEl ? qtyEl.value : NaN);
+        const newReason = reasonEl ? reasonEl.value : "";
+        if (isNaN(newQty) || newQty < 0) {
+          alert("Invalid quantity");
+          return;
+        }
+
+        // Call backend API to update damage
+        let updatedOnServer = false;
+        let errorMsg = "";
+        if (id) {
+          try {
+            const kindParam = kind ? `?kind=${encodeURIComponent(kind)}` : "";
+            const res = await fetch(
+              `/api/damages/${encodeURIComponent(id)}${kindParam}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ quantity: newQty, reason: newReason }),
+              }
+            );
+            const result = await res.json();
+            if (res.ok) {
+              updatedOnServer = true;
+            } else {
+              errorMsg = result.error || "Failed to update on server";
+            }
+          } catch (err) {
+            console.error("Failed updating damage on server", err);
+            errorMsg = "Network error during update";
+          }
+        }
+
+        // Close modal
+        const m = document.getElementById("update-damage-modal");
+        if (m) {
+          m.setAttribute("hidden", "");
+          m.setAttribute("aria-hidden", "true");
+        }
+
+        if (updatedOnServer) {
+          // Reload damages from server to reflect accurate data
+          await renderDamageTable();
+          alert("Damage updated successfully.");
+        } else if (errorMsg) {
+          alert("Error: " + errorMsg);
+        } else {
+          // Update the table row locally (fallback)
+          const rows = Array.from(
+            document.querySelectorAll("#damagesTable tbody tr")
+          );
+          for (const tr of rows) {
+            const btn = tr.querySelector(
+              ".view-damage-btn, .update-damage-btn"
+            );
+            if (!btn) continue;
+            if (String(btn.dataset.id) === String(id)) {
+              // qty is column index 2, reason is index 3
+              const cells = tr.children;
+              if (cells && cells.length >= 5) {
+                cells[2].textContent = String(newQty);
+                cells[3].textContent = String(newReason);
+              }
+              break;
+            }
+          }
+          alert("Updated locally (server update not available)");
+        }
+      });
+
+      // Close and submit handlers for update modal (delegated)
+      document.addEventListener("click", function (e) {
+        if (e.target && e.target.id === "close-update-purchase") {
+          const m = document.getElementById("update-purchase-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-otp-modal") {
+          const m = document.getElementById("otp-verification-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+      });
+
+      document.addEventListener("submit", async function (e) {
+        if (!(e.target && e.target.id === "update-purchase-form")) return;
+        e.preventDefault();
+        const id = document.getElementById("update-purchase-id").value || "";
+        const txid =
+          document.getElementById("update-purchase-txid").value || "";
+        const qtyEl = document.getElementById("update-purchase-qty");
+        const newQty = parseFloat(qtyEl ? qtyEl.value : NaN);
+        if (isNaN(newQty) || newQty < 0) {
+          alert("Invalid quantity");
+          return;
+        }
+
+        let updatedOnServer = false;
+        let errorMsg = "";
+        if (txid) {
+          try {
+            const res = await fetch(
+              `/api/transactions/${encodeURIComponent(txid)}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ quantity: newQty }),
+              }
+            );
+            const result = await res.json();
+            if (res.ok) {
+              updatedOnServer = true;
+            } else {
+              errorMsg = result.error || "Failed to update on server";
+            }
+          } catch (err) {
+            console.error("Failed updating transaction on server", err);
+            errorMsg = "Network error during update";
+          }
+        }
+
+        // close modal
+        const m = document.getElementById("update-purchase-modal");
+        if (m) {
+          m.setAttribute("hidden", "");
+          m.setAttribute("aria-hidden", "true");
+        }
+
+        if (updatedOnServer) {
+          // Reload transactions from server to reflect accurate stock
+          await loadServerTransactions();
+          renderTables();
+          alert("Transaction updated successfully. Stock adjusted.");
+        } else if (errorMsg) {
+          alert("Error: " + errorMsg);
+        } else {
+          // Update local purchases array and re-render (fallback)
+          purchases = purchases.map((p) => {
+            if (p.id === id || String(p.tx_id) === String(txid)) {
+              return Object.assign({}, p, { qty: newQty });
+            }
+            return p;
+          });
+          renderTables();
+          alert("Updated locally (server update not available)");
+        }
+      });
+
+      window.addEventListener("DOMContentLoaded", init);
+    </script>
+    <!-- View Purchase Modal -->
+    <div
+      id="view-purchase-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Purchase Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+          >
+            <strong>When:</strong><span id="view-purchase-when"></span>
+            <strong>Source:</strong><span id="view-purchase-source"></span>
+            <strong>Paddy:</strong><span id="view-purchase-paddy"></span>
+            <strong>Quantity:</strong><span id="view-purchase-qty"></span>
+            <strong>Tx ID:</strong><span id="view-purchase-txid"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-purchase-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-purchase-blocknumber"></span>
+            <strong>Tx Hash:</strong
+            ><span
+              id="view-purchase-txhash"
+              style="word-break: break-all"
+            ></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-purchase" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Update Purchase Modal -->
+    <div
+      id="update-purchase-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Update Purchase</h3>
+        </header>
+        <form
+          id="update-purchase-form"
+          style="padding: 16px; display: grid; gap: 8px"
+        >
+          <input type="hidden" id="update-purchase-id" />
+          <input type="hidden" id="update-purchase-txid" />
+          <label
+            style="
+              display: grid;
+              grid-template-columns: 120px 1fr;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <span>Paddy:</span><span id="update-purchase-paddy"></span>
+          </label>
+          <label style="display: block">
+            Quantity (kg)
+            <input
+              id="update-purchase-qty"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-update-purchase" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- View Damage Modal -->
+    <div
+      id="view-damage-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Damage Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+          >
+            <strong>When:</strong><span id="view-damage-when"></span>
+            <strong>Paddy:</strong><span id="view-damage-paddy"></span>
+            <strong>Quantity:</strong><span id="view-damage-qty"></span>
+            <strong>Reason:</strong><span id="view-damage-reason"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-damage-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-damage-blocknumber"></span> <strong>Tx Hash:</strong
+            ><span id="view-damage-txhash" style="word-break: break-all"></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-damage" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Damage Modal -->
+    <div
+      id="update-damage-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Update Damage</h3>
+        </header>
+        <form
+          id="update-damage-form"
+          style="padding: 16px; display: grid; gap: 8px"
+        >
+          <input type="hidden" id="update-damage-id" />
+          <input type="hidden" id="update-damage-kind" />
+          <label
+            style="
+              display: grid;
+              grid-template-columns: 120px 1fr;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <span>Paddy:</span><span id="update-damage-paddy"></span>
+          </label>
+          <label style="display: block"
+            >Quantity (kg)
+            <input
+              id="update-damage-qty"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <label style="display: block"
+            >Reason
+            <input
+              id="update-damage-reason"
+              type="text"
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-update-damage" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-verification-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 420px">
+        <header class="modal-header">
+          <h3>OTP Verification</h3>
+        </header>
+        <form
+          id="otp-verification-form"
+          style="padding: 16px; display: grid; gap: 16px"
+        >
+          <div style="text-align: center; padding: 8px 0">
+            <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280">
+              OTP sent to the farmer's phone ending with
+            </p>
+            <p
+              style="
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+                color: #1f2937;
+              "
+            >
+              ****<span id="otp-phone-digits">****</span>
+            </p>
+          </div>
+          <label style="display: block">
+            <span style="display: block; margin-bottom: 6px; font-weight: 500"
+              >Enter OTP received from farmer:</span
+            >
+            <input
+              id="otp-input-field"
+              type="password"
+              placeholder="Enter 6-digit OTP"
+              maxlength="6"
+              required
+              style="
+                width: 100%;
+                padding: 12px;
+                border-radius: 6px;
+                border: 2px solid #d1d5db;
+                font-size: 18px;
+                text-align: center;
+                letter-spacing: 4px;
+                font-weight: bold;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-otp-modal" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Verify & Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

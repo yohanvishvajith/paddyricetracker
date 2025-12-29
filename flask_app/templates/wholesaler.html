@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wholesaler - Sri Lanka Rice Supply Chain</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">Wholesaler Dashboard</h1>
+      <nav class="tabs" aria-label="Wholesaler tabs">
+        <ul>
+          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
+          <li class="tab"><a href="#" data-index="1">Sales</a></li>
+          <li class="tab"><a href="#" data-index="2">Damage</a></li>
+          <li class="tab"><a href="#" data-index="3">History</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="panel" id="purchases-panel">
+        <h2>Record Rice Purchase</h2>
+
+        <div class="card">
+          <form id="purchaseForm">
+            <label for="purchaseFromType">Purchase From</label>
+            <select id="purchaseFromType" required>
+              <option value="Miller">Miller</option>
+              <option value="PMB">PMB</option>
+            </select>
+
+            <label for="millerSelect">Source</label>
+            <select id="millerSelect" required>
+              <option value="">Loading...</option>
+            </select>
+
+            <label for="riceType">Rice Type (Paddy Base)</label>
+            <select id="riceType" required>
+              <option value="">Select rice type</option>
+            </select>
+
+            <label for="qty">Quantity (kg)</label>
+            <input id="qty" type="number" min="0" step="0.01" required />
+
+            <label for="price">Price (per kg)</label>
+            <input id="price" type="number" min="0" step="0.01" />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">
+                Record Rice Purchase (Blockchain)
+              </button>
+              <a href="/" class="btn">Back to home</a>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="purchasesTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Miller</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="sales-panel" hidden>
+        <h2>Sales</h2>
+
+        <h3 style="margin-top: 18px">Recent Sales</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="salesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="damage-panel" hidden>
+        <h2>Record Damaged Rice</h2>
+
+        <div class="card">
+          <form id="damageForm">
+            <label for="damageRiceType">Rice Type</label>
+            <select id="damageRiceType" required>
+              <option value="">Select rice type</option>
+            </select>
+
+            <label for="damageQty">Quantity (kg)</label>
+            <input id="damageQty" type="number" min="0" step="0.01" required />
+
+            <label for="damageReason">Reason</label>
+            <textarea id="damageReason" rows="3" required></textarea>
+
+            <label for="damageDate">Date</label>
+            <input id="damageDate" type="date" required />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Save Damage</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Damage Records</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="damagesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="history-panel" hidden>
+        <h2>History</h2>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+          <button id="historyPurchaseBtn" class="btn primary" style="flex: 1">
+            Purchases
+          </button>
+          <button id="historySalesBtn" class="btn" style="flex: 1">
+            Sales
+          </button>
+        </div>
+
+        <div id="historyPurchasePanel">
+          <h3>Purchase History</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="historyPurchaseTable">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Miller</th>
+                  <th>Rice Type</th>
+                  <th>Qty (kg)</th>
+                  <th>Block ID</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="historySalesPanel" hidden>
+          <h3>Sales History</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="historySalesTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Rice Type</th>
+                  <th>Qty (kg)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal for viewing rice purchase details -->
+    <div
+      id="purchaseModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <h2>Rice Purchase Details</h2>
+        <div id="purchaseDetails" style="margin: 20px 0">
+          <!-- Details will be populated here -->
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px">
+          <button class="btn primary" onclick="closePurchaseModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for viewing damage details -->
+    <div
+      id="damageModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <h2>Damage Record Details</h2>
+        <div id="damageDetails" style="margin: 20px 0">
+          <!-- Details will be populated here -->
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px">
+          <button class="btn primary" onclick="closeDamageModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Wholesaler purchases UI (server-backed)
+      let purchases = [];
+      let sales = [];
+      let damages = [];
+      let currentUser = null;
+
+      function qs(sel) {
+        return document.querySelector(sel);
+      }
+
+      async function fetchMillers() {
+        try {
+          const res = await fetch("/api/users/by_type?type=Miller");
+          if (!res.ok) throw new Error("Failed to load millers");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch millers:", e);
+          return [];
+        }
+      }
+
+      async function fetchPaddyTypes() {
+        try {
+          const res = await fetch("/api/paddy_types");
+          if (!res.ok) throw new Error("Failed to load paddy types");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch paddy types:", e);
+          return [];
+        }
+      }
+
+      async function fetchCurrentUser() {
+        try {
+          const res = await fetch("/api/me");
+          if (!res.ok) return null;
+          const j = await res.json();
+          return j && j.ok ? j : null;
+        } catch (e) {
+          console.error("Could not fetch current user", e);
+          return null;
+        }
+      }
+
+      async function populateMillerSelect(sourceType) {
+        const sel = qs("#millerSelect");
+        sel.innerHTML = "";
+        const ph = document.createElement("option");
+        ph.value = "";
+
+        if (sourceType === "PMB") {
+          // For PMB, just show PMB option
+          ph.textContent = "Select PMB";
+          sel.appendChild(ph);
+          const pmbOpt = document.createElement("option");
+          pmbOpt.value = "PMB";
+          pmbOpt.textContent = "Government (PMB)";
+          sel.appendChild(pmbOpt);
+        } else {
+          // For Miller, fetch and show all millers
+          const millers = await fetchMillers();
+          ph.textContent = "Select miller";
+          sel.appendChild(ph);
+          millers.forEach((m) => {
+            const o = document.createElement("option");
+            o.value = m.id;
+            o.textContent =
+              (m.full_name || m.name || "") +
+              " (" +
+              (m.user_code || m.id || "") +
+              ")";
+            sel.appendChild(o);
+          });
+        }
+      }
+
+      async function loadServerTransactions() {
+        try {
+          const userId = currentUser ? currentUser.user_id : null;
+          if (!userId) return;
+
+          // Fetch all transactions where user is either from or to (includes purchases and reversions)
+          const res = await fetch(
+            `/api/transactions?user=${encodeURIComponent(userId)}`
+          );
+          if (!res.ok) throw new Error("Failed to load transactions");
+          const txs = await res.json();
+
+          purchases = txs.map((t) => ({
+            id: t.id,
+            when: t.datetime || t.created_at,
+            from: t.from,
+            to: t.to,
+            fromName: t.from_name || t.from || "Unknown",
+            toName: t.to_name || t.to || "Unknown",
+            riceType: t.type,
+            qty: parseFloat(t.quantity) || 0,
+            price: t.price ? parseFloat(t.price) : null,
+            tx_id: t.id,
+            block_hash: t.block_hash || null,
+            block_number: t.block_number || null,
+            transaction_hash: t.transaction_hash || null,
+            status: t.status || 1,
+          }));
+        } catch (e) {
+          console.error("Could not load server transactions", e);
+          purchases = [];
+        }
+      }
+
+      function renderPurchaseTables() {
+        const pBody = qs("#purchasesTable tbody");
+        const hBody = qs("#historyPurchaseTable tbody");
+        const userId = currentUser ? currentUser.user_id : null;
+        pBody.innerHTML = "";
+        hBody.innerHTML = "";
+
+        const recent = purchases.slice().reverse().slice(0, 10);
+        recent.forEach((r) => {
+          const tr = document.createElement("tr");
+          const blockIdDisplay = r.block_hash
+            ? r.block_hash.substring(0, 10) + "..."
+            : "Not available";
+          const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+
+          // Determine if this is a purchase (user is recipient) or revert (user is sender)
+          const isPurchase = r.to === userId;
+          const isRevert = r.from === userId && r.status === 0;
+
+          // Show appropriate party name and action buttons
+          let displayName = isPurchase ? r.fromName : r.toName;
+          let displayLabel = isPurchase ? "Purchase" : "Revert";
+          let displayQty = isPurchase ? r.qty : -r.qty;
+          const actionBtns = isPurchase
+            ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})">Revert</button>`
+            : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+
+          const qtyColor = isPurchase ? "black" : "red";
+          tr.innerHTML = `<td>${new Date(
+            r.when
+          ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
+            r.riceType
+          }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
+            r.block_hash || ""
+          }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
+          pBody.appendChild(tr);
+        });
+
+        purchases
+          .slice()
+          .reverse()
+          .forEach((r) => {
+            const tr = document.createElement("tr");
+            const blockIdDisplay = r.block_hash
+              ? r.block_hash.substring(0, 10) + "..."
+              : "Not available";
+            const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+
+            // Determine if this is a purchase (user is recipient) or revert (user is sender)
+            const isPurchase = r.to === userId;
+            const isRevert = r.from === userId && r.status === 0;
+
+            // Show appropriate party name and action buttons
+            let displayName = isPurchase ? r.fromName : r.toName;
+            let displayLabel = isPurchase ? "Purchase" : "Revert";
+            let displayQty = isPurchase ? r.qty : -r.qty;
+            const actionBtns = isPurchase
+              ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})">Revert</button>`
+              : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+
+            const qtyColor = isPurchase ? "black" : "red";
+            tr.innerHTML = `<td>${new Date(
+              r.when
+            ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
+              r.riceType
+            }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
+              r.block_hash || ""
+            }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
+            hBody.appendChild(tr);
+          });
+      }
+
+      function renderSalesTables() {
+        const sBody = qs("#salesTable tbody");
+        const hBody = qs("#historySalesTable tbody");
+        sBody.innerHTML = "";
+        hBody.innerHTML = "";
+
+        const recent = sales.slice().reverse().slice(0, 10);
+        recent.forEach((s) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${new Date(
+            s.date
+          ).toLocaleDateString()}</td><td>${s.customer}</td><td>${
+            s.riceType
+          }</td><td>${s.qty}</td>`;
+          sBody.appendChild(tr);
+        });
+
+        sales
+          .slice()
+          .reverse()
+          .forEach((s) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${new Date(
+              s.date
+            ).toLocaleDateString()}</td><td>${s.customer}</td><td>${
+              s.riceType
+            }</td><td>${s.qty}</td>`;
+            hBody.appendChild(tr);
+          });
+      }
+
+      async function renderDamageTable() {
+        const dBody = qs("#damagesTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = currentUser ? currentUser.user_id : null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}`
+            : "/api/damages";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load damages");
+          damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const blockIdDisplay = d.block_hash
+              ? d.block_hash.substring(0, 10) + "..."
+              : "Not available";
+            const actionBtns = `<button class="btn small" onclick="viewDamage(event, ${d.id})">View</button> <button class="btn small" onclick="revertDamage(${d.id})">Revert</button>`;
+            tr.innerHTML = `<td>${new Date(displayDate).toLocaleString()}</td>
+                          <td>${d.paddy_type}</td>
+                          <td>${d.quantity}</td>
+                          <td>${d.reason}</td>
+                          <td title="${
+                            d.block_hash || ""
+                          }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load damages:", e);
+        }
+      }
+
+      function setupTabs() {
+        const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+        const panels = [
+          qs("#purchases-panel"),
+          qs("#sales-panel"),
+          qs("#damage-panel"),
+          qs("#history-panel"),
+        ];
+        tabs.forEach((tab, i) => {
+          tab.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            tabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            panels.forEach((p) => (p.hidden = true));
+            panels[i].hidden = false;
+          });
+        });
+      }
+
+      function setupHistoryTabs() {
+        const purchaseBtn = qs("#historyPurchaseBtn");
+        const salesBtn = qs("#historySalesBtn");
+        const purchasePanel = qs("#historyPurchasePanel");
+        const salesPanel = qs("#historySalesPanel");
+
+        purchaseBtn.addEventListener("click", () => {
+          purchaseBtn.classList.add("primary");
+          salesBtn.classList.remove("primary");
+          purchasePanel.hidden = false;
+          salesPanel.hidden = true;
+        });
+
+        salesBtn.addEventListener("click", () => {
+          salesBtn.classList.add("primary");
+          purchaseBtn.classList.remove("primary");
+          salesPanel.hidden = false;
+          purchasePanel.hidden = true;
+        });
+      }
+
+      async function init() {
+        setupTabs();
+        setupHistoryTabs();
+
+        const me = await fetchCurrentUser();
+        if (!me) {
+          window.location = "/";
+          return;
+        }
+        currentUser = me;
+        console.log("Current user (wholesaler):", currentUser);
+
+        const fromTypeSel = qs("#purchaseFromType");
+        await populateMillerSelect(fromTypeSel.value);
+
+        // Listen for purchase type changes
+        fromTypeSel.addEventListener("change", (e) => {
+          populateMillerSelect(e.target.value);
+        });
+
+        // Populate rice type dropdowns
+        const types = await fetchPaddyTypes();
+        const selectors = ["#riceType", "#saleRiceType", "#damageRiceType"];
+        selectors.forEach((selId) => {
+          const sel = qs(selId);
+          if (sel) {
+            sel.innerHTML = "";
+            const ph = document.createElement("option");
+            ph.value = "";
+            ph.textContent = "Select rice type";
+            sel.appendChild(ph);
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+          }
+        });
+
+        // Set default dates
+        const today = new Date().toISOString().split("T")[0];
+        if (qs("#saleDate")) qs("#saleDate").value = today;
+        if (qs("#damageDate")) qs("#damageDate").value = today;
+
+        await loadServerTransactions();
+        renderPurchaseTables();
+
+        // Purchase form handler (Record Rice Purchase with Blockchain)
+        qs("#purchaseForm").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const millerId = qs("#millerSelect").value;
+          const millerName =
+            qs("#millerSelect").selectedOptions[0]?.textContent || "";
+          const riceType = qs("#riceType").value;
+          const qty = qs("#qty").value;
+          const price = qs("#price").value;
+
+          if (!millerId || !riceType || !qty) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          try {
+            console.log(
+              `Recording Rice Purchase: From=${millerId}, To=${currentUser.user_id}, Type=${riceType}, Qty=${qty}`
+            );
+            const payload = {
+              from: millerId,
+              to: currentUser.user_id,
+              type: riceType,
+              quantity: parseFloat(qty),
+              price: price ? parseFloat(price) : null,
+              datetime: new Date().toISOString(),
+            };
+            const resp = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!resp.ok) {
+              const errData = await resp.json();
+              throw new Error(errData.error || "Failed to save purchase");
+            }
+            const respData = await resp.json();
+
+            if (respData.ok) {
+              alert(
+                `✓ Rice Purchase recorded successfully!\nBlock Hash: ${
+                  respData.block_hash
+                    ? respData.block_hash.substring(0, 10) + "..."
+                    : "Processing..."
+                }`
+              );
+            } else {
+              alert(
+                `⚠ Purchase saved but blockchain recording may have failed: ${
+                  respData.error || "Unknown error"
+                }`
+              );
+            }
+
+            qs("#purchaseForm").reset();
+            await loadServerTransactions();
+            renderPurchaseTables();
+          } catch (err) {
+            console.error("Error saving purchase", err);
+            alert("Error saving purchase: " + err.message);
+          }
+        });
+
+        // Revert rice purchase function
+        window.revertPurchase = async function (transactionId) {
+          if (
+            !confirm(
+              "Are you sure you want to revert this rice purchase? This will restore stock to the seller and deduct from yours."
+            )
+          ) {
+            return;
+          }
+
+          try {
+            console.log(`Reverting rice transaction: ${transactionId}`);
+            const resp = await fetch(
+              `/api/rice_transactions/${transactionId}/revert`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }
+            );
+
+            if (!resp.ok) {
+              const errData = await resp.json();
+              throw new Error(errData.error || "Failed to revert purchase");
+            }
+
+            const respData = await resp.json();
+
+            if (respData.ok) {
+              alert(
+                `✓ Rice Purchase reverted successfully!\nBlock Hash: ${
+                  respData.block_hash
+                    ? respData.block_hash.substring(0, 10) + "..."
+                    : "Processing..."
+                }`
+              );
+            } else {
+              alert(
+                `⚠ Revert saved but blockchain recording may have failed: ${
+                  respData.error || "Unknown error"
+                }`
+              );
+            }
+
+            await loadServerTransactions();
+            renderPurchaseTables();
+          } catch (err) {
+            console.error("Error reverting purchase", err);
+            alert("Error reverting purchase: " + err.message);
+          }
+        };
+
+        // View rice purchase details function
+        window.viewPurchase = function (event, transactionId) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const userId = currentUser ? currentUser.user_id : null;
+          const purchase = purchases.find((p) => p.tx_id === transactionId);
+          if (!purchase) {
+            alert("Purchase details not found");
+            return;
+          }
+
+          // Determine if this is a purchase or a revert
+          const isPurchase = purchase.to === userId;
+          const isRevert = purchase.from === userId && purchase.status === 0;
+
+          const detailsHtml = `
+            <div style="font-size: 14px; line-height: 1.8;">
+              <p><strong>Transaction ID:</strong> ${purchase.tx_id}</p>
+              <p><strong>Type:</strong> <span style="color: ${
+                isPurchase ? "green" : "red"
+              }; font-weight: bold;">${
+            isPurchase ? "PURCHASE" : "REVERT"
+          }</span></p>
+              <p><strong>Date/Time:</strong> ${new Date(
+                purchase.when
+              ).toLocaleString()}</p>
+              <p><strong>From:</strong> ${purchase.fromName}</p>
+              <p><strong>To:</strong> ${purchase.toName}</p>
+              <p><strong>Rice Type:</strong> ${purchase.riceType}</p>
+              <p><strong>Quantity:</strong> ${
+                isPurchase ? purchase.qty : -purchase.qty
+              } kg</p>
+              <p><strong>Block Number:</strong> ${
+                purchase.block_number || "Not available"
+              }</p>
+              <p><strong>Transaction Hash:</strong> ${
+                purchase.transaction_hash
+                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${purchase.transaction_hash}</span>`
+                  : "Not available"
+              }</p>
+              <p><strong>Block Hash:</strong> ${
+                purchase.block_hash
+                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${purchase.block_hash}</span>`
+                  : "Not available"
+              }</p>
+            </div>
+          `;
+
+          qs("#purchaseDetails").innerHTML = detailsHtml;
+          qs("#purchaseModal").style.display = "flex";
+        };
+
+        // Close purchase modal
+        window.closePurchaseModal = function () {
+          qs("#purchaseModal").style.display = "none";
+        };
+
+        // Close modal when clicking outside
+        qs("#purchaseModal").addEventListener("click", function (e) {
+          if (e.target === this) {
+            closePurchaseModal();
+          }
+        });
+
+        // View damage details function
+        window.viewDamage = function (event, damageId) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const damage = damages.find((d) => d.id === damageId);
+          if (!damage) {
+            alert("Damage details not found");
+            return;
+          }
+
+          const detailsHtml = `
+            <div style="font-size: 14px; line-height: 1.8;">
+              <p><strong>Damage ID:</strong> ${damage.id}</p>
+              <p><strong>Date/Time:</strong> ${new Date(
+                damage.damage_date || damage.created_at
+              ).toLocaleString()}</p>
+              <p><strong>Rice Type:</strong> ${damage.paddy_type}</p>
+              <p><strong>Quantity:</strong> ${damage.quantity} kg</p>
+              <p><strong>Reason:</strong> ${damage.reason}</p>
+              <p><strong>Block Number:</strong> ${
+                damage.block_number || "Not available"
+              }</p>
+              <p><strong>Transaction Hash:</strong> ${
+                damage.transaction_hash
+                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${damage.transaction_hash}</span>`
+                  : "Not available"
+              }</p>
+              <p><strong>Block Hash:</strong> ${
+                damage.block_hash
+                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${damage.block_hash}</span>`
+                  : "Not available"
+              }</p>
+            </div>
+          `;
+
+          qs("#damageDetails").innerHTML = detailsHtml;
+          qs("#damageModal").style.display = "flex";
+        };
+
+        // Close damage modal
+        window.closeDamageModal = function () {
+          qs("#damageModal").style.display = "none";
+        };
+
+        // Close modal when clicking outside
+        qs("#damageModal").addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeDamageModal();
+          }
+        });
+
+        // Revert damage record function
+        window.revertDamage = async function (damageId) {
+          if (
+            !confirm(
+              "Are you sure you want to revert this damage record? This will restore the rice quantity to your stock."
+            )
+          ) {
+            return;
+          }
+
+          try {
+            console.log(`Reverting damage record: ${damageId}`);
+            const resp = await fetch(`/api/damages/${damageId}/revert`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            if (!resp.ok) {
+              const errData = await resp.json();
+              throw new Error(errData.error || "Failed to revert damage");
+            }
+
+            const respData = await resp.json();
+
+            if (respData.ok) {
+              alert(
+                `✓ Damage record reverted successfully!\nBlock Hash: ${
+                  respData.block_hash
+                    ? respData.block_hash.substring(0, 10) + "..."
+                    : "Processing..."
+                }`
+              );
+            } else {
+              alert(
+                `⚠ Revert saved but blockchain recording may have failed: ${
+                  respData.error || "Unknown error"
+                }`
+              );
+            }
+
+            await renderDamageTable();
+          } catch (err) {
+            console.error("Error reverting damage", err);
+            alert("Error reverting damage: " + err.message);
+          }
+        };
+
+        // Sales form removed: form submission handled elsewhere or disabled
+
+        // Damage form handler
+        qs("#damageForm").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const riceType = qs("#damageRiceType").value;
+          const qty = qs("#damageQty").value;
+          const reason = qs("#damageReason").value;
+          const date = qs("#damageDate").value;
+
+          if (!riceType || !qty || !reason || !date) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          try {
+            const payload = {
+              user_id: currentUser.user_id,
+              paddy_type: riceType,
+              quantity: parseFloat(qty),
+              reason,
+              damage_date: date,
+            };
+            const resp = await fetch("/api/damages", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!resp.ok) throw new Error("Failed to save damage");
+            alert("Damage record saved successfully");
+            qs("#damageForm").reset();
+            await renderDamageTable();
+          } catch (err) {
+            console.error("Error saving damage", err);
+            alert("Error saving damage");
+          }
+        });
+
+        // Load sales from localStorage
+        try {
+          const stored = localStorage.getItem("wholesaler_sales");
+          if (stored) {
+            sales = JSON.parse(stored);
+            renderSalesTables();
+          }
+        } catch (e) {
+          console.error("Could not load sales from localStorage", e);
+        }
+
+        await renderDamageTable();
+      }
+
+      window.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>

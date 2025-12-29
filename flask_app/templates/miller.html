@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Miller - Sri Lanka Rice Supply Chain</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">Miller Dashboard</h1>
+      <nav class="tabs" aria-label="Miller tabs">
+        <ul>
+          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
+          <li class="tab"><a href="#" data-index="1">Milling</a></li>
+          <li class="tab"><a href="#" data-index="2">Damage</a></li>
+          <li class="tab"><a href="#" data-index="3">History</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="panel" id="purchases-panel">
+        <h2>Record Purchase</h2>
+
+        <div class="card">
+          <form id="purchaseForm">
+            <label for="purchaseFromType">Purchase From</label>
+            <select id="purchaseFromType" required>
+              <option value="Farmer">Farmer</option>
+              <option value="Broker">Broker</option>
+            </select>
+
+            <label for="sourceSelect">Source</label>
+            <select id="sourceSelect" required>
+              <option value="">Loading...</option>
+            </select>
+
+            <label for="paddyType">Paddy Type</label>
+            <select id="paddyType" required>
+              <option value="">Select paddy type</option>
+              <option value="Samba">Samba</option>
+              <option value="Nadu">Nadu</option>
+              <option value="Keeri Samba">Keeri Samba</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <label for="qty">Quantity (kg)</label>
+            <input id="qty" type="number" min="0" step="0.01" required />
+
+            <label for="price">Price (per kg)</label>
+            <input id="price" type="number" min="0" step="0.01" />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Save Purchase</button>
+              <a href="/" class="btn">Back to home</a>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="purchasesTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Source</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="milling-panel" hidden>
+        <h2>Milling Process</h2>
+
+        <div class="card">
+          <form id="millingForm">
+            <label for="millingPaddyType">Paddy Type</label>
+            <select id="millingPaddyType" required>
+              <option value="">Select paddy type</option>
+            </select>
+
+            <label for="millingInputQty">Input Paddy Quantity (kg)</label>
+            <input
+              id="millingInputQty"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+
+            <label for="millingOutputQty">Output Rice Quantity (kg)</label>
+            <input
+              id="millingOutputQty"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+
+            <label for="millingDate">Milling Date</label>
+            <input id="millingDate" type="date" required />
+
+            <label for="dryingDuration">Drying duration</label>
+            <input
+              id="dryingDuration"
+              type="number"
+              min="0"
+              step="1"
+              required
+            />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Record Milling</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Milling Records</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="millingTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Paddy Type</th>
+                <th>Input (kg)</th>
+                <th>Output Rice (kg)</th>
+                <th>Yield (%)</th>
+                <th>Drying Duration (min)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="damage-panel" hidden>
+        <h2>Record Damage</h2>
+
+        <div class="card">
+          <form id="damageForm">
+            <label for="damagePaddyType">Paddy Type</label>
+            <select id="damagePaddyType" required>
+              <option value="">Select paddy type</option>
+            </select>
+
+            <label for="damageQty">Damaged Quantity (kg)</label>
+            <input id="damageQty" type="number" min="0" step="0.01" required />
+
+            <label for="damageReason">Reason</label>
+            <textarea
+              id="damageReason"
+              rows="3"
+              placeholder="Describe the reason for damage"
+              required
+            ></textarea>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Record Damage</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Damages</h3>
+        <div class="tabs" style="margin-bottom: 12px">
+          <ul
+            style="
+              display: flex;
+              gap: 8px;
+              list-style: none;
+              padding: 0;
+              margin: 0;
+            "
+          >
+            <li>
+              <button id="damagePaddyTab" class="btn primary">Paddy</button>
+            </li>
+            <li><button id="damageRiceTab" class="btn">Rice</button></li>
+          </ul>
+        </div>
+
+        <div class="table-wrap" id="damagesPaddyPanel">
+          <table class="data-table" id="damagesPaddyTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap" id="damagesRicePanel" hidden>
+          <table class="data-table" id="damagesRiceTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="history-panel" hidden>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px">
+          <button
+            id="historyTransactionBtn"
+            class="btn primary"
+            style="flex: 1"
+          >
+            Transaction
+          </button>
+          <button id="historyMillingBtn" class="btn" style="flex: 1">
+            Milling
+          </button>
+        </div>
+
+        <div id="historyTransactionPanel">
+          <h3>Purchases History</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Source</th>
+                  <th>Paddy Type</th>
+                  <th>Qty (kg)</th>
+                  <th>Block ID</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="historyMillingPanel" hidden>
+          <h3>Milling History</h3>
+          <div class="table-wrap">
+            <table class="data-table" id="historyMillingTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Paddy Type</th>
+                  <th>Input Paddy (kg)</th>
+                  <th>Output Rice (kg)</th>
+                  <th>Yield (%)</th>
+                  <th>Block ID</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Miller purchases UI (server-backed). Fetches /api/users and /api/transactions.
+      let users = [];
+      let purchases = [];
+      let currentUser = null;
+
+      function qs(sel) {
+        return document.querySelector(sel);
+      }
+
+      function escapeHtml(s) {
+        if (s === null || s === undefined) return "";
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Fetch users for a specific type from the server endpoint
+      async function fetchUsersByType(type) {
+        try {
+          const q = encodeURIComponent(type || "");
+          const res = await fetch(`/api/users/by_type?type=${q}`);
+          if (!res.ok) throw new Error("Failed to load users by type");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch users by type:", e);
+          return [];
+        }
+      }
+
+      async function fetchCurrentUser() {
+        try {
+          const res = await fetch("/api/me");
+          if (!res.ok) return null;
+          const j = await res.json();
+          return j && j.ok ? j : null;
+        } catch (e) {
+          console.error("Could not fetch current user", e);
+          return null;
+        }
+      }
+
+      function userTypeOf(u) {
+        return u.user_type || u.type || u.role || u.userType || "";
+      }
+      function userLabel(u) {
+        return (
+          (u.full_name || u.name || "") +
+          " (" +
+          (u.user_code || u.code || u.id || "") +
+          ")"
+        );
+      }
+
+      // Fetch paddy types from server
+      async function fetchPaddyTypes() {
+        try {
+          const res = await fetch("/api/paddy_types");
+          if (!res.ok) throw new Error("Failed to load paddy types");
+          const data = await res.json();
+          return Array.isArray(data) ? data : [];
+        } catch (e) {
+          console.error("Could not fetch paddy types:", e);
+          return [];
+        }
+      }
+
+      async function populateSourceSelect(fromType) {
+        const sel = qs("#sourceSelect");
+        sel.innerHTML = "";
+
+        // If purchasing from a broker, the actual sources are collecters
+        // so map Broker -> Collecter when querying the backend.
+        let queryType = fromType;
+        if ((fromType || "").toLowerCase() === "broker") {
+          queryType = "Collecter";
+        }
+
+        const list = await fetchUsersByType(queryType);
+        
+        // Store users in global array for OTP verification
+        users = list || [];
+
+        if (!list || list.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          // show friendly message using the UI label (fromType)
+          opt.textContent = "No " + (fromType || "items") + " found";
+          sel.appendChild(opt);
+          return;
+        }
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select " + (queryType || fromType);
+        sel.appendChild(placeholder);
+        list.forEach((u) => {
+          const o = document.createElement("option");
+          o.value = u.id || u.user_code || "";
+          o.textContent =
+            (u.full_name || "") + " (" + (u.user_code || u.id || "") + ")";
+          o.dataset.full = u.full_name || "";
+          sel.appendChild(o);
+        });
+      }
+
+      // Load transactions for the current user from the server
+      async function loadServerTransactions() {
+        if (!currentUser) return;
+        try {
+          const res = await fetch(
+            `/api/transactions?to=${encodeURIComponent(currentUser.user_id)}`
+          );
+          if (!res.ok) throw new Error("Failed to load transactions");
+          const rows = await res.json();
+          // map server rows to UI records
+          purchases = rows.map((r) => ({
+            id: "srv-" + r.id,
+            when: r.datetime || r.created_at,
+            fromType: "",
+            sourceId: r["from"],
+            sourceName: String(r["from"]),
+            paddyType: r.type || "",
+            qty: Number(r.quantity) || 0,
+            price: r.price ? Number(r.price) : null,
+            tx_id: r.id,
+            block_hash: r.block_hash || null,
+            block_number: r.block_number || null,
+            transaction_hash: r.transaction_hash || null,
+          }));
+        } catch (e) {
+          console.error("Could not load server transactions", e);
+          purchases = [];
+        }
+      }
+
+      function renderTables() {
+        const pBody = qs("#purchasesTable tbody");
+        const hBody = qs("#historyTable tbody");
+        pBody.innerHTML = "";
+        hBody.innerHTML = "";
+
+        const recent = purchases.slice().reverse().slice(0, 10);
+        recent.forEach((r) => {
+          const tr = document.createElement("tr");
+          const hashDisplay = r.block_hash
+            ? String(r.block_hash).slice(0, 12) + "..."
+            : "Not available";
+          const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+          tr.innerHTML = `<td>${escapeHtml(
+            new Date(r.when).toLocaleString()
+          )}</td><td>${escapeHtml(r.sourceName)}</td><td>${escapeHtml(
+            r.paddyType
+          )}</td><td>${escapeHtml(r.qty)}</td><td>${escapeHtml(
+            priceDisplay
+          )}</td><td>${escapeHtml(hashDisplay)}</td><td>
+            <button class="btn view-purchase-btn" data-id="${escapeHtml(
+              r.id
+            )}" data-txid="${escapeHtml(
+            r.tx_id || ""
+          )}" data-source="${escapeHtml(
+            r.sourceName
+          )}" data-paddy="${escapeHtml(r.paddyType)}" data-qty="${escapeHtml(
+            r.qty
+          )}" data-price="${escapeHtml(priceDisplay)}" data-when="${escapeHtml(
+            r.when
+          )}" data-blockhash="${escapeHtml(
+            r.block_hash || ""
+          )}" data-blocknumber="${escapeHtml(
+            r.block_number || ""
+          )}" data-txhash="${escapeHtml(
+            r.transaction_hash || ""
+          )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+            <button class="btn revert-purchase-btn" data-id="${escapeHtml(
+              r.id
+            )}" data-txid="${escapeHtml(r.tx_id || "")}" data-qty="${escapeHtml(
+            r.qty
+          )}" data-paddy="${escapeHtml(r.paddyType)}" data-from="${escapeHtml(
+            r.sourceId
+          )}" data-price="${escapeHtml(
+            r.price || 0
+          )}" style="padding:4px 8px; background:#ef4444; color:#fff;">↩️ Revert</button>
+          </td>`;
+          pBody.appendChild(tr);
+        });
+
+        purchases
+          .slice()
+          .reverse()
+          .forEach((r) => {
+            const tr = document.createElement("tr");
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const priceDisplay = r.price ? r.price.toFixed(2) : "-";
+            tr.innerHTML = `<td>${escapeHtml(
+              new Date(r.when).toLocaleString()
+            )}</td><td>${escapeHtml(r.sourceName)}</td><td>${escapeHtml(
+              r.paddyType
+            )}</td><td>${escapeHtml(r.qty)}</td><td>${escapeHtml(
+              priceDisplay
+            )}</td><td>${escapeHtml(hashDisplay)}</td><td>
+              <button class="btn view-purchase-btn" data-id="${escapeHtml(
+                r.id
+              )}" data-txid="${escapeHtml(
+              r.tx_id || ""
+            )}" data-source="${escapeHtml(
+              r.sourceName
+            )}" data-paddy="${escapeHtml(r.paddyType)}" data-qty="${escapeHtml(
+              r.qty
+            )}" data-when="${escapeHtml(r.when)}" data-blockhash="${escapeHtml(
+              r.block_hash || ""
+            )}" data-blocknumber="${escapeHtml(
+              r.block_number || ""
+            )}" data-txhash="${escapeHtml(
+              r.transaction_hash || ""
+            )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+            </td>`;
+            hBody.appendChild(tr);
+          });
+      }
+
+      function setupTabs() {
+        const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+        const panels = [
+          qs("#purchases-panel"),
+          qs("#milling-panel"),
+          qs("#damage-panel"),
+          qs("#history-panel"),
+        ];
+        tabs.forEach((tab, i) => {
+          tab.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            tabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            panels.forEach((p) => (p.hidden = true));
+            panels[i].hidden = false;
+          });
+        });
+      }
+
+      function setupHistoryTabs() {
+        const transactionBtn = qs("#historyTransactionBtn");
+        const millingBtn = qs("#historyMillingBtn");
+        const transactionPanel = qs("#historyTransactionPanel");
+        const millingPanel = qs("#historyMillingPanel");
+
+        transactionBtn.addEventListener("click", () => {
+          transactionBtn.classList.add("primary");
+          millingBtn.classList.remove("primary");
+          transactionPanel.hidden = false;
+          millingPanel.hidden = true;
+        });
+
+        millingBtn.addEventListener("click", () => {
+          millingBtn.classList.add("primary");
+          transactionBtn.classList.remove("primary");
+          millingPanel.hidden = false;
+          transactionPanel.hidden = true;
+          renderHistoryMillingTable();
+        });
+      }
+
+      async function renderHistoryMillingTable() {
+        const mBody = qs("#historyMillingTable tbody");
+        mBody.innerHTML = "";
+        try {
+          const millerId = currentUser ? currentUser.user_id : null;
+          const url = millerId
+            ? `/api/milling?miller_id=${encodeURIComponent(millerId)}`
+            : "/api/milling";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load milling records");
+          const millingRecords = await res.json();
+          millingRecords.forEach((r) => {
+            const inputQty = parseFloat(r.input_paddy) || 0;
+            const outputQty = parseFloat(r.output_rice) || 0;
+            const yield_percent =
+              inputQty > 0 ? ((outputQty / inputQty) * 100).toFixed(2) : 0;
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const tr = document.createElement("tr");
+            const displayDate = r.milling_date || r.created_at;
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleDateString()}</td>
+                          <td>${r.paddy_type}</td>
+                          <td>${inputQty.toFixed(2)}</td>
+                          <td>${outputQty.toFixed(2)}</td>
+                          <td>${yield_percent}%</td>
+                          <td>${hashDisplay}</td>
+                          <td><button class="btn view-history-milling-btn" data-id="${
+                            r.id
+                          }" style="padding:4px 8px; background:#3b82f6; color:#fff;">👁️ View</button></td>`;
+            mBody.appendChild(tr);
+
+            // Add event listener for view button
+            const viewBtn = tr.querySelector(".view-history-milling-btn");
+            viewBtn.addEventListener("click", async () => {
+              try {
+                const millRes = await fetch(`/api/milling/${r.id}`);
+                if (!millRes.ok)
+                  throw new Error("Failed to load milling record");
+                const millRecord = await millRes.json();
+
+                // Display in modal
+                const vmodal = document.getElementById(
+                  "view-history-milling-modal"
+                );
+                if (vmodal) {
+                  document.getElementById(
+                    "view-history-milling-date"
+                  ).textContent = new Date(
+                    millRecord.milling_date || millRecord.created_at
+                  ).toLocaleDateString();
+                  document.getElementById(
+                    "view-history-milling-paddy"
+                  ).textContent = millRecord.paddy_type || "N/A";
+                  document.getElementById(
+                    "view-history-milling-input"
+                  ).textContent =
+                    parseFloat(millRecord.input_paddy).toFixed(2) + " kg";
+                  document.getElementById(
+                    "view-history-milling-output"
+                  ).textContent =
+                    parseFloat(millRecord.output_rice).toFixed(2) + " kg";
+
+                  const inQty = parseFloat(millRecord.input_paddy) || 0;
+                  const outQty = parseFloat(millRecord.output_rice) || 0;
+                  const yieldVal =
+                    inQty > 0 ? ((outQty / inQty) * 100).toFixed(2) : 0;
+                  document.getElementById(
+                    "view-history-milling-yield"
+                  ).textContent = yieldVal + "%";
+
+                  document.getElementById(
+                    "view-history-milling-duration"
+                  ).textContent = (millRecord.drying_duration || 0) + " days";
+                  document.getElementById(
+                    "view-history-milling-blockhash"
+                  ).textContent = millRecord.block_hash || "Not available";
+                  document.getElementById(
+                    "view-history-milling-blocknumber"
+                  ).textContent = millRecord.block_number || "Not available";
+                  document.getElementById(
+                    "view-history-milling-txhash"
+                  ).textContent =
+                    millRecord.transaction_hash || "Not available";
+
+                  vmodal.removeAttribute("hidden");
+                  vmodal.setAttribute("aria-hidden", "false");
+                }
+              } catch (e) {
+                console.error("Could not load milling record:", e);
+                alert("Failed to load record details");
+              }
+            });
+          });
+        } catch (e) {
+          console.error("Could not load milling records:", e);
+        }
+      }
+
+      async function init() {
+        setupTabs();
+        setupHistoryTabs();
+        // load current user then load server transactions
+        // get logged-in user from server-side session
+        const me = await fetchCurrentUser();
+        if (!me) {
+          window.location = "/";
+          return;
+        }
+        currentUser = me;
+        // For debugging: print current user to console when a Miller logs in
+        try {
+          if (
+            currentUser &&
+            (currentUser.user_type || "").toLowerCase().startsWith("miller")
+          ) {
+            console.log("Current user (miller):", currentUser);
+          } else {
+            console.log("Current user:", currentUser);
+          }
+        } catch (e) {
+          console.log("Current user (raw):", currentUser);
+        }
+        const fromSel = qs("#purchaseFromType");
+        await populateSourceSelect(fromSel.value);
+        // populate paddy types
+        const types = await fetchPaddyTypes();
+        const pSel = qs("#paddyType");
+        pSel.innerHTML = "";
+        const ph = document.createElement("option");
+        ph.value = "";
+        ph.textContent = "Select paddy type";
+        pSel.appendChild(ph);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          pSel.appendChild(o);
+        });
+        await loadServerTransactions();
+        renderTables();
+        fromSel.addEventListener("change", (e) =>
+          populateSourceSelect(e.target.value)
+        );
+
+        // Populate milling paddy type dropdown
+        const millingPaddyTypeSel = qs("#millingPaddyType");
+        millingPaddyTypeSel.innerHTML = "";
+        const millingPh = document.createElement("option");
+        millingPh.value = "";
+        millingPh.textContent = "Select paddy type";
+        millingPaddyTypeSel.appendChild(millingPh);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          millingPaddyTypeSel.appendChild(o);
+        });
+
+        // Populate damage paddy type dropdown
+        const damagePaddyTypeSel = qs("#damagePaddyType");
+        damagePaddyTypeSel.innerHTML = "";
+        const damagePh = document.createElement("option");
+        damagePh.value = "";
+        damagePh.textContent = "Select paddy type";
+        damagePaddyTypeSel.appendChild(damagePh);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          damagePaddyTypeSel.appendChild(o);
+        });
+
+        // Set default milling date to today
+        const today = new Date().toISOString().split("T")[0];
+        qs("#millingDate").value = today;
+
+        qs("#purchaseForm").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const fromType = qs("#purchaseFromType").value;
+          const srcSel = qs("#sourceSelect");
+          const sourceId = srcSel.value;
+          const sourceName = srcSel.selectedOptions[0]
+            ? srcSel.selectedOptions[0].textContent
+            : "";
+          const paddyType = qs("#paddyType").value;
+          const qty = qs("#qty").value;
+          const price = qs("#price").value;
+          if (!sourceId || !paddyType || !qty) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          // OTP Verification - Get farmer's phone number
+          let farmerPhone = "";
+          // Try multiple ways to find the farmer
+          const farmer = users.find(
+            (u) => String(u.id) === String(sourceId) || 
+                   String(u.user_code) === String(sourceId) || 
+                   String(u.code) === String(sourceId)
+          );
+          
+          if (farmer) {
+            farmerPhone = farmer.contact_number || farmer.phone || farmer.mobile || "";
+          }
+
+          // Show OTP verification modal
+          const lastDigits =
+            farmerPhone && farmerPhone.length >= 4 ? farmerPhone.slice(-4) : "0000";
+          
+          // Store purchase data temporarily
+          window.pendingPurchaseData = {
+            fromType,
+            sourceId,
+            sourceName,
+            paddyType,
+            qty,
+            price
+          };
+          
+          // Show OTP modal
+          const otpModal = document.getElementById("otp-verification-modal");
+          document.getElementById("otp-phone-digits").textContent = lastDigits;
+          document.getElementById("otp-input-field").value = "";
+          otpModal.removeAttribute("hidden");
+          otpModal.setAttribute("aria-hidden", "false");
+          document.getElementById("otp-input-field").focus();
+        });
+
+        // Handle OTP verification form submission
+        document.getElementById("otp-verification-form").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          
+          const otpInput = document.getElementById("otp-input-field").value;
+          const otpModal = document.getElementById("otp-verification-modal");
+          
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Purchase cancelled.");
+            otpModal.setAttribute("hidden", "");
+            otpModal.setAttribute("aria-hidden", "true");
+            return;
+          }
+          
+          // OTP verified, close modal and proceed with purchase
+          otpModal.setAttribute("hidden", "");
+          otpModal.setAttribute("aria-hidden", "true");
+          
+          const data = window.pendingPurchaseData;
+          const rec = {
+            id:
+              Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            when: new Date().toISOString(),
+            fromType: data.fromType,
+            sourceId: data.sourceId,
+            sourceName: data.sourceName,
+            paddyType: data.paddyType,
+            qty: Number(data.qty),
+            price: data.price ? Number(data.price) : null,
+            to: currentUser ? currentUser.user_id : null,
+          };
+
+          // POST the transaction to the server
+          (async () => {
+            try {
+              const payload = {
+                from: rec.sourceId,
+                to: rec.to,
+                type: rec.paddyType,
+                quantity: rec.qty,
+                price: rec.price,
+                datetime: rec.when,
+              };
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert(
+                  "Failed to save transaction: " + (j.error || resp.statusText)
+                );
+                return;
+              }
+              // on success, reload server transactions to reflect DB
+              await loadServerTransactions();
+              renderTables();
+              qs("#purchaseForm").reset();
+              populateSourceSelect(data.fromType);
+              alert("Purchase recorded successfully!");
+            } catch (err) {
+              console.error("Error saving transaction", err);
+              alert("Error saving transaction");
+            }
+          })();
+        });
+
+        renderTables();
+
+        // Damage form handler
+        qs("#damageForm").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const paddyType = qs("#damagePaddyType").value;
+          const qty = qs("#damageQty").value;
+          const reason = qs("#damageReason").value;
+          if (!paddyType || !qty || !reason) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          // POST the damage to the server
+          (async () => {
+            try {
+              const kind = qs("#damageRiceTab").classList.contains("primary")
+                ? "rice"
+                : "paddy";
+              const payload = {
+                user_id: currentUser ? currentUser.user_id : null,
+                paddy_type: paddyType,
+                quantity: qty,
+                reason: reason,
+                damage_date: new Date().toISOString(),
+                kind: kind,
+              };
+              const resp = await fetch("/api/damages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert(
+                  "Failed to record damage: " + (j.error || resp.statusText)
+                );
+                return;
+              }
+              // refresh paddy damage table from server
+              await renderPaddyDamageTable();
+              qs("#damageForm").reset();
+              alert("Damage recorded successfully");
+            } catch (err) {
+              console.error("Error recording damage", err);
+              alert("Error recording damage");
+            }
+          })();
+        });
+
+        setupDamageTabs();
+        await renderPaddyDamageTable();
+        renderMillingTable();
+
+        // Milling form handler
+        qs("#millingForm").addEventListener("submit", (ev) => {
+          ev.preventDefault();
+          const paddyType = qs("#millingPaddyType").value;
+          const inputQty = qs("#millingInputQty").value;
+          const outputQty = qs("#millingOutputQty").value;
+          const millingDate = qs("#millingDate").value;
+          const dryingDuration = qs("#dryingDuration").value;
+
+          if (
+            !paddyType ||
+            !inputQty ||
+            !outputQty ||
+            !millingDate ||
+            !dryingDuration
+          ) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          const inputNum = parseFloat(inputQty);
+          const outputNum = parseFloat(outputQty);
+
+          if (outputNum > inputNum) {
+            alert("Output rice quantity cannot exceed input paddy quantity");
+            return;
+          }
+
+          // POST the milling record to the server
+          (async () => {
+            try {
+              const payload = {
+                miller_id: currentUser ? currentUser.user_id : null,
+                paddy_type: paddyType,
+                input_paddy: inputNum,
+                output_rice: outputNum,
+                milling_date: millingDate,
+                drying_duration: parseInt(dryingDuration),
+              };
+              const resp = await fetch("/api/milling", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert(
+                  "Failed to save milling record: " +
+                    (j.error || resp.statusText)
+                );
+                return;
+              }
+              // refresh from server
+              await renderMillingTable();
+              qs("#millingForm").reset();
+              const today = new Date().toISOString().split("T")[0];
+              qs("#millingDate").value = today;
+              alert("Milling record saved successfully");
+            } catch (err) {
+              console.error("Error saving milling record", err);
+              alert("Error saving milling record");
+            }
+          })();
+        });
+      }
+
+      async function renderMillingTable() {
+        const mBody = qs("#millingTable tbody");
+        mBody.innerHTML = "";
+        try {
+          const millerId = currentUser ? currentUser.user_id : null;
+          const url = millerId
+            ? `/api/milling?miller_id=${encodeURIComponent(millerId)}`
+            : "/api/milling";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load milling records");
+          const millingRecords = await res.json();
+          millingRecords.forEach((r) => {
+            const inputQty = parseFloat(r.input_paddy) || 0;
+            const outputQty = parseFloat(r.output_rice) || 0;
+            const yield_percent =
+              inputQty > 0 ? ((outputQty / inputQty) * 100).toFixed(2) : 0;
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const tr = document.createElement("tr");
+            const displayDate = r.milling_date || r.created_at;
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleDateString()}</td>
+                          <td>${r.paddy_type}</td>
+                          <td>${inputQty.toFixed(2)}</td>
+                          <td>${outputQty.toFixed(2)}</td>
+                          <td>${yield_percent}%</td>
+                          <td>${r.drying_duration || 0}</td>
+                          <td>${hashDisplay}</td>
+                          <td>
+                            <button class="btn view-milling-btn" data-id="${
+                              r.id
+                            }" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                            <button class="btn revert-milling-btn" data-id="${
+                              r.id
+                            }" data-paddy="${escapeHtml(
+              r.paddy_type
+            )}" data-input="${inputQty}" data-output="${outputQty}" style="padding:4px 8px; background:#ef4444; color:#fff;">⟲ Revert</button>
+                          </td>`;
+            mBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load milling records:", e);
+        }
+      }
+
+      async function renderPaddyDamageTable() {
+        const dBody = qs("#damagesPaddyTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = currentUser ? currentUser.user_id : null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}&kind=paddy`
+            : "/api/damages?kind=paddy";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load paddy damages");
+          const damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const hashDisplay = d.block_hash
+              ? String(d.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const kind = d.kind || "paddy";
+            tr.innerHTML = `<td>${escapeHtml(
+              new Date(displayDate).toLocaleString()
+            )}</td>
+                          <td>${escapeHtml(d.paddy_type)}</td>
+                          <td>${escapeHtml(d.quantity)}</td>
+                          <td>${escapeHtml(d.reason)}</td>
+                          <td title="${d.block_hash || ""}">${escapeHtml(
+              hashDisplay
+            )}</td>
+                          <td>
+                            <button class="btn view-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" data-kind="${escapeHtml(
+              kind
+            )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                            <button class="btn revert-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" data-kind="${escapeHtml(
+              kind
+            )}" data-qty="${escapeHtml(
+              d.quantity
+            )}" data-paddy-type="${escapeHtml(
+              d.paddy_type
+            )}" data-user-id="${escapeHtml(
+              d.user_id
+            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+                          </td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load paddy damages:", e);
+        }
+      }
+
+      async function renderRiceDamageTable() {
+        const dBody = qs("#damagesRiceTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = currentUser ? currentUser.user_id : null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}&kind=rice`
+            : "/api/damages?kind=rice";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load rice damages");
+          const damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const hashDisplay = d.block_hash
+              ? String(d.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleDateString()}</td>
+                          <td>${d.paddy_type || d.rice_type}</td>
+                          <td>${d.quantity}</td>
+                          <td>${d.reason}</td>
+                          <td title="${d.block_hash || ""}">${hashDisplay}</td>
+                          <td>
+                            <button class="btn view-rice-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
+                            <button class="btn revert-rice-damage-btn" data-id="${escapeHtml(
+                              d.id
+                            )}" data-rice-type="${escapeHtml(
+              d.paddy_type || d.rice_type
+            )}" data-qty="${escapeHtml(
+              d.quantity
+            )}" style="padding:4px 8px; background:#ef4444; color:#fff;">⟲ Revert</button>
+                          </td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load rice damages:", e);
+        }
+      }
+
+      function setupDamageTabs() {
+        const pTab = qs("#damagePaddyTab");
+        const rTab = qs("#damageRiceTab");
+        const pPanel = qs("#damagesPaddyPanel");
+        const rPanel = qs("#damagesRicePanel");
+
+        pTab.addEventListener("click", async () => {
+          pTab.classList.add("primary");
+          rTab.classList.remove("primary");
+          pPanel.hidden = false;
+          rPanel.hidden = true;
+          await renderPaddyDamageTable();
+        });
+
+        rTab.addEventListener("click", async () => {
+          rTab.classList.add("primary");
+          pTab.classList.remove("primary");
+          rPanel.hidden = false;
+          pPanel.hidden = true;
+          await renderRiceDamageTable();
+        });
+      }
+
+      // Event delegation for purchase view/update buttons
+      document.addEventListener("click", async function (e) {
+        // View purchase
+        if (e.target && e.target.classList.contains("view-purchase-btn")) {
+          const txid = e.target.dataset.txid;
+          const source = e.target.dataset.source || "";
+          const paddy = e.target.dataset.paddy || "";
+          const qty = e.target.dataset.qty || "";
+          const when = e.target.dataset.when || "";
+          const blockhash = e.target.dataset.blockhash || "";
+          const blocknumber = e.target.dataset.blocknumber || "";
+          const txhash = e.target.dataset.txhash || "";
+
+          const vmodal = document.getElementById("view-purchase-modal");
+          if (vmodal) {
+            document.getElementById("view-purchase-when").textContent =
+              new Date(when).toLocaleString();
+            document.getElementById("view-purchase-source").textContent =
+              source;
+            document.getElementById("view-purchase-paddy").textContent = paddy;
+            document.getElementById("view-purchase-qty").textContent = qty;
+            document.getElementById("view-purchase-txid").textContent =
+              txid || "N/A";
+            document.getElementById("view-purchase-blockhash").textContent =
+              blockhash || "Not available";
+            document.getElementById("view-purchase-blocknumber").textContent =
+              blocknumber || "Not available";
+            document.getElementById("view-purchase-txhash").textContent =
+              txhash || "Not available";
+            vmodal.removeAttribute("hidden");
+            vmodal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        // Revert purchase: create reversal with status=0
+        if (e.target && e.target.classList.contains("revert-purchase-btn")) {
+          const txid = e.target.dataset.txid;
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+          const paddy = e.target.dataset.paddy || "";
+          const from = e.target.dataset.from || "";
+          const price = parseFloat(e.target.dataset.price) || 0;
+
+          if (
+            !confirm(
+              `Revert purchase of ${qty} kg ${paddy} from ${from}? This will create a reversal with status=0.`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const to = currentUser ? currentUser.user_id : "";
+            const payload = {
+              from: from,
+              to: to,
+              type: paddy,
+              quantity: qty,
+              price: price,
+              datetime: new Date().toISOString(),
+              status: 0, // Revert transaction
+            };
+
+            const res = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok && result.ok) {
+              alert("Purchase reverted successfully");
+              await loadServerTransactions();
+              renderTables();
+            } else {
+              alert("Error: " + (result.error || "Failed to revert purchase"));
+            }
+          } catch (err) {
+            console.error("Failed to revert purchase:", err);
+            alert("Network error: " + err.message);
+          }
+          return;
+        }
+
+        // View damage
+        if (e.target && e.target.classList.contains("view-damage-btn")) {
+          const id = e.target.dataset.id;
+          const kind = e.target.dataset.kind || "";
+          try {
+            const res = await fetch(
+              `/api/damages/${encodeURIComponent(id)}?kind=${encodeURIComponent(
+                kind
+              )}`
+            );
+            if (!res.ok) throw new Error("Failed to load damage");
+            const d = await res.json();
+            const vmodal = document.getElementById("view-damage-modal");
+            if (vmodal) {
+              document.getElementById("view-damage-when").textContent =
+                new Date(d.damage_date || d.created_at || "").toLocaleString();
+              document.getElementById("view-damage-paddy").textContent =
+                d.paddy_type || "";
+              document.getElementById("view-damage-qty").textContent =
+                d.quantity || "";
+              document.getElementById("view-damage-reason").textContent =
+                d.reason || "";
+              document.getElementById("view-damage-blockhash").textContent =
+                d.block_hash || "Not available";
+              document.getElementById("view-damage-blocknumber").textContent =
+                d.block_number || "Not available";
+              document.getElementById("view-damage-txhash").textContent =
+                d.transaction_hash || "Not available";
+              vmodal.removeAttribute("hidden");
+              vmodal.setAttribute("aria-hidden", "false");
+            }
+          } catch (err) {
+            console.error("Failed to load damage record", err);
+            alert("Failed to load damage record");
+          }
+        }
+
+        // Revert damage: create new damage record with reason "revert"
+        if (e.target && e.target.classList.contains("revert-damage-btn")) {
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+          const paddyType = e.target.dataset.paddyType || "";
+          const userId =
+            e.target.dataset.userId || (currentUser ? currentUser.user_id : "");
+          const kind = e.target.dataset.kind || "paddy";
+
+          if (!userId) {
+            alert("Error: User ID not available. Please refresh the page.");
+            return;
+          }
+
+          if (!paddyType) {
+            alert("Error: Paddy type not available.");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Revert damage of ${qty} kg ${paddyType}? This will create a new record with reason "revert".`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const payload = {
+              user_id: userId,
+              paddy_type: paddyType,
+              quantity: qty,
+              reason: "revert",
+              kind: kind,
+              damage_date: new Date().toISOString(),
+            };
+
+            fetch("/api/damages", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+              .then((res) => res.json())
+              .then((result) => {
+                if (result.ok) {
+                  alert("Damage reverted successfully. New record created.");
+                  renderPaddyDamageTable();
+                } else {
+                  alert(
+                    "Error: " + (result.error || "Failed to revert damage")
+                  );
+                }
+              })
+              .catch((err) => {
+                console.error("Failed to revert damage:", err);
+                alert("Network error during revert: " + err.message);
+              });
+          } catch (err) {
+            console.error("Failed to revert damage:", err);
+            alert("Error: " + err.message);
+          }
+          return;
+        }
+
+        // View milling record
+        if (e.target && e.target.classList.contains("view-milling-btn")) {
+          const id = e.target.dataset.id;
+          try {
+            const res = await fetch(`/api/milling/${encodeURIComponent(id)}`);
+            if (!res.ok) throw new Error("Failed to load milling record");
+            const m = await res.json();
+            const vmodal = document.getElementById("view-milling-modal");
+            if (vmodal) {
+              const inputQty = parseFloat(m.input_paddy) || 0;
+              const outputQty = parseFloat(m.output_rice) || 0;
+              const yieldPercent =
+                inputQty > 0 ? ((outputQty / inputQty) * 100).toFixed(2) : 0;
+              document.getElementById("view-milling-date").textContent =
+                new Date(
+                  m.milling_date || m.created_at || ""
+                ).toLocaleDateString();
+              document.getElementById("view-milling-paddy").textContent =
+                m.paddy_type || "";
+              document.getElementById("view-milling-input").textContent =
+                inputQty.toFixed(2) || "";
+              document.getElementById("view-milling-output").textContent =
+                outputQty.toFixed(2) || "";
+              document.getElementById("view-milling-yield").textContent =
+                yieldPercent + "%";
+              document.getElementById("view-milling-duration").textContent =
+                (m.drying_duration || 0) + " days";
+              document.getElementById("view-milling-blockhash").textContent =
+                m.block_hash || "Not available";
+              document.getElementById("view-milling-blocknumber").textContent =
+                m.block_number || "Not available";
+              document.getElementById("view-milling-txhash").textContent =
+                m.transaction_hash || "Not available";
+              vmodal.removeAttribute("hidden");
+              vmodal.setAttribute("aria-hidden", "false");
+            }
+          } catch (err) {
+            console.error("Failed to load milling record", err);
+            alert("Failed to load milling record");
+          }
+        }
+
+        // Revert milling record
+        if (e.target && e.target.classList.contains("revert-milling-btn")) {
+          const id = e.target.dataset.id;
+          const paddyType = e.target.dataset.paddy || "";
+          const inputQty = parseFloat(e.target.dataset.input) || 0;
+
+          if (!paddyType) {
+            alert("Error: Paddy type not available.");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Revert milling record ${id}? This will reverse ${inputQty} kg of input paddy and ${inputQty} kg of output rice.`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `/api/milling/${encodeURIComponent(id)}/revert`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+              }
+            );
+            const j = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              alert(
+                "Error: " +
+                  (j.error ||
+                    res.statusText ||
+                    "Failed to revert milling record")
+              );
+              return;
+            }
+            alert("Milling record reverted successfully.");
+            await renderMillingTable();
+          } catch (err) {
+            console.error("Failed to revert milling record:", err);
+            alert("Network error: " + err.message);
+          }
+          return;
+        }
+
+        // View rice damage record
+        if (e.target && e.target.classList.contains("view-rice-damage-btn")) {
+          const id = e.target.dataset.id;
+          try {
+            const res = await fetch(
+              `/api/damages/${encodeURIComponent(id)}?kind=rice`
+            );
+            if (!res.ok) throw new Error("Failed to load rice damage");
+            const d = await res.json();
+            const vmodal = document.getElementById("view-rice-damage-modal");
+            if (vmodal) {
+              document.getElementById("view-rice-damage-date").textContent =
+                new Date(
+                  d.damage_date || d.created_at || ""
+                ).toLocaleDateString();
+              document.getElementById("view-rice-damage-type").textContent =
+                d.paddy_type || d.rice_type || "";
+              document.getElementById("view-rice-damage-qty").textContent =
+                d.quantity || "";
+              document.getElementById("view-rice-damage-reason").textContent =
+                d.reason || "";
+              document.getElementById(
+                "view-rice-damage-blockhash"
+              ).textContent = d.block_hash || "Not available";
+              document.getElementById(
+                "view-rice-damage-blocknumber"
+              ).textContent = d.block_number || "Not available";
+              document.getElementById("view-rice-damage-txhash").textContent =
+                d.transaction_hash || "Not available";
+              vmodal.removeAttribute("hidden");
+              vmodal.setAttribute("aria-hidden", "false");
+            }
+          } catch (err) {
+            console.error("Failed to load rice damage record", err);
+            alert("Failed to load rice damage record");
+          }
+        }
+
+        // Revert rice damage record
+        if (e.target && e.target.classList.contains("revert-rice-damage-btn")) {
+          const id = e.target.dataset.id;
+          const riceType = e.target.dataset.riceType || "";
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+
+          if (!riceType) {
+            alert("Error: Rice type not available.");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Revert rice damage record ${id}? This will reverse ${qty} kg of ${riceType}.`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `/api/damages/${encodeURIComponent(id)}/revert?kind=rice`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+              }
+            );
+            const j = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              alert(
+                "Error: " +
+                  (j.error ||
+                    res.statusText ||
+                    "Failed to revert rice damage record")
+              );
+              return;
+            }
+            alert("Rice damage record reverted successfully.");
+            await renderRiceDamageTable();
+          } catch (err) {
+            console.error("Failed to revert rice damage record:", err);
+            alert("Network error: " + err.message);
+          }
+          return;
+        }
+
+        // Legacy update damage handler (keeping for compatibility)
+        if (e.target && e.target.classList.contains("update-damage-btn")) {
+          const id = e.target.dataset.id;
+          const kind = e.target.dataset.kind || "";
+          const oldQty = parseFloat(e.target.dataset.qty) || 0;
+          const reason = e.target.dataset.reason || "";
+
+          const umodal = document.getElementById("update-damage-modal");
+          if (umodal) {
+            document.getElementById("update-damage-id").value = id || "";
+            document.getElementById("update-damage-kind").value = kind || "";
+            document.getElementById("update-damage-paddy").textContent =
+              kind || "";
+            document.getElementById("update-damage-qty").value = oldQty;
+            document.getElementById("update-damage-reason").value = reason;
+            umodal.removeAttribute("hidden");
+            umodal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        // Close modals
+        if (e.target && e.target.id === "close-view-purchase") {
+          const m = document.getElementById("view-purchase-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-update-purchase") {
+          const m = document.getElementById("update-purchase-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-view-damage") {
+          const m = document.getElementById("view-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-view-milling") {
+          const m = document.getElementById("view-milling-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-view-history-milling") {
+          const m = document.getElementById("view-history-milling-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-view-rice-damage") {
+          const m = document.getElementById("view-rice-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-update-damage") {
+          const m = document.getElementById("update-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+        if (e.target && e.target.id === "close-otp-modal") {
+          const m = document.getElementById("otp-verification-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+        }
+      });
+
+      // Purchase update form submit
+      document.addEventListener("submit", async function (e) {
+        if (e.target && e.target.id === "update-purchase-form") {
+          e.preventDefault();
+          const txid =
+            document.getElementById("update-purchase-txid").value || "";
+          const qtyEl = document.getElementById("update-purchase-qty");
+          const newQty = parseFloat(qtyEl ? qtyEl.value : NaN);
+          if (isNaN(newQty) || newQty < 0) {
+            alert("Invalid quantity");
+            return;
+          }
+
+          let updatedOnServer = false;
+          let errorMsg = "";
+          if (txid) {
+            try {
+              const res = await fetch(
+                `/api/transactions/${encodeURIComponent(txid)}`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ quantity: newQty }),
+                }
+              );
+              const result = await res.json();
+              if (res.ok) {
+                updatedOnServer = true;
+              } else {
+                errorMsg = result.error || "Failed to update on server";
+              }
+            } catch (err) {
+              console.error("Failed updating transaction on server", err);
+              errorMsg = "Network error during update";
+            }
+          }
+
+          const m = document.getElementById("update-purchase-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+
+          if (updatedOnServer) {
+            await loadServerTransactions();
+            renderTables();
+            alert("Transaction updated successfully.");
+          } else if (errorMsg) {
+            alert("Error: " + errorMsg);
+          }
+        }
+
+        // Damage update form submit
+        if (e.target && e.target.id === "update-damage-form") {
+          e.preventDefault();
+          const id = document.getElementById("update-damage-id").value || "";
+          const kind =
+            document.getElementById("update-damage-kind").value || "";
+          const qtyEl = document.getElementById("update-damage-qty");
+          const reasonEl = document.getElementById("update-damage-reason");
+          const newQty = parseFloat(qtyEl ? qtyEl.value : NaN);
+          const newReason = reasonEl ? reasonEl.value : "";
+          if (isNaN(newQty) || newQty < 0) {
+            alert("Invalid quantity");
+            return;
+          }
+
+          let updatedOnServer = false;
+          let errorMsg = "";
+          if (id) {
+            try {
+              const kindParam = kind ? `?kind=${encodeURIComponent(kind)}` : "";
+              const res = await fetch(
+                `/api/damages/${encodeURIComponent(id)}${kindParam}`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ quantity: newQty, reason: newReason }),
+                }
+              );
+              const result = await res.json();
+              if (res.ok) {
+                updatedOnServer = true;
+              } else {
+                errorMsg = result.error || "Failed to update on server";
+              }
+            } catch (err) {
+              console.error("Failed updating damage on server", err);
+              errorMsg = "Network error during update";
+            }
+          }
+
+          const m = document.getElementById("update-damage-modal");
+          if (m) {
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+          }
+
+          if (updatedOnServer) {
+            await renderPaddyDamageTable();
+            alert("Damage updated successfully.");
+          } else if (errorMsg) {
+            alert("Error: " + errorMsg);
+          }
+        }
+      });
+
+      window.addEventListener("DOMContentLoaded", init);
+    </script>
+
+    <!-- View Purchase Modal -->
+    <div
+      id="view-purchase-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Purchase Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+          >
+            <strong>When:</strong><span id="view-purchase-when"></span>
+            <strong>Source:</strong><span id="view-purchase-source"></span>
+            <strong>Paddy:</strong><span id="view-purchase-paddy"></span>
+            <strong>Quantity:</strong><span id="view-purchase-qty"></span>
+            <strong>Tx ID:</strong><span id="view-purchase-txid"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-purchase-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-purchase-blocknumber"></span>
+            <strong>Tx Hash:</strong
+            ><span
+              id="view-purchase-txhash"
+              style="word-break: break-all"
+            ></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-purchase" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Purchase Modal -->
+    <div
+      id="update-purchase-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Update Purchase</h3>
+        </header>
+        <form
+          id="update-purchase-form"
+          style="padding: 16px; display: grid; gap: 8px"
+        >
+          <input type="hidden" id="update-purchase-id" />
+          <input type="hidden" id="update-purchase-txid" />
+          <label
+            style="
+              display: grid;
+              grid-template-columns: 120px 1fr;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <span>Paddy:</span><span id="update-purchase-paddy"></span>
+          </label>
+          <label style="display: block"
+            >Quantity (kg)
+            <input
+              id="update-purchase-qty"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-update-purchase" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- View Damage Modal -->
+    <div
+      id="view-damage-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Damage Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+          >
+            <strong>When:</strong><span id="view-damage-when"></span>
+            <strong>Paddy:</strong><span id="view-damage-paddy"></span>
+            <strong>Quantity:</strong><span id="view-damage-qty"></span>
+            <strong>Reason:</strong><span id="view-damage-reason"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-damage-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-damage-blocknumber"></span> <strong>Tx Hash:</strong
+            ><span id="view-damage-txhash" style="word-break: break-all"></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-damage" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Milling Modal -->
+    <div
+      id="view-milling-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Milling Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
+          >
+            <strong>Date:</strong><span id="view-milling-date"></span>
+            <strong>Paddy Type:</strong><span id="view-milling-paddy"></span>
+            <strong>Input Paddy (kg):</strong
+            ><span id="view-milling-input"></span>
+            <strong>Output Rice (kg):</strong
+            ><span id="view-milling-output"></span> <strong>Yield (%):</strong
+            ><span id="view-milling-yield"></span>
+            <strong>Drying Duration (days):</strong
+            ><span id="view-milling-duration"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-milling-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-milling-blocknumber"></span>
+            <strong>Tx Hash:</strong
+            ><span
+              id="view-milling-txhash"
+              style="word-break: break-all"
+            ></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-milling" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View History Milling Modal -->
+    <div
+      id="view-history-milling-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Milling Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
+          >
+            <strong>Date:</strong><span id="view-history-milling-date"></span>
+            <strong>Paddy Type:</strong
+            ><span id="view-history-milling-paddy"></span>
+            <strong>Input Paddy (kg):</strong
+            ><span id="view-history-milling-input"></span>
+            <strong>Output Rice (kg):</strong
+            ><span id="view-history-milling-output"></span>
+            <strong>Yield (%):</strong
+            ><span id="view-history-milling-yield"></span>
+            <strong>Drying Duration (days):</strong
+            ><span id="view-history-milling-duration"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-history-milling-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-history-milling-blocknumber"></span>
+            <strong>Tx Hash:</strong
+            ><span
+              id="view-history-milling-txhash"
+              style="word-break: break-all"
+            ></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-history-milling" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Rice Damage Modal -->
+    <div
+      id="view-rice-damage-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Rice Damage Details</h3>
+        </header>
+        <div style="padding: 16px; display: grid; gap: 8px">
+          <div
+            style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
+          >
+            <strong>Date:</strong><span id="view-rice-damage-date"></span>
+            <strong>Rice Type:</strong><span id="view-rice-damage-type"></span>
+            <strong>Quantity (kg):</strong
+            ><span id="view-rice-damage-qty"></span> <strong>Reason:</strong
+            ><span id="view-rice-damage-reason"></span>
+            <strong>Block Hash:</strong
+            ><span
+              id="view-rice-damage-blockhash"
+              style="word-break: break-all"
+            ></span>
+            <strong>Block Number:</strong
+            ><span id="view-rice-damage-blocknumber"></span>
+            <strong>Tx Hash:</strong
+            ><span
+              id="view-rice-damage-txhash"
+              style="word-break: break-all"
+            ></span>
+          </div>
+          <div style="text-align: right; margin-top: 8px">
+            <button id="close-view-rice-damage" class="btn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Damage Modal -->
+    <div
+      id="update-damage-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Update Damage</h3>
+        </header>
+        <form
+          id="update-damage-form"
+          style="padding: 16px; display: grid; gap: 8px"
+        >
+          <input type="hidden" id="update-damage-id" />
+          <input type="hidden" id="update-damage-kind" />
+          <label
+            style="
+              display: grid;
+              grid-template-columns: 120px 1fr;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <span>Paddy:</span><span id="update-damage-paddy"></span>
+          </label>
+          <label style="display: block"
+            >Quantity (kg)
+            <input
+              id="update-damage-qty"
+              type="number"
+              step="0.001"
+              min="0"
+              required
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <label style="display: block"
+            >Reason
+            <input
+              id="update-damage-reason"
+              type="text"
+              style="
+                width: 100%;
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-update-damage" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-verification-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 420px">
+        <header class="modal-header">
+          <h3>OTP Verification</h3>
+        </header>
+        <form
+          id="otp-verification-form"
+          style="padding: 16px; display: grid; gap: 16px"
+        >
+          <div style="text-align: center; padding: 8px 0">
+            <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280">
+              OTP sent to the farmer's phone ending with
+            </p>
+            <p
+              style="
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+                color: #1f2937;
+              "
+            >
+              ****<span id="otp-phone-digits">****</span>
+            </p>
+          </div>
+          <label style="display: block">
+            <span style="display: block; margin-bottom: 6px; font-weight: 500"
+              >Enter OTP received from farmer:</span
+            >
+            <input
+              id="otp-input-field"
+              type="password"
+              placeholder="Enter 6-digit OTP"
+              maxlength="6"
+              required
+              style="
+                width: 100%;
+                padding: 12px;
+                border-radius: 6px;
+                border: 2px solid #d1d5db;
+                font-size: 18px;
+                text-align: center;
+                letter-spacing: 4px;
+                font-weight: bold;
+              "
+            />
+          </label>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="close-otp-modal" class="btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">Verify & Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

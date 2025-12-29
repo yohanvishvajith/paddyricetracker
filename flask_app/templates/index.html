@@ -1,0 +1,3715 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sri Lanka Rice Supply Chain Blockchain Traceability System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">
+        Sri Lanka Rice Supply Chain<br />Blockchain Traceability System
+      </h1>
+
+      <nav class="tabs" aria-label="Primary">
+        <ul>
+          <li class="tab active">
+            <a
+              href="#"
+              id="tab-dashboard"
+              role="tab"
+              aria-controls="dashboard"
+              aria-selected="true"
+              >Dashboard</a
+            >
+          </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-manage-user"
+              role="tab"
+              aria-controls="manage-user"
+              aria-selected="false"
+              >Manage User</a
+            >
+          </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-initial-pr"
+              role="tab"
+              aria-controls="initial-pr"
+              aria-selected="false"
+              >Initial P/R</a
+            >
+          </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-analytics"
+              role="tab"
+              aria-controls="analytics"
+              aria-selected="false"
+              >Analytics</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section
+        id="dashboard"
+        class="tab-panel"
+        aria-labelledby="tab-dashboard"
+        hidden
+      >
+        <h2>Dashboard</h2>
+        <div class="stats-grid">
+          <div class="stat-card farmers">
+            <div class="stat-icon" aria-hidden="true">🌾</div>
+            <div>
+              <div class="stat-value" id="total-farmers">-</div>
+              <div class="stat-label">Total Farmers</div>
+            </div>
+          </div>
+          <div class="stat-card collectors">
+            <div class="stat-icon" aria-hidden="true">🚜</div>
+            <div>
+              <div class="stat-value" id="total-collectors">-</div>
+              <div class="stat-label">Total Collectors</div>
+            </div>
+          </div>
+          <div class="stat-card millers">
+            <div class="stat-icon" aria-hidden="true">🏭</div>
+            <div>
+              <div class="stat-value" id="total-millers">-</div>
+              <div class="stat-label">Total Millers</div>
+            </div>
+          </div>
+          <div class="stat-card wholesalers">
+            <div class="stat-icon" aria-hidden="true">🏪</div>
+            <div>
+              <div class="stat-value" id="total-wholesalers">-</div>
+              <div class="stat-label">Total Wholesalers</div>
+            </div>
+          </div>
+          <div class="stat-card retailers">
+            <div class="stat-icon" aria-hidden="true">🏬</div>
+            <div>
+              <div class="stat-value" id="total-retailers">-</div>
+              <div class="stat-label">Total Retailers</div>
+            </div>
+          </div>
+          <div class="stat-card beer">
+            <div class="stat-icon" aria-hidden="true">🍺</div>
+            <div>
+              <div class="stat-value" id="total-beer">-</div>
+              <div class="stat-label">Total Beer</div>
+            </div>
+          </div>
+          <div class="stat-card animalfood">
+            <div class="stat-icon" aria-hidden="true">🐾</div>
+            <div>
+              <div class="stat-value" id="total-animalfood">-</div>
+              <div class="stat-label">Total Animal Food</div>
+            </div>
+          </div>
+          <div class="stat-card exporter">
+            <div class="stat-icon" aria-hidden="true">🚢</div>
+            <div>
+              <div class="stat-value" id="total-exporter">-</div>
+              <div class="stat-label">Total Exporters</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px">
+          <label
+            for="paddy-type-select"
+            style="
+              display: block;
+              margin-bottom: 6px;
+              font-size: 13px;
+              color: #374151;
+            "
+            >Paddy Type</label
+          >
+          <select
+            id="paddy-type-select"
+            style="
+              padding: 6px;
+              border-radius: 6px;
+              border: 1px solid #d1d5db;
+              min-width: 220px;
+              margin-bottom: 8px;
+            "
+          >
+            <option value="">All paddy types</option>
+          </select>
+          <div
+            style="
+              height: 200px;
+              max-width: 800px;
+              margin-top: 8px;
+              position: relative;
+            "
+          >
+            <canvas id="paddy-chart" aria-label="Paddy stock by role"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="manage-user"
+        class="tab-panel"
+        aria-labelledby="tab-manage-user"
+        hidden
+      >
+        <h2>Manage User</h2>
+
+        <div class="controls" style="margin-bottom: 12px">
+          <button id="add-user-btn" class="btn">Add User</button>
+        </div>
+
+        <div
+          class="controls"
+          style="
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          "
+        >
+          <label style="display: flex; flex-direction: column; font-size: 13px">
+            User Type
+            <select id="manage-user-type-filter">
+              <option value="Farmer">Farmer</option>
+              <option value="Collecter">Collecter</option>
+              <option value="Miller">Miller</option>
+              <option value="Wholesaler">Wholesaler</option>
+              <option value="Retailer">Retailer</option>
+              <option value="Beer">Beer</option>
+              <option value="Animal Food">Animal Food</option>
+              <option value="Exporter">Exporter</option>
+              <option value="PMB">PMB</option>
+            </select>
+          </label>
+          <label
+            style="
+              display: flex;
+              flex-direction: column;
+              flex: 1;
+              font-size: 13px;
+            "
+          >
+            Search (ID / Name)
+            <input
+              id="manage-user-search"
+              type="search"
+              placeholder="Enter user ID or name"
+              style="
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+              "
+            />
+          </label>
+          <button id="manage-user-refresh" class="btn">Refresh</button>
+        </div>
+
+        <div class="table-wrap">
+          <table
+            id="manage-user-table"
+            class="data-table"
+            aria-describedby="manage-user-table-desc"
+          >
+            <caption id="manage-user-table-desc">
+              All Users
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">User ID</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">District</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows will be added here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section
+        id="initial-pr"
+        class="tab-panel"
+        aria-labelledby="tab-initial-pr"
+        hidden
+      >
+        <h2>Initial Paddy/Rice</h2>
+
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+          "
+        >
+          <div
+            class="initial-pr-subtabs"
+            style="display: flex; flex: 1; gap: 0"
+          >
+            <button
+              id="initial-pr-tab-paddy"
+              class="btn primary"
+              type="button"
+              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+            >
+              Initial Paddy
+            </button>
+            <button
+              id="initial-pr-tab-rice"
+              class="btn"
+              type="button"
+              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+            >
+              Initial Rice
+            </button>
+          </div>
+        </div>
+
+        <div id="initial-paddy-panel">
+          <div
+            class="controls"
+            style="
+              margin-bottom: 12px;
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 13px;
+                min-width: 200px;
+              "
+            >
+              Filter by User (Collectors & Millers)
+              <select
+                id="initial-paddy-user-filter"
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                "
+              >
+                <option value="">All Users</option>
+              </select>
+            </label>
+            <button
+              id="add-initial-paddy-btn"
+              class="btn primary"
+              style="margin-top: 18px"
+            >
+              + Add Paddy
+            </button>
+            <button
+              id="initial-paddy-refresh"
+              class="btn"
+              style="margin-top: 18px"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table
+              id="initial-paddy-table"
+              class="data-table"
+              aria-describedby="initial-paddy-table-desc"
+            >
+              <caption id="initial-paddy-table-desc">
+                Initial Paddy (Collectors & Millers)
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">District</th>
+                  <th scope="col">Paddy Type</th>
+                  <th scope="col">Quantity (kg)</th>
+                  <th scope="col">Date Created</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="initial-rice-panel" style="display: none">
+          <div
+            class="controls"
+            style="
+              margin-bottom: 12px;
+              display: flex;
+              gap: 8px;
+              align-items: center;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 13px;
+                min-width: 200px;
+              "
+            >
+              Filter by User (Millers & Wholesalers)
+              <select
+                id="initial-rice-user-filter"
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                "
+              >
+                <option value="">All Users</option>
+              </select>
+            </label>
+            <button
+              id="initial-rice-refresh"
+              class="btn"
+              style="margin-top: 18px"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table
+              id="initial-rice-table"
+              class="data-table"
+              aria-describedby="initial-rice-table-desc"
+            >
+              <caption id="initial-rice-table-desc">
+                Initial Rice Inventory
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">District</th>
+                  <th scope="col">Rice Type</th>
+                  <th scope="col">Quantity (kg)</th>
+                  <th scope="col">Date Created</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="analytics"
+        class="tab-panel"
+        aria-labelledby="tab-analytics"
+        hidden
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+          "
+        >
+          <div class="analytics-subtabs" style="display: flex; flex: 1; gap: 0">
+            <button
+              id="analytics-tab-paddy"
+              class="btn primary"
+              type="button"
+              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+            >
+              Paddy
+            </button>
+            <button
+              id="analytics-tab-rice"
+              class="btn"
+              type="button"
+              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+            >
+              Rice
+            </button>
+          </div>
+        </div>
+
+        <div id="analytics-paddy-panel">
+          <div style="margin-top: 12px">
+            <label
+              for="analytics-paddy-type-select"
+              style="
+                display: block;
+                margin-bottom: 6px;
+                font-size: 13px;
+                color: #374151;
+              "
+              >Paddy Type (Analytics)</label
+            >
+            <select
+              id="analytics-paddy-type-select"
+              style="
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+                min-width: 220px;
+                margin-bottom: 8px;
+              "
+            >
+              <option value="">All paddy types</option>
+            </select>
+            <div
+              style="
+                height: 260px;
+                max-width: 900px;
+                margin-top: 8px;
+                position: relative;
+              "
+            >
+              <canvas
+                id="paddy-chart-analytics"
+                aria-label="Paddy stock comparison chart"
+              ></canvas>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 32px;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 24px;
+            "
+          >
+            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
+              District-based Stock Analysis
+            </h3>
+            <label
+              for="district-paddy-type-select"
+              style="
+                display: block;
+                margin-bottom: 6px;
+                font-size: 13px;
+                color: #374151;
+              "
+              >Filter by Paddy Type</label
+            >
+            <select
+              id="district-paddy-type-select"
+              style="
+                padding: 6px;
+                border-radius: 6px;
+                border: 1px solid #d1d5db;
+                min-width: 220px;
+                margin-bottom: 8px;
+              "
+            >
+              <option value="">All paddy types</option>
+            </select>
+            <div
+              style="
+                height: 320px;
+                max-width: 900px;
+                margin-top: 8px;
+                position: relative;
+              "
+            >
+              <canvas
+                id="district-chart-analytics"
+                aria-label="Stock by district - Millers and Collectors"
+              ></canvas>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 32px;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 24px;
+            "
+          >
+            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
+              User Stock Analysis
+            </h3>
+            <div
+              class="controls"
+              style="
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                margin-bottom: 12px;
+              "
+            >
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                User Type
+                <select id="filter-user-type">
+                  <option value="collect">Collectors</option>
+                  <option value="miller">Millers</option>
+                </select>
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                Paddy Type
+                <select id="filter-paddy-type"></select>
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                District (Optional)
+                <select id="filter-district">
+                  <option value="">All Districts</option>
+                </select>
+              </label>
+
+              <button id="filter-refresh" class="btn">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table
+                id="user-table"
+                class="data-table"
+                aria-describedby="user-table-desc"
+              >
+                <caption id="user-table-desc">
+                  User list
+                </caption>
+                <thead id="user-table-head">
+                  <tr>
+                    <th scope="col">User ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">User Type</th>
+                    <th scope="col">District</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- rows will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 32px;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 24px;
+            "
+          >
+            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
+              Transaction History
+            </h3>
+            <div
+              class="controls"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                align-items: flex-end;
+                margin-bottom: 12px;
+              "
+            >
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                Transaction Type
+                <select id="transaction-type-filter">
+                  <option value="">All Types</option>
+                  <option value="farmer-collector">Farmer → Collector</option>
+                  <option value="farmer-pmb">Farmer → PMB</option>
+                  <option value="collector-collector">
+                    Collector → Collector
+                  </option>
+                  <option value="collector-miller">Collector → Miller</option>
+                  <option value="collector-pmb">Collector → PMB</option>
+                </select>
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                Paddy Type
+                <select id="transaction-paddy-filter">
+                  <option value="">All Paddy Types</option>
+                </select>
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                From Date
+                <input
+                  id="transaction-date-from"
+                  type="date"
+                  style="
+                    padding: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #d1d5db;
+                  "
+                />
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                To Date
+                <input
+                  id="transaction-date-to"
+                  type="date"
+                  style="
+                    padding: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #d1d5db;
+                  "
+                />
+              </label>
+
+              <label
+                style="display: flex; flex-direction: column; font-size: 13px"
+              >
+                Search (From/To)
+                <input
+                  id="transaction-search"
+                  type="search"
+                  placeholder="Enter user ID"
+                  style="
+                    padding: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #d1d5db;
+                  "
+                />
+              </label>
+
+              <button id="transaction-refresh" class="btn">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table
+                id="transaction-table"
+                class="data-table"
+                aria-describedby="transaction-table-desc"
+              >
+                <caption id="transaction-table-desc">
+                  Transaction History
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">From</th>
+                    <th scope="col">To</th>
+                    <th scope="col">Paddy Type</th>
+                    <th scope="col">Quantity (kg)</th>
+                    <th scope="col">Date/Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- rows will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="analytics-rice-panel" hidden>
+          <div style="text-align: center; padding: 80px 24px; color: #6b7280">
+            <h3
+              style="
+                font-size: 24px;
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 12px;
+              "
+            >
+              Rice Analytics
+            </h3>
+            <p style="font-size: 16px; margin-bottom: 24px">
+              To be implemented
+            </p>
+            <svg
+              style="width: 120px; height: 120px; opacity: 0.3"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
+              />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stock detail modal -->
+      <div
+        id="stock-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3 id="stock-modal-title">User Stock Details</h3>
+          </header>
+          <div style="padding: 12px">
+            <table class="data-table" id="stock-detail-table">
+              <thead>
+                <tr>
+                  <th>Paddy Type</th>
+                  <th>Quantity (kg)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div style="margin-top: 12px; text-align: right">
+              <button id="stock-close-btn" class="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add User Modal -->
+      <div
+        id="user-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Add User</h3>
+          </header>
+          <form id="user-form">
+            <label>
+              User Type
+              <select name="userType">
+                <option selected>Farmer</option>
+                <option>Collecter</option>
+                <option>Miller</option>
+                <option>Wholesaler</option>
+                <option>Retailer</option>
+                <option>Beer</option>
+                <option>Animal Food</option>
+                <option>Exporter</option>
+                <option>PMB</option>
+              </select>
+            </label>
+            <div id="type-fields">
+              <!-- fields rendered by JS -->
+            </div>
+
+            <div id="paddy-section">
+              <label>Paddy stock</label>
+              <div class="paddy-controls">
+                <button type="button" id="add-paddy-btn" class="btn">
+                  Add Paddy
+                </button>
+              </div>
+              <div id="paddy-list"></div>
+            </div>
+
+            <div id="rice-section">
+              <label>Rice stock</label>
+              <div class="rice-controls">
+                <button type="button" id="add-rice-btn" class="btn">
+                  Add Rice
+                </button>
+              </div>
+              <div id="rice-list"></div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" id="cancel-btn" class="btn">Cancel</button>
+              <button type="submit" class="btn primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Add Initial Paddy Modal -->
+      <div
+        id="add-initial-paddy-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Add Initial Paddy</h3>
+          </header>
+          <form id="add-initial-paddy-form" style="padding: 16px">
+            <label style="display: block; margin-bottom: 12px">
+              User Type
+              <select
+                id="initial-paddy-user-type"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select User Type</option>
+                <option value="Collecter">Collector</option>
+                <option value="Miller">Miller</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              User Name
+              <select
+                id="initial-paddy-user-select"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select User</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              Paddy Type
+              <select
+                id="initial-paddy-type-select"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select Paddy Type</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              Quantity (kg)
+              <input
+                type="number"
+                id="initial-paddy-quantity"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                  box-sizing: border-box;
+                "
+                required
+                min="0"
+                step="0.01"
+              />
+            </label>
+
+            <div class="modal-actions">
+              <button type="button" id="add-paddy-cancel-btn" class="btn">
+                Cancel
+              </button>
+              <button type="submit" class="btn primary">Add Paddy</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- User Detail Modal -->
+      <div
+        id="user-detail-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>User Details</h3>
+          </header>
+          <div style="padding: 16px">
+            <div id="user-detail-content" style="display: grid; gap: 12px">
+              <!-- User details will be populated here -->
+            </div>
+            <div style="margin-top: 16px; text-align: right">
+              <button id="user-detail-close-btn" class="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Initial Paddy Modal -->
+      <div
+        id="update-initial-paddy-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Update Initial Paddy</h3>
+          </header>
+          <form id="update-initial-paddy-form" style="padding: 16px">
+            <input type="hidden" id="update-paddy-id" />
+            <input type="hidden" id="update-paddy-user-id" />
+            <label style="display: block; margin-bottom: 12px">
+              Paddy Type
+              <input
+                type="text"
+                id="update-paddy-type"
+                disabled
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                  width: 100%;
+                  background-color: #f3f4f6;
+                "
+              />
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              Quantity (kg)
+              <input
+                type="number"
+                step="0.001"
+                id="update-paddy-quantity"
+                required
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                  width: 100%;
+                "
+              />
+            </label>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+                margin-top: 16px;
+              "
+            >
+              <button type="button" id="cancel-update-paddy-btn" class="btn">
+                Cancel
+              </button>
+              <button type="submit" class="btn primary">Update</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Update Initial Rice Modal -->
+      <div
+        id="update-initial-rice-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Update Initial Rice</h3>
+          </header>
+          <form id="update-initial-rice-form" style="padding: 16px">
+            <input type="hidden" id="update-rice-id" />
+            <input type="hidden" id="update-rice-user-id" />
+            <label style="display: block; margin-bottom: 12px">
+              Rice Type
+              <input
+                type="text"
+                id="update-rice-type"
+                readonly
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                  width: 100%;
+                  background-color: #f3f4f6;
+                "
+              />
+            </label>
+            <label style="display: block; margin-bottom: 12px">
+              Quantity (kg)
+              <input
+                type="number"
+                step="0.001"
+                id="update-rice-quantity"
+                required
+                style="
+                  padding: 6px;
+                  border-radius: 6px;
+                  border: 1px solid #d1d5db;
+                  width: 100%;
+                "
+              />
+            </label>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+                margin-top: 16px;
+              "
+            >
+              <button type="button" id="cancel-update-rice-btn" class="btn">
+                Cancel
+              </button>
+              <button type="submit" class="btn primary">Update</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- View Initial Paddy Modal -->
+      <div
+        id="view-initial-paddy-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Initial Paddy Details</h3>
+          </header>
+          <div style="padding: 16px">
+            <div id="view-paddy-content" style="display: grid; gap: 8px">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 140px 1fr;
+                  gap: 8px;
+                "
+              >
+                <strong>User ID:</strong><span id="view-paddy-user-id"></span>
+                <strong>Name:</strong><span id="view-paddy-user-name"></span>
+                <strong>District:</strong
+                ><span id="view-paddy-district"></span>
+                <strong>Paddy Type:</strong><span id="view-paddy-type"></span>
+                <strong>Quantity (kg):</strong
+                ><span id="view-paddy-quantity"></span> <strong>Date:</strong
+                ><span id="view-paddy-date"></span>
+                <strong>Block Number:</strong
+                ><span id="view-paddy-block-number"></span>
+                <strong>Transaction ID:</strong
+                ><span
+                  id="view-paddy-transaction-id"
+                  style="word-break: break-all; font-size: 12px"
+                ></span>
+                <strong>Block Hash:</strong
+                ><span
+                  id="view-paddy-block-hash"
+                  style="word-break: break-all; font-size: 12px"
+                ></span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; text-align: right">
+              <button id="close-view-paddy-btn" class="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Initial Rice Modal -->
+      <div
+        id="view-initial-rice-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Initial Rice Details</h3>
+          </header>
+          <div style="padding: 16px">
+            <div id="view-rice-content" style="display: grid; gap: 8px">
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 140px 1fr;
+                  gap: 8px;
+                "
+              >
+                <strong>User ID:</strong><span id="view-rice-user-id"></span>
+                <strong>Name:</strong><span id="view-rice-user-name"></span>
+                <strong>District:</strong><span id="view-rice-district"></span>
+                <strong>Rice Type:</strong><span id="view-rice-type"></span>
+                <strong>Quantity (kg):</strong
+                ><span id="view-rice-quantity"></span> <strong>Date:</strong
+                ><span id="view-rice-date"></span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; text-align: right">
+              <button id="close-view-rice-btn" class="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Tab switching + modal handling
+      document.addEventListener("DOMContentLoaded", function () {
+        const tabAnchors = document.querySelectorAll(".tabs .tab a");
+        const tabs = document.querySelectorAll(".tab");
+        const panels = document.querySelectorAll(".tab-panel");
+
+        function activateTab(index) {
+          tabs.forEach((t, i) => {
+            const a = t.querySelector("a");
+            const selected = i === index;
+            if (selected) {
+              t.classList.add("active");
+              panels[i].hidden = false;
+              a.setAttribute("aria-selected", "true");
+            } else {
+              t.classList.remove("active");
+              panels[i].hidden = true;
+              a.setAttribute("aria-selected", "false");
+            }
+          });
+          // Load manage users when that tab is activated (index 1)
+          if (index === 1) {
+            loadManageUsers();
+          }
+          // Load initial P/R when that tab is activated (index 2)
+          if (index === 2) {
+            populateInitialPRUserFilters();
+            loadInitialPaddy();
+          }
+        }
+
+        tabAnchors.forEach((a, i) => {
+          a.addEventListener("click", function (e) {
+            e.preventDefault();
+            activateTab(i);
+          });
+        });
+
+        // Modal behavior
+        const addBtn = document.getElementById("add-user-btn");
+        const modal = document.getElementById("user-modal");
+        const modalContent = modal && modal.querySelector(".modal-content");
+        const cancelBtn = document.getElementById("cancel-btn");
+        const form = document.getElementById("user-form");
+        const tbody = document.querySelector("#user-table tbody");
+        const filterUserType = document.getElementById("filter-user-type");
+        const filterPaddyType = document.getElementById("filter-paddy-type");
+        const filterSearch = document.getElementById("filter-search");
+        const filterRefresh = document.getElementById("filter-refresh");
+        const stockModal = document.getElementById("stock-modal");
+        const stockCloseBtn = document.getElementById("stock-close-btn");
+        const stockDetailBody = document.querySelector(
+          "#stock-detail-table tbody"
+        );
+        let lastFocused = null;
+
+        // Close stock modal
+        if (stockCloseBtn) {
+          stockCloseBtn.addEventListener("click", () => {
+            if (stockModal) {
+              stockModal.hidden = true;
+              stockModal.removeAttribute("aria-hidden");
+            }
+          });
+        }
+
+        // Close stock modal when clicking outside
+        if (stockModal) {
+          stockModal.addEventListener("click", function (e) {
+            if (e.target === stockModal) {
+              stockModal.hidden = true;
+              stockModal.removeAttribute("aria-hidden");
+            }
+          });
+        }
+
+        // Load users for Manage User section
+        async function loadManageUsers() {
+          const manageUserTableBody = document.querySelector(
+            "#manage-user-table tbody"
+          );
+          if (!manageUserTableBody) return;
+
+          const manageUserTypeFilter = document.getElementById(
+            "manage-user-type-filter"
+          );
+          const manageUserSearch =
+            document.getElementById("manage-user-search");
+          const selectedType = manageUserTypeFilter
+            ? manageUserTypeFilter.value
+            : "";
+          const searchQuery = manageUserSearch
+            ? manageUserSearch.value.trim().toLowerCase()
+            : "";
+
+          try {
+            const resp = await fetch("/api/users");
+            if (!resp.ok) throw new Error("Failed to fetch users");
+            const users = await resp.json();
+
+            manageUserTableBody.innerHTML = "";
+            users
+              .filter((u) => {
+                // Filter by user type
+                if (selectedType && u.user_type !== selectedType) return false;
+                // Filter by search query (ID or name)
+                if (searchQuery) {
+                  const matchId = (u.id || "")
+                    .toLowerCase()
+                    .includes(searchQuery);
+                  const matchName = (u.full_name || "")
+                    .toLowerCase()
+                    .includes(searchQuery);
+                  const matchCompany = (u.company_name || "")
+                    .toLowerCase()
+                    .includes(searchQuery);
+                  if (!matchId && !matchName && !matchCompany) return false;
+                }
+                return true;
+              })
+              .forEach((u) => {
+                const tr = document.createElement("tr");
+                // For millers, wholesalers, retailers and company-type users, show company name instead of full name
+                const displayName =
+                  u.user_type === "Miller" ||
+                  u.user_type === "Wholesaler" ||
+                  u.user_type === "Retailer" ||
+                  u.user_type === "Beer" ||
+                  u.user_type === "Animal Food" ||
+                  u.user_type === "Exporter"
+                    ? u.company_name || ""
+                    : u.full_name || "";
+                tr.innerHTML = `
+                  <td>${escapeHtml(u.id || "")}</td>
+                  <td>${escapeHtml(displayName)}</td>
+                  <td>${escapeHtml(u.district || "")}</td>
+                  <td>${escapeHtml(u.contact_number || "")}</td>
+                  <td>
+                    <button class="btn view-user-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;" title="View Details">
+                      👁️ View
+                    </button>
+                    <button class="btn edit-user-btn" style="padding: 4px 8px; font-size: 12px; background-color: #f59e0b; color: white;" title="Edit User">
+                      ✏️ Edit
+                    </button>
+                  </td>
+                `;
+                tr.dataset.user = JSON.stringify(u);
+                tr.dataset.userId = u.id;
+
+                // Add click event listener to the view button
+                const viewBtn = tr.querySelector(".view-user-btn");
+                viewBtn.addEventListener("click", () => showUserDetail(u.id));
+
+                // Add click event listener to the edit button
+                const editBtn = tr.querySelector(".edit-user-btn");
+                editBtn.addEventListener("click", () => editUser(u));
+
+                manageUserTableBody.appendChild(tr);
+              });
+          } catch (err) {
+            console.error("Failed to load users", err);
+          }
+        }
+
+        // Add event listeners for update and view buttons (using event delegation)
+        document.addEventListener("click", function (e) {
+          handleViewInitialPaddy(e);
+          handleUpdateInitialPaddy(e);
+          handleRevertInitialPaddy(e);
+          handleViewInitialRice(e);
+          handleUpdateInitialRice(e);
+        });
+
+        // Add event listeners for modal cancel buttons
+        document
+          .getElementById("cancel-update-paddy-btn")
+          .addEventListener("click", closeUpdatePaddyModal);
+        document
+          .getElementById("cancel-update-rice-btn")
+          .addEventListener("click", closeUpdateRiceModal);
+        // View modal close buttons
+        const closeViewPaddyBtn = document.getElementById(
+          "close-view-paddy-btn"
+        );
+        if (closeViewPaddyBtn)
+          closeViewPaddyBtn.addEventListener("click", closeViewPaddyModal);
+        const closeViewRiceBtn = document.getElementById("close-view-rice-btn");
+        if (closeViewRiceBtn)
+          closeViewRiceBtn.addEventListener("click", closeViewRiceModal);
+
+        // Add event listeners for form submissions
+        document
+          .getElementById("update-initial-paddy-form")
+          .addEventListener("submit", submitUpdatePaddy);
+        document
+          .getElementById("update-initial-rice-form")
+          .addEventListener("submit", submitUpdateRice);
+
+        // Load initial paddy data for Initial P/R section
+        async function loadInitialPaddy() {
+          const initialPaddyTableBody = document.querySelector(
+            "#initial-paddy-table tbody"
+          );
+          if (!initialPaddyTableBody) return;
+
+          const userFilter = document.getElementById(
+            "initial-paddy-user-filter"
+          );
+          const selectedUserType = userFilter ? userFilter.value : "";
+
+          try {
+            const url = selectedUserType
+              ? `/api/initial_paddy?user_type=${encodeURIComponent(
+                  selectedUserType
+                )}`
+              : "/api/initial_paddy";
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error("Failed to fetch initial paddy data");
+            const data = await resp.json();
+
+            initialPaddyTableBody.innerHTML = "";
+
+            if (data.length === 0) {
+              initialPaddyTableBody.innerHTML = `
+                <tr>
+                  <td colspan="7" style="text-align: center; color: #6b7280;">
+                    No data available
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            data.forEach((item) => {
+              const tr = document.createElement("tr");
+              // Format the date
+              let dateStr = "";
+              if (item.created_at) {
+                try {
+                  const date = new Date(item.created_at);
+                  dateStr =
+                    date.toLocaleDateString() + " " + date.toLocaleTimeString();
+                } catch (e) {
+                  dateStr = item.created_at;
+                }
+              }
+
+              // Display company_name for Miller, full_name for Collecter
+              const displayName =
+                item.user_type === "Miller"
+                  ? item.company_name || ""
+                  : item.full_name || "";
+
+              tr.innerHTML = `
+                <td>${escapeHtml(item.user_id || "")}</td>
+                <td>${escapeHtml(displayName)}</td>
+                <td>${escapeHtml(item.district || "")}</td>
+                <td>${escapeHtml(item.paddy_type || "Mixed")}</td>
+                <td>${escapeHtml(
+                  item.quantity ? item.quantity.toLocaleString() : "0"
+                )}</td>
+                <td>${escapeHtml(dateStr)}</td>
+                  <td>
+                    <button class="btn view-initial-paddy-btn" style="padding: 4px 8px; font-size: 12px; margin-right:6px; background-color: #3b82f6; color: white;" data-id="${
+                      item.id
+                    }" data-user-id="${
+                item.user_id
+              }" data-user-name="${escapeHtml(displayName)}" data-user-type="${
+                item.user_type || ""
+              }" data-district="${item.district || ""}" data-paddy-type="${
+                item.paddy_type || ""
+              }" data-quantity="${
+                item.quantity || 0
+              }" data-created-at="${dateStr}" data-block-number="${
+                item.block_number || ""
+              }" data-transaction-id="${
+                item.transaction_id || ""
+              }" data-block-hash="${item.block_hash || ""}">
+                      👁️ View
+                    </button>
+                    <button class="btn revert-initial-paddy-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
+                      item.id
+                    }" data-user-id="${item.user_id}" data-paddy-type="${
+                item.paddy_type || ""
+              }" data-quantity="${item.quantity || 0}">
+                      ↶ Revert
+                    </button>
+                  </td>
+              `;
+              initialPaddyTableBody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed to load initial paddy data", err);
+            initialPaddyTableBody.innerHTML = `
+              <tr>
+                <td colspan="7" style="text-align: center; color: #dc2626;">
+                  Failed to load data. Please try again.
+                </td>
+              </tr>
+            `;
+          }
+        }
+
+        // Load initial rice data for Initial P/R section
+        async function loadInitialRice() {
+          const initialRiceTableBody = document.querySelector(
+            "#initial-rice-table tbody"
+          );
+          if (!initialRiceTableBody) return;
+
+          const userFilter = document.getElementById(
+            "initial-rice-user-filter"
+          );
+          const selectedUserType = userFilter ? userFilter.value : "";
+
+          try {
+            const url = selectedUserType
+              ? `/api/initial_rice?user_type=${encodeURIComponent(
+                  selectedUserType
+                )}`
+              : "/api/initial_rice";
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error("Failed to fetch initial rice data");
+            const data = await resp.json();
+
+            initialRiceTableBody.innerHTML = "";
+
+            if (data.length === 0) {
+              initialRiceTableBody.innerHTML = `
+                <tr>
+                  <td colspan="7" style="text-align: center; color: #6b7280;">
+                    No data available
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            data.forEach((item) => {
+              const tr = document.createElement("tr");
+              // Format the date
+              let dateStr = "";
+              if (item.created_at) {
+                try {
+                  const date = new Date(item.created_at);
+                  dateStr =
+                    date.toLocaleDateString() + " " + date.toLocaleTimeString();
+                } catch (e) {
+                  dateStr = item.created_at;
+                }
+              }
+
+              tr.innerHTML = `
+                <td>${escapeHtml(item.user_id || "")}</td>
+                <td>${escapeHtml(item.user_name || "")}</td>
+                <td>${escapeHtml(item.district || "")}</td>
+                <td>${escapeHtml(item.rice_type || "")}</td>
+                <td>${escapeHtml(
+                  item.quantity ? item.quantity.toLocaleString() : "0"
+                )}</td>
+                <td>${escapeHtml(dateStr)}</td>
+                <td>
+                  <button class="btn view-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; margin-right:6px; background-color: #3b82f6; color: white;" data-id="${
+                    item.id
+                  }" data-user-id="${
+                item.user_id
+              }" data-user-name="${escapeHtml(
+                item.user_name || ""
+              )}" data-user-type="${item.user_type || ""}" data-district="${
+                item.district || ""
+              }" data-rice-type="${item.rice_type || ""}" data-quantity="${
+                item.quantity || 0
+              }" data-created-at="${dateStr}">
+                    👁️ View
+                  </button>
+                  <button class="btn update-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #f59e0b; color: white;" data-id="${
+                    item.id
+                  }" data-user-id="${item.user_id}" data-rice-type="${
+                item.rice_type || ""
+              }" data-quantity="${item.quantity || 0}">
+                    ✏️ Update
+                  </button>
+                </td>
+              `;
+              initialRiceTableBody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed to load initial rice data", err);
+            initialRiceTableBody.innerHTML = `
+              <tr>
+                <td colspan="7" style="text-align: center; color: #dc2626;">
+                  Failed to load data. Please try again.
+                </td>
+              </tr>
+            `;
+          }
+        }
+
+        // Populate user filter dropdowns for Initial P/R
+        async function populateInitialPRUserFilters() {
+          try {
+            // Populate Initial Paddy user filter with user type options
+            const paddyUserFilter = document.getElementById(
+              "initial-paddy-user-filter"
+            );
+            if (paddyUserFilter) {
+              paddyUserFilter.innerHTML = `
+                <option value="Collecter">Collecter</option>
+                <option value="Miller">Miller</option>
+              `;
+            }
+
+            // Populate Initial Rice user filter with user type options
+            const riceUserFilter = document.getElementById(
+              "initial-rice-user-filter"
+            );
+            if (riceUserFilter) {
+              riceUserFilter.innerHTML = `
+                <option value="Miller">Miller</option>
+                <option value="Wholesaler">Wholesaler</option>
+              `;
+            }
+          } catch (err) {
+            console.error("Failed to populate user filters", err);
+          }
+        }
+
+        // Handle update initial paddy button clicks
+        function handleUpdateInitialPaddy(e) {
+          if (e.target.classList.contains("update-initial-paddy-btn")) {
+            const id = e.target.dataset.id;
+            const userId = e.target.dataset.userId;
+            const paddyType = e.target.dataset.paddyType;
+            const quantity = e.target.dataset.quantity;
+
+            document.getElementById("update-paddy-id").value = id;
+            document.getElementById("update-paddy-user-id").value = userId;
+            document.getElementById("update-paddy-type").value = paddyType;
+            document.getElementById("update-paddy-quantity").value = quantity;
+
+            const modal = document.getElementById("update-initial-paddy-modal");
+            modal.removeAttribute("hidden");
+            modal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        // Handle revert initial paddy button clicks
+        async function handleRevertInitialPaddy(e) {
+          if (e.target.classList.contains("revert-initial-paddy-btn")) {
+            const id = e.target.dataset.id;
+            const userId = e.target.dataset.userId;
+            const paddyType = e.target.dataset.paddyType;
+            const quantity = parseFloat(e.target.dataset.quantity);
+
+            if (
+              !confirm(
+                `Are you sure you want to revert this paddy record? This will set status to inactive and deduct ${quantity} kg from the stock.`
+              )
+            ) {
+              return;
+            }
+
+            try {
+              const resp = await fetch(`/api/initial_paddy/${id}/revert`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: userId,
+                  paddy_type: paddyType,
+                  quantity: quantity,
+                }),
+              });
+
+              if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(
+                  error.message || "Failed to revert initial paddy"
+                );
+              }
+
+              alert("Initial paddy reverted successfully!");
+              loadInitialPaddy();
+            } catch (err) {
+              console.error("Error reverting initial paddy:", err);
+              alert(`Error: ${err.message}`);
+            }
+          }
+        }
+
+        // Handle update initial rice button clicks
+        function handleUpdateInitialRice(e) {
+          if (e.target.classList.contains("update-initial-rice-btn")) {
+            const id = e.target.dataset.id;
+            const userId = e.target.dataset.userId;
+            const riceType = e.target.dataset.riceType;
+            const quantity = e.target.dataset.quantity;
+
+            document.getElementById("update-rice-id").value = id;
+            document.getElementById("update-rice-user-id").value = userId;
+            document.getElementById("update-rice-type").value = riceType;
+            document.getElementById("update-rice-quantity").value = quantity;
+
+            const modal = document.getElementById("update-initial-rice-modal");
+            modal.removeAttribute("hidden");
+            modal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        // Close update modals
+        function closeUpdatePaddyModal() {
+          const modal = document.getElementById("update-initial-paddy-modal");
+          modal.setAttribute("hidden", "");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        function closeUpdateRiceModal() {
+          const modal = document.getElementById("update-initial-rice-modal");
+          modal.setAttribute("hidden", "");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        // Handle view initial paddy button clicks
+        function handleViewInitialPaddy(e) {
+          if (e.target.classList.contains("view-initial-paddy-btn")) {
+            const id = e.target.dataset.id;
+            const userId = e.target.dataset.userId;
+            const userName = e.target.dataset.userName || "";
+            const district = e.target.dataset.district || "";
+            const paddyType = e.target.dataset.paddyType || "";
+            const quantity = e.target.dataset.quantity || 0;
+            const created = e.target.dataset.createdAt || "";
+            const blockNumber = e.target.dataset.blockNumber || "N/A";
+            const transactionId = e.target.dataset.transactionId || "N/A";
+            const blockHash = e.target.dataset.blockHash || "N/A";
+
+            document.getElementById("view-paddy-user-id").textContent = userId;
+            document.getElementById("view-paddy-user-name").textContent =
+              userName;
+            document.getElementById("view-paddy-district").textContent =
+              district;
+            document.getElementById("view-paddy-type").textContent = paddyType;
+            document.getElementById("view-paddy-quantity").textContent =
+              quantity;
+            document.getElementById("view-paddy-date").textContent = created;
+            document.getElementById("view-paddy-block-number").textContent =
+              blockNumber;
+            document.getElementById("view-paddy-transaction-id").textContent =
+              transactionId;
+            document.getElementById("view-paddy-block-hash").textContent =
+              blockHash;
+
+            const modal = document.getElementById("view-initial-paddy-modal");
+            modal.removeAttribute("hidden");
+            modal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        function closeViewPaddyModal() {
+          const modal = document.getElementById("view-initial-paddy-modal");
+          modal.setAttribute("hidden", "");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        // Handle view initial rice button clicks
+        function handleViewInitialRice(e) {
+          if (e.target.classList.contains("view-initial-rice-btn")) {
+            const id = e.target.dataset.id;
+            const userId = e.target.dataset.userId;
+            const userName = e.target.dataset.userName || "";
+            const district = e.target.dataset.district || "";
+            const riceType = e.target.dataset.riceType || "";
+            const quantity = e.target.dataset.quantity || 0;
+            const created = e.target.dataset.createdAt || "";
+
+            document.getElementById("view-rice-user-id").textContent = userId;
+            document.getElementById("view-rice-user-name").textContent =
+              userName;
+            document.getElementById("view-rice-district").textContent =
+              district;
+            document.getElementById("view-rice-type").textContent = riceType;
+            document.getElementById("view-rice-quantity").textContent =
+              quantity;
+            document.getElementById("view-rice-date").textContent = created;
+
+            const modal = document.getElementById("view-initial-rice-modal");
+            modal.removeAttribute("hidden");
+            modal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        function closeViewRiceModal() {
+          const modal = document.getElementById("view-initial-rice-modal");
+          modal.setAttribute("hidden", "");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        // Submit update paddy form
+        async function submitUpdatePaddy(e) {
+          e.preventDefault();
+          const id = document.getElementById("update-paddy-id").value;
+          const quantity = document.getElementById(
+            "update-paddy-quantity"
+          ).value;
+
+          try {
+            const res = await fetch(`/api/initial_paddy/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantity: parseFloat(quantity) }),
+            });
+
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.error || "Failed to update");
+            }
+
+            alert("Initial paddy updated successfully");
+            closeUpdatePaddyModal();
+            loadInitialPaddy();
+          } catch (err) {
+            alert("Error updating initial paddy: " + err.message);
+          }
+        }
+
+        // Submit update rice form
+        async function submitUpdateRice(e) {
+          e.preventDefault();
+          const id = document.getElementById("update-rice-id").value;
+          const quantity = document.getElementById(
+            "update-rice-quantity"
+          ).value;
+
+          try {
+            const res = await fetch(`/api/initial_rice/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantity: parseFloat(quantity) }),
+            });
+
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.error || "Failed to update");
+            }
+
+            alert("Initial rice updated successfully");
+            closeUpdateRiceModal();
+            loadInitialRice();
+          } catch (err) {
+            alert("Error updating initial rice: " + err.message);
+          }
+        }
+
+        // Show user detail modal
+        function showUserDetail(userId) {
+          const rows = document.querySelectorAll("#manage-user-table tbody tr");
+          let user = null;
+          rows.forEach((row) => {
+            const userData = row.dataset.user;
+            if (userData) {
+              const u = JSON.parse(userData);
+              if (u.id === userId) {
+                user = u;
+              }
+            }
+          });
+
+          if (!user) return;
+
+          const detailContent = document.getElementById("user-detail-content");
+          detailContent.innerHTML = `
+            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 8px;">
+              <strong>User ID:</strong><span>${escapeHtml(user.id || "")}</span>
+              <strong>User Type:</strong><span>${escapeHtml(
+                user.user_type || ""
+              )}</span>
+              ${
+                // Full name shown only for non-company user types
+                user.user_type !== "Miller" &&
+                user.user_type !== "Wholesaler" &&
+                user.user_type !== "Retailer" &&
+                user.user_type !== "Beer" &&
+                user.user_type !== "Animal Food" &&
+                user.user_type !== "Exporter"
+                  ? `<strong>Full Name:</strong><span>${escapeHtml(
+                      user.full_name || ""
+                    )}</span>`
+                  : ""
+              }
+              ${
+                // Retailer: show only company name; other company types show name+register
+                user.user_type === "Retailer"
+                  ? `<strong>Company Name:</strong><span>${escapeHtml(
+                      user.company_name || ""
+                    )}</span>`
+                  : user.user_type === "Miller" ||
+                    user.user_type === "Wholesaler" ||
+                    user.user_type === "Beer" ||
+                    user.user_type === "Animal Food" ||
+                    user.user_type === "Exporter"
+                  ? `
+                <strong>Company Name:</strong><span>${escapeHtml(
+                  user.company_name || ""
+                )}</span>
+                <strong>Register Number:</strong><span>${escapeHtml(
+                  user.company_register_number || ""
+                )}</span>
+              `
+                  : ""
+              }
+              ${
+                // NIC hidden for company user types and PMB
+                user.user_type !== "Miller" &&
+                user.user_type !== "Wholesaler" &&
+                user.user_type !== "Retailer" &&
+                user.user_type !== "Beer" &&
+                user.user_type !== "Animal Food" &&
+                user.user_type !== "Exporter" &&
+                user.user_type !== "PMB"
+                  ? `<strong>NIC:</strong><span>${escapeHtml(
+                      user.nic || ""
+                    )}</span>`
+                  : ""
+              }
+              <strong>Address:</strong><span>${escapeHtml(
+                user.address || ""
+              )}</span>
+              <strong>District:</strong><span>${escapeHtml(
+                user.district || ""
+              )}</span>
+              <strong>Contact Number:</strong><span>${escapeHtml(
+                user.contact_number || ""
+              )}</span>
+              ${
+                user.user_type === "Farmer"
+                  ? `
+                <strong>Paddy Land Area:</strong><span>${escapeHtml(
+                  user.total_area_of_paddy_land || ""
+                )}</span>
+              `
+                  : ""
+              }
+              <strong>Created At:</strong><span>${escapeHtml(
+                user.created_at || user.createdAt || ""
+              )}</span>
+              <strong>Updated At:</strong><span>${escapeHtml(
+                user.updated_at || user.updatedAt || ""
+              )}</span>
+              <strong>Block Hash:</strong><span style="word-break: break-all; font-size: 11px; font-family: monospace;">${escapeHtml(
+                user.block_hash || user.blockHash || "Not available"
+              )}</span>
+              <strong>Block Number:</strong><span>${escapeHtml(
+                user.block_number || user.blockNumber || "Not available"
+              )}</span>
+              <strong>Transaction Hash:</strong><span style="word-break: break-all; font-size: 11px; font-family: monospace;">${
+                user.transaction_hash || user.transactionHash
+                  ? `<a href="https://sepolia.etherscan.io/tx/${escapeHtml(
+                      user.transaction_hash || user.transactionHash
+                    )}" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">${escapeHtml(
+                      user.transaction_hash || user.transactionHash
+                    )}</a>`
+                  : "Not available"
+              }</span>
+            </div>
+          `;
+
+          const userDetailModal = document.getElementById("user-detail-modal");
+          userDetailModal.hidden = false;
+          userDetailModal.setAttribute("aria-hidden", "false");
+        }
+
+        // Close user detail modal
+        const userDetailCloseBtn = document.getElementById(
+          "user-detail-close-btn"
+        );
+        if (userDetailCloseBtn) {
+          userDetailCloseBtn.addEventListener("click", () => {
+            const userDetailModal =
+              document.getElementById("user-detail-modal");
+            userDetailModal.hidden = true;
+            userDetailModal.removeAttribute("aria-hidden");
+          });
+        }
+
+        // Edit user function
+        let editingUserId = null;
+        function editUser(user) {
+          editingUserId = user.id;
+          const modal = document.getElementById("user-modal");
+          const form = document.getElementById("user-form");
+          const modalHeader = modal.querySelector(".modal-header h3");
+
+          // Change modal title
+          modalHeader.textContent = "Edit User";
+
+          // Set user type
+          const userTypeSelect = form.querySelector('[name="userType"]');
+          if (userTypeSelect) {
+            userTypeSelect.value = user.user_type;
+            userTypeSelect.disabled = true; // Can't change user type when editing
+            renderTypeFields(user.user_type);
+          }
+
+          // Populate form fields based on user type
+          setTimeout(() => {
+            if (user.user_type === "Farmer") {
+              form.querySelector('[name="nic"]').value = user.nic || "";
+              form.querySelector('[name="fullName"]').value =
+                user.full_name || "";
+              form.querySelector('[name="address"]').value = user.address || "";
+              form.querySelector('[name="district"]').value =
+                user.district || "";
+              form.querySelector('[name="contactNumber"]').value =
+                user.contact_number || "";
+              form.querySelector('[name="totalAreaOfPaddyLand"]').value =
+                user.total_area_of_paddy_land || "";
+            } else if (user.user_type === "Collecter") {
+              form.querySelector('[name="nic"]').value = user.nic || "";
+              form.querySelector('[name="fullName"]').value =
+                user.full_name || "";
+              form.querySelector('[name="address"]').value = user.address || "";
+              form.querySelector('[name="district"]').value =
+                user.district || "";
+              form.querySelector('[name="contactNumber"]').value =
+                user.contact_number || "";
+            } else if (
+              user.user_type === "Miller" ||
+              user.user_type === "Wholesaler" ||
+              user.user_type === "Retailer" ||
+              user.user_type === "Beer" ||
+              user.user_type === "Animal Food" ||
+              user.user_type === "Exporter"
+            ) {
+              form.querySelector('[name="companyRegisterNumber"]').value =
+                user.company_register_number || "";
+              form.querySelector('[name="companyName"]').value =
+                user.company_name || "";
+              form.querySelector('[name="address"]').value = user.address || "";
+              form.querySelector('[name="district"]').value =
+                user.district || "";
+              form.querySelector('[name="contactNumber"]').value =
+                user.contact_number || "";
+            } else if (user.user_type === "PMB") {
+              form.querySelector('[name="fullName"]').value =
+                user.full_name || "";
+              form.querySelector('[name="address"]').value = user.address || "";
+              form.querySelector('[name="district"]').value =
+                user.district || "";
+              form.querySelector('[name="contactNumber"]').value =
+                user.contact_number || "";
+            }
+          }, 100);
+
+          // Hide paddy section for editing
+          const paddySection = document.getElementById("paddy-section");
+          if (paddySection) {
+            paddySection.style.display = "none";
+          }
+
+          // Show modal
+          modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
+        }
+
+        // Add event listeners for manage user filters
+        const manageUserTypeFilter = document.getElementById(
+          "manage-user-type-filter"
+        );
+        const manageUserRefresh = document.getElementById(
+          "manage-user-refresh"
+        );
+        const manageUserSearch = document.getElementById("manage-user-search");
+        if (manageUserTypeFilter) {
+          manageUserTypeFilter.addEventListener("change", loadManageUsers);
+        }
+        if (manageUserSearch) {
+          manageUserSearch.addEventListener("input", loadManageUsers);
+        }
+        if (manageUserRefresh) {
+          manageUserRefresh.addEventListener("click", loadManageUsers);
+        }
+
+        // Add event listeners for initial P/R sub-tabs
+        const initialPrTabPaddy = document.getElementById(
+          "initial-pr-tab-paddy"
+        );
+        const initialPrTabRice = document.getElementById("initial-pr-tab-rice");
+        const initialPaddyPanel = document.getElementById(
+          "initial-paddy-panel"
+        );
+        const initialRicePanel = document.getElementById("initial-rice-panel");
+
+        if (initialPrTabPaddy && initialPrTabRice) {
+          initialPrTabPaddy.addEventListener("click", function () {
+            initialPrTabPaddy.classList.add("primary");
+            initialPrTabRice.classList.remove("primary");
+            if (initialPaddyPanel) initialPaddyPanel.style.display = "";
+            if (initialRicePanel) initialRicePanel.style.display = "none";
+          });
+
+          initialPrTabRice.addEventListener("click", function () {
+            initialPrTabRice.classList.add("primary");
+            initialPrTabPaddy.classList.remove("primary");
+            if (initialRicePanel) initialRicePanel.style.display = "";
+            if (initialPaddyPanel) initialPaddyPanel.style.display = "none";
+            loadInitialRice();
+          });
+        }
+
+        // Add event listeners for initial P/R refresh buttons
+        const initialPaddyRefresh = document.getElementById(
+          "initial-paddy-refresh"
+        );
+        if (initialPaddyRefresh) {
+          initialPaddyRefresh.addEventListener("click", loadInitialPaddy);
+        }
+
+        const initialRiceRefresh = document.getElementById(
+          "initial-rice-refresh"
+        );
+        if (initialRiceRefresh) {
+          initialRiceRefresh.addEventListener("click", loadInitialRice);
+        }
+
+        // Add event listeners for initial P/R filters
+        const initialPaddyUserFilter = document.getElementById(
+          "initial-paddy-user-filter"
+        );
+        if (initialPaddyUserFilter) {
+          initialPaddyUserFilter.addEventListener("change", loadInitialPaddy);
+        }
+
+        const initialRiceUserFilter = document.getElementById(
+          "initial-rice-user-filter"
+        );
+        if (initialRiceUserFilter) {
+          initialRiceUserFilter.addEventListener("change", loadInitialRice);
+        }
+
+        // ========================================
+        // ADD INITIAL PADDY MODAL FUNCTIONALITY
+        // ========================================
+        const addInitialPaddyModal = document.getElementById(
+          "add-initial-paddy-modal"
+        );
+        const addInitialPaddyBtn = document.getElementById(
+          "add-initial-paddy-btn"
+        );
+        const addPaddyCancelBtn = document.getElementById(
+          "add-paddy-cancel-btn"
+        );
+        const addInitialPaddyForm = document.getElementById(
+          "add-initial-paddy-form"
+        );
+        const initialPaddyUserTypeSelect = document.getElementById(
+          "initial-paddy-user-type"
+        );
+        const initialPaddyUserSelect = document.getElementById(
+          "initial-paddy-user-select"
+        );
+        const initialPaddyTypeSelect = document.getElementById(
+          "initial-paddy-type-select"
+        );
+
+        // Fetch paddy types on page load
+        async function fetchPaddyTypesForModal() {
+          try {
+            const resp = await fetch("/api/paddy_types");
+            if (!resp.ok) throw new Error("Failed to fetch paddy types");
+            const types = await resp.json();
+            initialPaddyTypeSelect.innerHTML =
+              '<option value="">Select Paddy Type</option>';
+            types.forEach((t) => {
+              const opt = document.createElement("option");
+              opt.value = t.name || t.id || "";
+              opt.textContent = t.name || String(t.id || "");
+              initialPaddyTypeSelect.appendChild(opt);
+            });
+          } catch (err) {
+            console.error("Failed to fetch paddy types:", err);
+          }
+        }
+
+        // Load users based on selected user type
+        async function loadUsersForPaddyModal() {
+          const userType = initialPaddyUserTypeSelect.value;
+          initialPaddyUserSelect.innerHTML =
+            '<option value="">Select User</option>';
+
+          if (!userType) return;
+
+          try {
+            const resp = await fetch(
+              `/api/users?user_type=${encodeURIComponent(userType)}`
+            );
+            if (!resp.ok) throw new Error("Failed to fetch users");
+            const users = await resp.json();
+
+            users.forEach((u) => {
+              const opt = document.createElement("option");
+              opt.value = u.id || "";
+              const displayName =
+                u.full_name || u.company_name || u.name || u.user_code || "";
+              const idPart =
+                u.id !== undefined && u.id !== null ? String(u.id) : "";
+              opt.textContent = idPart
+                ? `${idPart} - ${displayName || idPart}`
+                : displayName || idPart;
+              initialPaddyUserSelect.appendChild(opt);
+            });
+          } catch (err) {
+            console.error("Failed to load users:", err);
+          }
+        }
+
+        // Open Add Paddy Modal
+        if (addInitialPaddyBtn) {
+          addInitialPaddyBtn.addEventListener("click", () => {
+            addInitialPaddyModal.hidden = false;
+            fetchPaddyTypesForModal();
+          });
+        }
+
+        // Close Add Paddy Modal
+        if (addPaddyCancelBtn) {
+          addPaddyCancelBtn.addEventListener("click", () => {
+            addInitialPaddyModal.hidden = true;
+            addInitialPaddyForm.reset();
+          });
+        }
+
+        // User type change handler
+        if (initialPaddyUserTypeSelect) {
+          initialPaddyUserTypeSelect.addEventListener(
+            "change",
+            loadUsersForPaddyModal
+          );
+        }
+
+        // Form submission handler
+        if (addInitialPaddyForm) {
+          addInitialPaddyForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const userId = initialPaddyUserSelect.value;
+            const paddyType = initialPaddyTypeSelect.value;
+            const quantity = document.getElementById(
+              "initial-paddy-quantity"
+            ).value;
+
+            if (!userId || !paddyType || !quantity) {
+              alert("Please fill in all fields");
+              return;
+            }
+
+            try {
+              const resp = await fetch("/api/initial_paddy", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: userId,
+                  paddy_type: paddyType,
+                  quantity: parseFloat(quantity),
+                }),
+              });
+
+              if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(error.message || "Failed to add initial paddy");
+              }
+
+              const result = await resp.json();
+              alert("Initial paddy added successfully!");
+              addInitialPaddyModal.hidden = true;
+              addInitialPaddyForm.reset();
+              loadInitialPaddy();
+            } catch (err) {
+              console.error("Error adding initial paddy:", err);
+              alert(`Error: ${err.message}`);
+            }
+          });
+        }
+
+        // Populate filter paddy type dropdown for Analytics
+        async function populateFilterPaddyType() {
+          try {
+            if (!filterPaddyType) return;
+            const types = await fetchPaddyTypes();
+            filterPaddyType.innerHTML = "";
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              filterPaddyType.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate filter paddy type", e);
+          }
+        }
+
+        // Populate filter district dropdown
+        function populateFilterDistrict() {
+          const filterDistrict = document.getElementById("filter-district");
+          if (!filterDistrict) return;
+
+          const districts = [
+            "Ampara",
+            "Anuradhapura",
+            "Badulla",
+            "Batticaloa",
+            "Colombo",
+            "Galle",
+            "Gampaha",
+            "Hambantota",
+            "Jaffna",
+            "Kalutara",
+            "Kandy",
+            "Kegalle",
+            "Kilinochchi",
+            "Kurunegala",
+            "Mannar",
+            "Matale",
+            "Matara",
+            "Monaragala",
+            "Mullaitivu",
+            "Nuwara Eliya",
+            "Polonnaruwa",
+            "Puttalam",
+            "Ratnapura",
+            "Trincomalee",
+            "Vavuniya",
+          ];
+
+          districts.forEach((d) => {
+            const o = document.createElement("option");
+            o.value = d;
+            o.textContent = d;
+            filterDistrict.appendChild(o);
+          });
+        }
+
+        // Initialize Analytics filters
+        populateFilterPaddyType();
+        populateFilterDistrict();
+
+        const filterDistrict = document.getElementById("filter-district");
+        if (filterUserType) {
+          filterUserType.addEventListener("change", loadStockUsers);
+        }
+        if (filterPaddyType) {
+          filterPaddyType.addEventListener("change", loadStockUsers);
+        }
+        if (filterDistrict) {
+          filterDistrict.addEventListener("change", loadStockUsers);
+        }
+        if (filterRefresh) {
+          filterRefresh.addEventListener("click", loadStockUsers);
+        }
+
+        // Load users - stock view only
+        async function loadStockUsers() {
+          try {
+            const userType = filterUserType ? filterUserType.value : "collect";
+            const ptype = filterPaddyType ? filterPaddyType.value : "";
+            const district = filterDistrict ? filterDistrict.value : "";
+
+            // Update table headers for stock view
+            const tableHead = document.getElementById("user-table-head");
+            tableHead.innerHTML = `<tr>
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Quantity (kg)</th>
+              <th scope="col">District</th>
+            </tr>`;
+
+            let url = `/api/stock_by_user?user_type=${encodeURIComponent(
+              userType
+            )}`;
+            if (ptype) url += `&paddy_type=${encodeURIComponent(ptype)}`;
+            if (district) url += `&district=${encodeURIComponent(district)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Failed to load data");
+            let rows = await res.json();
+
+            // Sort by quantity in descending order
+            rows.sort((a, b) => (b.total || 0) - (a.total || 0));
+
+            // Get tbody from the user-table in analytics section
+            const userTableBody = document.querySelector("#user-table tbody");
+            if (!userTableBody) {
+              console.error("User table tbody not found");
+              return;
+            }
+
+            userTableBody.innerHTML = "";
+            rows.forEach((r) => {
+              const tr = document.createElement("tr");
+              tr.dataset.userId = r.id || "";
+              tr.innerHTML = `<td>${escapeHtml(
+                r.id || ""
+              )}</td><td>${escapeHtml(r.full_name || "")}</td><td>${Number(
+                r.total || 0
+              ).toFixed(3)}</td><td>${escapeHtml(r.district || "")}</td>`;
+              tr.style.cursor = "pointer";
+              tr.addEventListener("click", async () => {
+                // load detail for this user
+                try {
+                  const uid = tr.dataset.userId;
+                  const resp = await fetch(
+                    `/api/stock_user_detail?user_id=${encodeURIComponent(uid)}`
+                  );
+                  if (!resp.ok) throw new Error("Failed to load details");
+                  const detail = await resp.json();
+                  stockDetailBody.innerHTML = "";
+                  detail.forEach((d) => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `<td>${escapeHtml(
+                      d.type || ""
+                    )}</td><td>${Number(d.amount || 0).toFixed(3)}</td>`;
+                    stockDetailBody.appendChild(row);
+                  });
+                  // set modal title
+                  const title = document.getElementById("stock-modal-title");
+                  title.textContent = `Stock details - ${r.full_name || r.id}`;
+                  stockModal.hidden = false;
+                  stockModal.setAttribute("aria-hidden", "false");
+                } catch (err) {
+                  console.error("Failed to load user stock detail", err);
+                  alert("Failed to load user stock details");
+                }
+              });
+              userTableBody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed loading users", err);
+          }
+        }
+
+        // Paddy types handling
+        let __paddyTypes = [];
+        async function fetchPaddyTypes() {
+          try {
+            const res = await fetch("/api/paddy_types");
+            if (!res.ok) return [];
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+          } catch (e) {
+            return [];
+          }
+        }
+
+        function createPaddyRow(types) {
+          const wrap = document.createElement("div");
+          wrap.className = "paddy-row";
+          const sel = document.createElement("select");
+          sel.name = "paddyType";
+          const ph = document.createElement("option");
+          ph.value = "";
+          ph.textContent = "Select paddy type";
+          sel.appendChild(ph);
+          types.forEach((t) => {
+            const o = document.createElement("option");
+            o.value = t.name || t.id || "";
+            o.textContent = t.name || String(t.id || "");
+            sel.appendChild(o);
+          });
+          const qty = document.createElement("input");
+          qty.type = "number";
+          qty.name = "paddyQty";
+          qty.min = "0";
+          qty.step = "0.01";
+          qty.placeholder = "Quantity (kg)";
+          const rem = document.createElement("button");
+          rem.type = "button";
+          rem.className = "btn";
+          rem.textContent = "Remove";
+          rem.addEventListener("click", () => wrap.remove());
+          wrap.appendChild(sel);
+          wrap.appendChild(qty);
+          wrap.appendChild(rem);
+          return wrap;
+        }
+
+        function createRiceRow(types) {
+          const wrap = document.createElement("div");
+          wrap.className = "rice-row";
+          const sel = document.createElement("select");
+          sel.name = "riceType";
+          const ph = document.createElement("option");
+          ph.value = "";
+          ph.textContent = "Select paddy type (for rice)";
+          sel.appendChild(ph);
+          types.forEach((t) => {
+            const o = document.createElement("option");
+            o.value = t.name || t.id || "";
+            o.textContent = t.name || String(t.id || "");
+            sel.appendChild(o);
+          });
+          const qty = document.createElement("input");
+          qty.type = "number";
+          qty.name = "riceQty";
+          qty.min = "0";
+          qty.step = "0.01";
+          qty.placeholder = "Quantity (kg)";
+          const rem = document.createElement("button");
+          rem.type = "button";
+          rem.className = "btn";
+          rem.textContent = "Remove";
+          rem.addEventListener("click", () => wrap.remove());
+          wrap.appendChild(sel);
+          wrap.appendChild(qty);
+          wrap.appendChild(rem);
+          return wrap;
+        }
+
+        function openModal() {
+          lastFocused = document.activeElement;
+          modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
+          // render fields for currently selected type (in case modal reused)
+          const currentType = form.querySelector('[name="userType"]')
+            ? form.querySelector('[name="userType"]').value
+            : "Farmer";
+          renderTypeFields(currentType);
+          // load paddy types for the add-paddy UI
+          (async () => {
+            __paddyTypes = await fetchPaddyTypes();
+            // clear any existing rows
+            const list = document.getElementById("paddy-list");
+            if (list) list.innerHTML = "";
+          })();
+          // focus the first input/select inside the modal
+          const first =
+            modalContent && modalContent.querySelector("input, select");
+          first && first.focus();
+        }
+
+        function closeModal() {
+          modal.hidden = true;
+          modal.setAttribute("aria-hidden", "true");
+          form.reset();
+          editingUserId = null;
+          const userTypeSelect =
+            form && form.querySelector('[name="userType"]');
+          if (userTypeSelect) userTypeSelect.disabled = false;
+          const modalHeader = modal && modal.querySelector(".modal-header h3");
+          if (modalHeader) modalHeader.textContent = "Add User";
+          lastFocused && lastFocused.focus();
+        }
+
+        addBtn && addBtn.addEventListener("click", openModal);
+        cancelBtn && cancelBtn.addEventListener("click", closeModal);
+
+        // Close modal when clicking overlay (outside modal-content)
+        modal &&
+          modal.addEventListener("click", function (e) {
+            if (e.target === modal) closeModal();
+          });
+
+        // Dynamic type-specific fields
+        const userTypeSelect = form && form.querySelector('[name="userType"]');
+        const typeFieldsContainer = document.getElementById("type-fields");
+
+        function renderTypeFields(type) {
+          if (!typeFieldsContainer) return;
+          let html = "";
+
+          const districtOptions = `
+          
+            <option value="Ampara">Ampara</option>
+            <option value="Anuradhapura">Anuradhapura</option>
+            <option value="Badulla">Badulla</option>
+            <option value="Batticaloa">Batticaloa</option>
+            <option value="Colombo">Colombo</option>
+            <option value="Galle">Galle</option>
+            <option value="Gampaha">Gampaha</option>
+            <option value="Hambantota">Hambantota</option>
+            <option value="Jaffna">Jaffna</option>
+            <option value="Kalutara">Kalutara</option>
+            <option value="Kandy">Kandy</option>
+            <option value="Kegalle">Kegalle</option>
+            <option value="Kilinochchi">Kilinochchi</option>
+            <option value="Kurunegala">Kurunegala</option>
+            <option value="Mannar">Mannar</option>
+            <option value="Matale">Matale</option>
+            <option value="Matara">Matara</option>
+            <option value="Monaragala">Monaragala</option>
+            <option value="Mullaitivu">Mullaitivu</option>
+            <option value="Nuwara Eliya">Nuwara Eliya</option>
+            <option value="Polonnaruwa">Polonnaruwa</option>
+            <option value="Puttalam">Puttalam</option>
+            <option value="Ratnapura">Ratnapura</option>
+            <option value="Trincomalee">Trincomalee</option>
+            <option value="Vavuniya">Vavuniya</option>
+          `;
+
+          if (type === "Farmer") {
+            html = `
+
+              <label>NIC<input type="text" name="nic" /></label>
+              <label>Full Name<input type="text" name="fullName" /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+              <label>Total Area Of Paddy Land<input type="text" name="totalAreaOfPaddyLand" /></label>
+            `;
+          } else if (type === "Collecter") {
+            html = `
+              <label>NIC<input type="text" name="nic" required /></label>
+              <label>Name<input type="text" name="fullName" /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Miller") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Wholesaler") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Retailer") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Beer") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" required /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Animal Food") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" required /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "Exporter") {
+            html = `
+              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Company Name<input type="text" name="companyName" required /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          } else if (type === "PMB") {
+            html = `
+              <label>Full Name<input type="text" name="fullName" required /></label>
+              <label>Address<input type="text" name="address" /></label>
+              <label>District<select name="district">${districtOptions}</select></label>
+              <label>Contact Number<input type="text" name="contactNumber" /></label>
+            `;
+          }
+          typeFieldsContainer.innerHTML = html;
+          // Show or hide paddy stock section: farmers, PMB and Wholesaler should not have initial paddy stock input
+          const paddySection = document.getElementById("paddy-section");
+          if (paddySection) {
+            if (
+              type === "Farmer" ||
+              type === "PMB" ||
+              type === "Wholesaler" ||
+              type === "Retailer" ||
+              type === "Beer" ||
+              type === "Animal Food" ||
+              type === "Exporter"
+            ) {
+              paddySection.style.display = "none";
+              // clear any existing paddy rows
+              const list = document.getElementById("paddy-list");
+              if (list) list.innerHTML = "";
+            } else {
+              paddySection.style.display = "";
+            }
+          }
+          // Show rice stock section for Miller, Wholesaler, Retailer, Beer, Animal Food and Exporter
+          const riceSection = document.getElementById("rice-section");
+          if (riceSection) {
+            if (
+              type === "Miller" ||
+              type === "Wholesaler" ||
+              type === "Retailer" ||
+              type === "Beer" ||
+              type === "Animal Food" ||
+              type === "Exporter"
+            ) {
+              riceSection.style.display = "";
+            } else {
+              riceSection.style.display = "none";
+              // clear any existing rice rows
+              const riceList = document.getElementById("rice-list");
+              if (riceList) riceList.innerHTML = "";
+            }
+          }
+        }
+
+        userTypeSelect &&
+          userTypeSelect.addEventListener("change", function (e) {
+            const type = e.target.value;
+            renderTypeFields(type);
+          });
+        // initialize
+        const initialType = userTypeSelect ? userTypeSelect.value : "Farmer";
+        renderTypeFields(initialType);
+
+        // wire Add Paddy button
+        const addPaddyBtn = document.getElementById("add-paddy-btn");
+        if (addPaddyBtn) {
+          addPaddyBtn.addEventListener("click", async function () {
+            try {
+              if (!__paddyTypes || !__paddyTypes.length) {
+                __paddyTypes = await fetchPaddyTypes();
+              }
+              const list = document.getElementById("paddy-list");
+              if (list) {
+                const row = createPaddyRow(__paddyTypes);
+                list.appendChild(row);
+              }
+            } catch (e) {
+              console.error("Could not add paddy row", e);
+            }
+          });
+        }
+
+        // wire Add Rice button
+        const addRiceBtn = document.getElementById("add-rice-btn");
+        if (addRiceBtn) {
+          addRiceBtn.addEventListener("click", async function () {
+            try {
+              if (!__paddyTypes || !__paddyTypes.length) {
+                __paddyTypes = await fetchPaddyTypes();
+              }
+              const list = document.getElementById("rice-list");
+              if (list) {
+                const row = createRiceRow(__paddyTypes);
+                list.appendChild(row);
+              }
+            } catch (e) {
+              console.error("Could not add rice row", e);
+            }
+          });
+        }
+
+        form &&
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const isEditing = editingUserId !== null;
+            const data = new FormData(form);
+            const userType = data.get("userType");
+
+            // gather type-specific ids/names/addresses when present
+            const nic = data.get("nic") ? data.get("nic").trim() : "";
+            const companyRegisterNumber = data.get("companyRegisterNumber")
+              ? data.get("companyRegisterNumber").trim()
+              : "";
+            const userId = data.get("userId") ? data.get("userId").trim() : "";
+            const fullName = data.get("fullName")
+              ? data.get("fullName").trim()
+              : "";
+            const companyName = data.get("companyName")
+              ? data.get("companyName").trim()
+              : "";
+            const address = data.get("address")
+              ? data.get("address").trim()
+              : "";
+            const contactNumber = data.get("contactNumber")
+              ? data.get("contactNumber").trim()
+              : "";
+            const totalAreaOfPaddyLand = data.get("totalAreaOfPaddyLand")
+              ? data.get("totalAreaOfPaddyLand").trim()
+              : "";
+
+            // determine display values (no generic fields)
+            let displayId = nic || companyRegisterNumber || userId;
+            let displayName = fullName || companyName;
+            const displayLocation = address;
+
+            // Special cases: PMB, Retailer, Beer and Animal Food require only a name (no external ID)
+            const lowType = (userType || "").toString().trim().toLowerCase();
+            if (lowType === "pmb") {
+              displayId = "PMB";
+              displayName = fullName || "";
+              if (!displayName) {
+                alert("Name is required for PMB");
+                return;
+              }
+            } else if (lowType === "retailer") {
+              // Retailer does not supply an external ID; require company name only
+              displayName = companyName || "";
+              if (!displayName) {
+                alert("Company Name is required for " + userType);
+                return;
+              }
+            } else if (lowType === "beer") {
+              // Beer requires company register number and company name
+              displayId = companyRegisterNumber || "";
+              displayName = companyName || "";
+              if (!displayId || !displayName) {
+                alert(
+                  "Company Register Number and Company Name are required for " +
+                    userType
+                );
+                return;
+              }
+            } else if (lowType === "exporter") {
+              // Exporter require Company Register Number and Company Name
+              displayId = companyRegisterNumber || "";
+              displayName = companyName || "";
+              if (!displayId || !displayName) {
+                alert(
+                  "Company Register Number and Company Name are required for " +
+                    userType
+                );
+                return;
+              }
+            } else if (lowType === "animal food") {
+              // Animal Food require Company Register Number and Company Name
+              displayId = companyRegisterNumber || "";
+              displayName = companyName || "";
+              if (!displayId || !displayName) {
+                alert(
+                  "Company Register Number and Company Name are required for " +
+                    userType
+                );
+                return;
+              }
+            } else {
+              // Other user types require both ID and Name (NIC/company reg no + name)
+              if (!displayId || !displayName) {
+                alert("ID and Name are required for the selected user type");
+                return;
+              }
+            }
+
+            // build payload expected by server
+            const payload = {
+              userType,
+              nic,
+              companyRegisterNumber,
+              fullName,
+              companyName,
+              address,
+              district: data.get("district") || "",
+              contactNumber,
+              totalAreaOfPaddyLand,
+            };
+
+            // collect paddy stock rows if any
+            try {
+              const pList = [];
+              const container = document.getElementById("paddy-list");
+              if (container) {
+                const rows = container.querySelectorAll(".paddy-row");
+                rows.forEach((r) => {
+                  const sel = r.querySelector('select[name="paddyType"]');
+                  const q = r.querySelector('input[name="paddyQty"]');
+                  const pval = sel ? sel.value : "";
+                  const qtyval = q ? q.value : "";
+                  if (pval && qtyval) {
+                    pList.push({ paddyType: pval, quantity: qtyval });
+                  }
+                });
+              }
+              if (pList.length) payload.stock = pList;
+            } catch (err) {
+              // ignore
+            }
+
+            // collect rice stock rows if any (for Miller)
+            try {
+              const rList = [];
+              const riceContainer = document.getElementById("rice-list");
+              if (riceContainer) {
+                const rows = riceContainer.querySelectorAll(".rice-row");
+                rows.forEach((r) => {
+                  const sel = r.querySelector('select[name="riceType"]');
+                  const q = r.querySelector('input[name="riceQty"]');
+                  const rval = sel ? sel.value : "";
+                  const qtyval = q ? q.value : "";
+                  if (rval && qtyval) {
+                    rList.push({ paddyType: rval, quantity: qtyval });
+                  }
+                });
+              }
+              if (rList.length) payload.riceStock = rList;
+            } catch (err) {
+              // ignore
+            }
+
+            try {
+              // Show loading overlay
+              const loadingOverlay = document.getElementById("loading-overlay");
+              const loadingText = document.getElementById("loading-text");
+              if (loadingOverlay) {
+                loadingText.textContent = isEditing
+                  ? "Updating user..."
+                  : "Creating user...";
+                loadingOverlay.classList.add("active");
+              }
+
+              let url = "/api/users";
+              let method = "POST";
+
+              if (isEditing) {
+                // Edit mode - use PUT method and include user ID in URL
+                url = `/api/users/${encodeURIComponent(editingUserId)}`;
+                method = "PUT";
+              }
+
+              const res = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || res.statusText);
+              }
+              const saved = await res.json();
+
+              // if server returned null/empty, fall back to locally computed values
+              let displayId2, displayName2, displayLocation2, savedUserType;
+              if (!saved || typeof saved !== "object") {
+                // use payload/local values as fallback
+                displayId2 =
+                  payload.user_code || nic || companyRegisterNumber || "";
+                displayName2 = fullName || companyName || "";
+                displayLocation2 = address || "";
+                savedUserType = userType;
+              } else {
+                displayId2 =
+                  saved.user_code ||
+                  saved.nic ||
+                  saved.company_register_number ||
+                  "";
+                displayName2 = saved.full_name || saved.company_name || "";
+                displayLocation2 = saved.address || "";
+                savedUserType = saved.user_type || userType;
+              }
+
+              const tr = document.createElement("tr");
+              tr.innerHTML = `<td>${escapeHtml(
+                displayId2
+              )}</td><td>${escapeHtml(displayName2)}</td><td>${escapeHtml(
+                savedUserType
+              )}</td><td>${escapeHtml(displayLocation2)}</td>`;
+              tbody.appendChild(tr);
+              closeModal();
+              // clear paddy rows after successful save
+              const pListEl = document.getElementById("paddy-list");
+              if (pListEl) pListEl.innerHTML = "";
+            } catch (err) {
+              console.error("Failed to save user", err);
+              alert("Failed to save user: " + (err.message || err));
+            } finally {
+              // Hide loading overlay
+              const loadingOverlay = document.getElementById("loading-overlay");
+              if (loadingOverlay) {
+                loadingOverlay.classList.remove("active");
+              }
+            }
+          });
+
+        // Initialize manage user table with empty state
+        // User must select user type and paddy type to load data
+        const userTableBody = document.querySelector("#user-table tbody");
+        if (userTableBody) {
+          userTableBody.innerHTML =
+            '<tr><td colspan="4" style="text-align:center;padding:20px;color:#6b7280;">Select User Type and Paddy Type to view stock data</td></tr>';
+        }
+
+        // load dashboard stats
+        async function loadStats() {
+          try {
+            const res = await fetch("/api/stats");
+            if (!res.ok) return;
+            const d = await res.json();
+            const f = document.getElementById("total-farmers");
+            const c = document.getElementById("total-collectors");
+            const m = document.getElementById("total-millers");
+            const w = document.getElementById("total-wholesalers");
+            const r = document.getElementById("total-retailers");
+            const b = document.getElementById("total-beer");
+            const a = document.getElementById("total-animalfood");
+            const e = document.getElementById("total-exporter");
+            if (f) f.textContent = d.farmers != null ? d.farmers : "-";
+            if (c) c.textContent = d.collectors != null ? d.collectors : "-";
+            if (m) m.textContent = d.millers != null ? d.millers : "-";
+            if (w) w.textContent = d.wholesalers != null ? d.wholesalers : "-";
+            if (r) r.textContent = d.retailers != null ? d.retailers : "-";
+            if (b) b.textContent = d.beer != null ? d.beer : "-";
+            if (a) a.textContent = d.animalfood != null ? d.animalfood : "-";
+            if (e) e.textContent = d.exporter != null ? d.exporter : "-";
+          } catch (e) {
+            console.error("Failed to load stats", e);
+          }
+        }
+
+        // refresh stats when dashboard tab is activated
+        const dashboardTabAnchor = document.getElementById("tab-dashboard");
+        if (dashboardTabAnchor) {
+          dashboardTabAnchor.addEventListener("click", function () {
+            // small timeout to ensure panel becomes visible
+            setTimeout(loadStats, 100);
+          });
+        }
+
+        // initial stats load
+        loadStats();
+
+        // populate paddy type select used by chart
+        async function populatePaddySelect() {
+          try {
+            const sel = document.getElementById("paddy-type-select");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            // clear existing options (except the default)
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", function () {
+              // reload chart for selected paddy type
+              loadPaddyChart();
+            });
+          } catch (e) {
+            console.error("Failed to populate paddy select", e);
+          }
+        }
+
+        // initial populate
+        populatePaddySelect();
+
+        // Load and render paddy chart
+        async function ensureChartJs() {
+          if (window.Chart) return Promise.resolve();
+          return new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Failed to load Chart.js"));
+            document.head.appendChild(s);
+          });
+        }
+
+        let paddyChart = null;
+        async function loadPaddyChart() {
+          try {
+            const sel = document.getElementById("paddy-type-select");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_history";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+            const dates = d.dates || [];
+            const pmbData = d.pmb || [];
+            const colData = d.collecter || [];
+            const milData = d.miller || [];
+            await ensureChartJs();
+            const ctx = document.getElementById("paddy-chart").getContext("2d");
+            if (paddyChart) {
+              paddyChart.data.labels = dates;
+              paddyChart.data.datasets[0].data = pmbData;
+              paddyChart.data.datasets[1].data = colData;
+              paddyChart.data.datasets[2].data = milData;
+              paddyChart.update();
+              return;
+            }
+            paddyChart = new Chart(ctx, {
+              type: "line",
+              data: {
+                labels: dates,
+                datasets: [
+                  {
+                    label: "PMB (kg)",
+                    data: pmbData,
+                    borderColor: "rgba(11,61,145,0.9)",
+                    backgroundColor: "rgba(11,61,145,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                  {
+                    label: "Collectors (kg)",
+                    data: colData,
+                    borderColor: "rgba(11,132,255,0.9)",
+                    backgroundColor: "rgba(11,132,255,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                  {
+                    label: "Millers (kg)",
+                    data: milData,
+                    borderColor: "rgba(245,158,11,0.9)",
+                    backgroundColor: "rgba(245,158,11,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: {
+                    title: { display: true, text: "Date" },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Stock (kg)" },
+                  },
+                },
+                plugins: {
+                  legend: { display: true, position: "bottom" },
+                },
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load paddy chart", e);
+          }
+        }
+
+        // refresh chart when dashboard tab activated
+        if (dashboardTabAnchor) {
+          dashboardTabAnchor.addEventListener("click", function () {
+            setTimeout(loadPaddyChart, 120);
+          });
+        }
+
+        // initial chart load
+        loadPaddyChart();
+
+        // --- Analytics chart (same comparison chart shown in Analytics tab) ---
+        async function populateAnalyticsPaddySelect() {
+          try {
+            const sel = document.getElementById("analytics-paddy-type-select");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            // clear existing options (except the default)
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", function () {
+              loadAnalyticsChart();
+            });
+          } catch (e) {
+            console.error("Failed to populate analytics paddy select", e);
+          }
+        }
+
+        let analyticsChart = null;
+        async function loadAnalyticsChart() {
+          try {
+            const sel = document.getElementById("analytics-paddy-type-select");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_history";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+            const dates = d.dates || [];
+            const pmbData = d.pmb || [];
+            const colData = d.collecter || [];
+            const milData = d.miller || [];
+            await ensureChartJs();
+            const ctx = document
+              .getElementById("paddy-chart-analytics")
+              .getContext("2d");
+            if (analyticsChart) {
+              analyticsChart.data.labels = dates;
+              analyticsChart.data.datasets[0].data = pmbData;
+              analyticsChart.data.datasets[1].data = colData;
+              analyticsChart.data.datasets[2].data = milData;
+              analyticsChart.update();
+              return;
+            }
+            analyticsChart = new Chart(ctx, {
+              type: "line",
+              data: {
+                labels: dates,
+                datasets: [
+                  {
+                    label: "PMB (kg)",
+                    data: pmbData,
+                    borderColor: "rgba(11,61,145,0.9)",
+                    backgroundColor: "rgba(11,61,145,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                  {
+                    label: "Collectors (kg)",
+                    data: colData,
+                    borderColor: "rgba(11,132,255,0.9)",
+                    backgroundColor: "rgba(11,132,255,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                  {
+                    label: "Millers (kg)",
+                    data: milData,
+                    borderColor: "rgba(245,158,11,0.9)",
+                    backgroundColor: "rgba(245,158,11,0.08)",
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: { title: { display: true, text: "Date" } },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Stock (kg)" },
+                  },
+                },
+                plugins: { legend: { display: true, position: "bottom" } },
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load analytics paddy chart", e);
+          }
+        }
+
+        // Populate analytics paddy select now
+        populateAnalyticsPaddySelect();
+
+        // Populate district paddy select
+        async function populateDistrictPaddySelect() {
+          try {
+            const sel = document.getElementById("district-paddy-type-select");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            // clear existing options (except the default)
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", function () {
+              loadDistrictChart();
+            });
+          } catch (e) {
+            console.error("Failed to populate district paddy select", e);
+          }
+        }
+
+        populateDistrictPaddySelect();
+
+        // Analytics subtabs: show/hide Paddy vs Rice panels
+        function showPaddyPanel() {
+          const p = document.getElementById("analytics-paddy-panel");
+          const r = document.getElementById("analytics-rice-panel");
+          const btnP = document.getElementById("analytics-tab-paddy");
+          const btnR = document.getElementById("analytics-tab-rice");
+
+          if (p) {
+            p.hidden = false;
+            p.style.display = "block";
+          }
+          if (r) {
+            r.hidden = true;
+            r.style.display = "none";
+          }
+          if (btnP) {
+            btnP.classList.add("primary");
+          }
+          if (btnR) {
+            btnR.classList.remove("primary");
+          }
+
+          // load paddy analytics content
+          setTimeout(() => {
+            loadAnalyticsChart();
+            loadDistrictChart();
+            loadStockUsers();
+            loadTransactions();
+          }, 50);
+        }
+
+        function showRicePanel() {
+          const p = document.getElementById("analytics-paddy-panel");
+          const r = document.getElementById("analytics-rice-panel");
+          const btnP = document.getElementById("analytics-tab-paddy");
+          const btnR = document.getElementById("analytics-tab-rice");
+
+          if (p) {
+            p.hidden = true;
+            p.style.display = "none";
+          }
+          if (r) {
+            r.hidden = false;
+            r.style.display = "block";
+          }
+          if (btnP) {
+            btnP.classList.remove("primary");
+          }
+          if (btnR) {
+            btnR.classList.add("primary");
+          }
+        }
+
+        // wire analytics subtabs
+        const analyticsTabPaddyBtn = document.getElementById(
+          "analytics-tab-paddy"
+        );
+        const analyticsTabRiceBtn =
+          document.getElementById("analytics-tab-rice");
+        if (analyticsTabPaddyBtn)
+          analyticsTabPaddyBtn.addEventListener("click", showPaddyPanel);
+        if (analyticsTabRiceBtn)
+          analyticsTabRiceBtn.addEventListener("click", showRicePanel);
+
+        // --- District-based stock chart ---
+        let districtChart = null;
+        async function loadDistrictChart() {
+          try {
+            const sel = document.getElementById("district-paddy-type-select");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_by_district";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+            const districts = d.districts || [];
+
+            await ensureChartJs();
+            const ctx = document
+              .getElementById("district-chart-analytics")
+              .getContext("2d");
+
+            let datasets = [];
+
+            // Check if we have a single paddy type or multiple types breakdown
+            if (d.paddy_types && d.data) {
+              // Multiple paddy types - create datasets for each paddy type for both collectors and millers
+              const paddyTypes = d.paddy_types || [];
+              const colors = [
+                { bg: "rgba(11,132,255,0.7)", border: "rgba(11,132,255,1)" },
+                { bg: "rgba(245,158,11,0.7)", border: "rgba(245,158,11,1)" },
+                { bg: "rgba(16,185,129,0.7)", border: "rgba(16,185,129,1)" },
+                { bg: "rgba(239,68,68,0.7)", border: "rgba(239,68,68,1)" },
+                { bg: "rgba(139,92,246,0.7)", border: "rgba(139,92,246,1)" },
+                { bg: "rgba(236,72,153,0.7)", border: "rgba(236,72,153,1)" },
+              ];
+
+              paddyTypes.forEach((pt, idx) => {
+                const colorIdx = idx % colors.length;
+                // Collector dataset for this paddy type
+                datasets.push({
+                  label: `Collectors - ${pt} (kg)`,
+                  data: d.data.collectors[pt] || [],
+                  backgroundColor: colors[colorIdx].bg,
+                  borderColor: colors[colorIdx].border,
+                  borderWidth: 1,
+                });
+                // Miller dataset for this paddy type
+                datasets.push({
+                  label: `Millers - ${pt} (kg)`,
+                  data: d.data.millers[pt] || [],
+                  backgroundColor: colors[colorIdx].bg.replace("0.7", "0.5"),
+                  borderColor: colors[colorIdx].border,
+                  borderWidth: 1,
+                  borderDash: [5, 5],
+                });
+              });
+            } else {
+              // Single paddy type selected
+              const collectorsData = d.collectors || [];
+              const millersData = d.millers || [];
+
+              datasets = [
+                {
+                  label: "Collectors (kg)",
+                  data: collectorsData,
+                  backgroundColor: "rgba(11,132,255,0.7)",
+                  borderColor: "rgba(11,132,255,1)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Millers (kg)",
+                  data: millersData,
+                  backgroundColor: "rgba(245,158,11,0.7)",
+                  borderColor: "rgba(245,158,11,1)",
+                  borderWidth: 1,
+                },
+              ];
+            }
+
+            if (districtChart) {
+              districtChart.data.labels = districts;
+              districtChart.data.datasets = datasets;
+              districtChart.update();
+              return;
+            }
+
+            districtChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: districts,
+                datasets: datasets,
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: {
+                    title: { display: true, text: "District" },
+                    stacked: false,
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Stock (kg)" },
+                    stacked: false,
+                  },
+                },
+                plugins: {
+                  legend: { display: true, position: "bottom" },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          context.parsed.y.toFixed(2) +
+                          " kg"
+                        );
+                      },
+                    },
+                  },
+                },
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
+                barPercentage: 0.8,
+                categoryPercentage: 0.9,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load district chart", e);
+          }
+        }
+
+        // When analytics tab is activated, load both charts and user stock table
+        const analyticsTabAnchor = document.getElementById("tab-analytics");
+        if (analyticsTabAnchor) {
+          analyticsTabAnchor.addEventListener("click", function () {
+            // give UI a moment to show the panel; default to Paddy subtab
+            setTimeout(() => {
+              showPaddyPanel();
+            }, 120);
+          });
+        }
+
+        // Populate transaction paddy type filter
+        async function populateTransactionPaddyFilter() {
+          try {
+            const sel = document.getElementById("transaction-paddy-filter");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            sel.innerHTML = '<option value="">All Paddy Types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", loadTransactions);
+          } catch (e) {
+            console.error("Failed to populate transaction paddy filter", e);
+          }
+        }
+
+        populateTransactionPaddyFilter();
+
+        // Transaction filter event listeners
+        const transactionTypeFilter = document.getElementById(
+          "transaction-type-filter"
+        );
+        const transactionPaddyFilter = document.getElementById(
+          "transaction-paddy-filter"
+        );
+        const transactionDateFrom = document.getElementById(
+          "transaction-date-from"
+        );
+        const transactionDateTo = document.getElementById(
+          "transaction-date-to"
+        );
+        const transactionSearch = document.getElementById("transaction-search");
+        const transactionRefresh = document.getElementById(
+          "transaction-refresh"
+        );
+
+        if (transactionTypeFilter) {
+          transactionTypeFilter.addEventListener("change", loadTransactions);
+        }
+        if (transactionDateFrom) {
+          transactionDateFrom.addEventListener("change", loadTransactions);
+        }
+        if (transactionDateTo) {
+          transactionDateTo.addEventListener("change", loadTransactions);
+        }
+        if (transactionSearch) {
+          transactionSearch.addEventListener("input", loadTransactions);
+        }
+        if (transactionRefresh) {
+          transactionRefresh.addEventListener("click", loadTransactions);
+        }
+
+        // Load transactions
+        async function loadTransactions() {
+          try {
+            const transactionTableBody = document.querySelector(
+              "#transaction-table tbody"
+            );
+            if (!transactionTableBody) {
+              console.error("Transaction table tbody not found");
+              return;
+            }
+
+            const typeFilter = document.getElementById(
+              "transaction-type-filter"
+            );
+            const paddyFilter = document.getElementById(
+              "transaction-paddy-filter"
+            );
+            const dateFromInput = document.getElementById(
+              "transaction-date-from"
+            );
+            const dateToInput = document.getElementById("transaction-date-to");
+            const searchInput = document.getElementById("transaction-search");
+            const selectedType = typeFilter ? typeFilter.value : "";
+            const selectedPaddy = paddyFilter ? paddyFilter.value : "";
+            const dateFrom = dateFromInput ? dateFromInput.value : "";
+            const dateTo = dateToInput ? dateToInput.value : "";
+            const searchQuery = searchInput
+              ? searchInput.value.trim().toLowerCase()
+              : "";
+
+            const res = await fetch("/api/transactions");
+            if (!res.ok) throw new Error("Failed to load transactions");
+            let transactions = await res.json();
+
+            // Fetch users to determine user types for transaction type filtering
+            let usersMap = {};
+            try {
+              const usersRes = await fetch("/api/users");
+              if (usersRes.ok) {
+                const users = await usersRes.json();
+                users.forEach((u) => {
+                  usersMap[u.id] = (u.user_type || "").toLowerCase();
+                });
+              }
+            } catch (e) {
+              console.error("Failed to fetch users for type filtering", e);
+            }
+
+            // Apply filters
+            transactions = transactions.filter((t) => {
+              // Filter by transaction type (based on from/to user types)
+              if (selectedType) {
+                // Get user types from usersMap, fallback to checking the ID itself for PMB
+                const fromId = (t.from || "").toLowerCase();
+                const toId = (t.to || "").toLowerCase();
+                const fromType =
+                  usersMap[t.from] || (fromId === "pmb" ? "pmb" : "");
+                const toType = usersMap[t.to] || (toId === "pmb" ? "pmb" : "");
+
+                if (selectedType === "farmer-collector") {
+                  if (
+                    !fromType.includes("farmer") ||
+                    !toType.includes("collect")
+                  )
+                    return false;
+                } else if (selectedType === "collector-collector") {
+                  if (
+                    !fromType.includes("collect") ||
+                    !toType.includes("collect")
+                  )
+                    return false;
+                } else if (selectedType === "collector-miller") {
+                  if (
+                    !fromType.includes("collect") ||
+                    !toType.includes("miller")
+                  )
+                    return false;
+                } else if (selectedType === "farmer-pmb") {
+                  if (!fromType.includes("farmer") || !toType.includes("pmb"))
+                    return false;
+                } else if (selectedType === "collector-pmb") {
+                  if (!fromType.includes("collect") || !toType.includes("pmb"))
+                    return false;
+                }
+              }
+              // Filter by paddy type
+              if (selectedPaddy && t.type !== selectedPaddy) return false;
+              // Filter by date range
+              if (dateFrom || dateTo) {
+                const txDate = t.datetime
+                  ? new Date(t.datetime)
+                  : t.created_at
+                  ? new Date(t.created_at)
+                  : null;
+                if (txDate) {
+                  if (dateFrom) {
+                    const fromDate = new Date(dateFrom);
+                    fromDate.setHours(0, 0, 0, 0);
+                    if (txDate < fromDate) return false;
+                  }
+                  if (dateTo) {
+                    const toDate = new Date(dateTo);
+                    toDate.setHours(23, 59, 59, 999);
+                    if (txDate > toDate) return false;
+                  }
+                }
+              }
+              // Filter by search query (from or to)
+              if (searchQuery) {
+                const matchFrom = (t.from || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                const matchTo = (t.to || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                if (!matchFrom && !matchTo) return false;
+              }
+              return true;
+            });
+
+            transactionTableBody.innerHTML = "";
+
+            if (transactions.length === 0) {
+              transactionTableBody.innerHTML =
+                '<tr><td colspan="6" style="text-align:center;padding:20px;color:#6b7280;">No transactions found</td></tr>';
+              return;
+            }
+
+            transactions.forEach((t) => {
+              const tr = document.createElement("tr");
+              const dateStr = t.datetime
+                ? new Date(t.datetime).toLocaleString()
+                : t.created_at
+                ? new Date(t.created_at).toLocaleString()
+                : "-";
+              tr.innerHTML = `
+                <td>${escapeHtml(t.id || "")}</td>
+                <td>${escapeHtml(t.from || "")}</td>
+                <td>${escapeHtml(t.to || "")}</td>
+                <td>${escapeHtml(t.type || "")}</td>
+                <td>${Number(t.quantity || 0).toFixed(3)}</td>
+                <td>${escapeHtml(dateStr)}</td>
+              `;
+              transactionTableBody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed to load transactions", err);
+          }
+        }
+
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>\"]/g, function (m) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+            }[m];
+          });
+        }
+      });
+    </script>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-content">
+        <p>
+          <span class="loading-spinner"></span>
+          <span id="loading-text">Processing...</span>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

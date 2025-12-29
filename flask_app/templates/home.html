@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Home - Sri Lanka Rice Supply Chain</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">
+        Sri Lanka Rice Supply Chain<br />Blockchain Traceability System
+      </h1>
+    </header>
+
+    <main class="content" style="text-align: center; padding-top: 80px">
+      <button id="login-btn" class="btn primary">Login</button>
+    </main>
+
+    <!-- Login Modal -->
+    <div
+      id="login-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document">
+        <header class="modal-header">
+          <h3>Login</h3>
+        </header>
+        <form id="login-form">
+          <label
+            >Username
+            <input type="text" name="username" required />
+          </label>
+          <label
+            >Password
+            <input type="password" name="password" required />
+          </label>
+          <label
+            >Role
+            <select name="role">
+              <option>Collecter</option>
+              <option>Miller</option>
+              <option>Wholesaler</option>
+              <option>Retailer</option>
+              <option>Beer</option>
+              <option>Animal Food</option>
+              <option>Exporter</option>
+              <option>Admin</option>
+              <option>PMB</option>
+            </select>
+          </label>
+
+          <div class="modal-actions">
+            <button type="button" id="login-cancel" class="btn">Cancel</button>
+            <button type="submit" class="btn primary">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("login-btn");
+        const modal = document.getElementById("login-modal");
+        const modalContent = modal && modal.querySelector(".modal-content");
+        const cancelBtn = document.getElementById("login-cancel");
+        const form = document.getElementById("login-form");
+        let lastFocused = null;
+
+        function openModal() {
+          lastFocused = document.activeElement;
+          modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
+          const first =
+            modalContent && modalContent.querySelector("input, select");
+          first && first.focus();
+        }
+
+        function closeModal() {
+          modal.hidden = true;
+          modal.setAttribute("aria-hidden", "true");
+          form.reset();
+          lastFocused && lastFocused.focus();
+        }
+
+        loginBtn && loginBtn.addEventListener("click", openModal);
+        cancelBtn && cancelBtn.addEventListener("click", closeModal);
+
+        modal &&
+          modal.addEventListener("click", function (e) {
+            if (e.target === modal) closeModal();
+          });
+
+        form &&
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const data = new FormData(form);
+            const username = (data.get("username") || "").trim();
+            const password = (data.get("password") || "").trim();
+            const role = (data.get("role") || "").trim();
+
+            try {
+              const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password, role }),
+              });
+              const j = await res.json();
+              if (res.ok && j.ok) {
+                // navigate based on role returned by server
+                const returnedRole = (j.role || "").toLowerCase();
+                if (returnedRole.startsWith("miller")) {
+                  window.location.href = "/miller";
+                } else if (returnedRole.startsWith("wholesaler")) {
+                  window.location.href = "/wholesaler";
+                } else if (returnedRole.startsWith("retailer")) {
+                  window.location.href = "/retailer";
+                } else if (returnedRole.startsWith("beer")) {
+                  window.location.href = "/beer";
+                } else if (returnedRole.startsWith("animal food")) {
+                  window.location.href = "/animalfood";
+                } else if (returnedRole.startsWith("exporter")) {
+                  window.location.href = "/exporter";
+                } else if (returnedRole.startsWith("pmb")) {
+                  window.location.href = "/pmb";
+                } else if (
+                  returnedRole.startsWith("collecter") ||
+                  returnedRole.startsWith("collector")
+                ) {
+                  window.location.href = "/collecter";
+                } else if (returnedRole.startsWith("admin")) {
+                  window.location.href = "/app";
+                } else {
+                  // default to main app
+                  window.location.href = "/app";
+                }
+                return;
+              }
+              alert(j.error || "Invalid credentials or role.");
+            } catch (err) {
+              console.error(err);
+              alert("Login failed: " + err.message);
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

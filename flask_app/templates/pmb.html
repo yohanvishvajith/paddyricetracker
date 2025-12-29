@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Government Dashboard - PMB</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-title">Government Dashboard (PMB)</h1>
+      <nav class="tabs" aria-label="Government tabs">
+        <ul>
+          <li class="tab active"><a href="#" data-index="0">Overview</a></li>
+          <li class="tab"><a href="#" data-index="1">Milling</a></li>
+          <li class="tab"><a href="#" data-index="2">Damage</a></li>
+          <li class="tab"><a href="#" data-index="3">Reports</a></li>
+          <li class="tab"><a href="#" data-index="4">Settings</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content">
+      <section class="panel" id="purchase-panel">
+        <h2>Record Purchase (PMB)</h2>
+
+        <div class="card">
+          <form id="purchaseForm">
+            <label for="purchaseFromType">Purchase From</label>
+            <select id="purchaseFromType" required>
+              <option value="Farmer">Farmer</option>
+              <option value="Collecter">Collecter</option>
+            </select>
+
+            <label for="sourceSelect">Source</label>
+            <select id="sourceSelect" required>
+              <option value="">Loading...</option>
+            </select>
+
+            <label for="paddyType">Paddy Type</label>
+            <select id="paddyType" required>
+              <option value="">Loading paddy types...</option>
+            </select>
+
+            <label for="qty">Quantity (kg)</label>
+            <input id="qty" type="number" min="0" step="0.01" required />
+
+            <label for="price">Price (per kg)</label>
+            <input id="price" type="number" min="0" step="0.01" />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Save Purchase</button>
+              <a href="/" class="btn">Back to home</a>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="purchasesTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Hash ID</th>
+                <th>Source</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="milling-panel" hidden>
+        <h2>Record Milling (PMB)</h2>
+
+        <div class="card">
+          <form id="pmbMillingForm">
+            <label for="pmbMillingPaddyType">Paddy Type</label>
+            <select id="pmbMillingPaddyType" required>
+              <option value="">Select paddy type</option>
+            </select>
+
+            <label for="pmbMillingInputQty">Input Paddy Quantity (kg)</label>
+            <input
+              id="pmbMillingInputQty"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+
+            <label for="pmbMillingOutputQty">Output Rice Quantity (kg)</label>
+            <input
+              id="pmbMillingOutputQty"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            />
+
+            <label for="pmbMillingDryDuration">Dry Duration (days)</label>
+            <input
+              id="pmbMillingDryDuration"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="Number of days for drying"
+            />
+
+            <label for="pmbMillingDate">Milling Date</label>
+            <input id="pmbMillingDate" type="date" required />
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Record Milling</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Milling Records</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="pmbMillingTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Miller</th>
+                <th>Paddy Type</th>
+                <th>Input (kg)</th>
+                <th>Output Rice (kg)</th>
+                <th>Yield (%)</th>
+                <th>Block ID</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="damage-panel" hidden>
+        <h2>Record Damage (PMB)</h2>
+
+        <div class="card">
+          <form id="damageForm">
+            <label for="damagePaddyType">Paddy / Rice Type</label>
+            <select id="damagePaddyType" required>
+              <option value="">Select paddy type</option>
+            </select>
+
+            <label for="damageQty">Damaged Quantity (kg)</label>
+            <input id="damageQty" type="number" min="0" step="0.01" required />
+
+            <label for="damageReason">Reason</label>
+            <textarea
+              id="damageReason"
+              rows="3"
+              placeholder="Describe the reason for damage"
+              required
+            ></textarea>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn primary">Record Damage</button>
+            </div>
+          </form>
+        </div>
+
+        <h3 style="margin-top: 18px">Recent Damages</h3>
+        <div class="tabs" style="margin-bottom: 12px">
+          <ul
+            style="
+              display: flex;
+              gap: 8px;
+              list-style: none;
+              padding: 0;
+              margin: 0;
+            "
+          >
+            <li>
+              <button type="button" id="pmbDamagePaddyTab" class="btn primary">
+                Paddy
+              </button>
+            </li>
+            <li>
+              <button type="button" id="pmbDamageRiceTab" class="btn">
+                Rice
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="table-wrap" id="pmbDamagesPaddyPanel">
+          <table class="data-table" id="pmbDamagesPaddyTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Paddy Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap" id="pmbDamagesRicePanel" hidden>
+          <table class="data-table" id="pmbDamagesRiceTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Reason</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="reports-panel" hidden>
+        <h2>Reports</h2>
+        <p>Report views will appear here.</p>
+      </section>
+
+      <section class="panel" id="settings-panel" hidden>
+        <h2>Settings</h2>
+        <p>Settings will appear here.</p>
+      </section>
+    </main>
+
+    <script>
+      // PMB purchase form - fetches sources and paddy types and posts transactions
+      let currentUser = null;
+      let purchases = [];
+
+      function qs(s) {
+        return document.querySelector(s);
+      }
+
+      async function fetchCurrentUser() {
+        try {
+          const res = await fetch("/api/me");
+          if (!res.ok) return null;
+          const j = await res.json();
+          return j && j.ok ? j : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      async function fetchUsersByType(type) {
+        try {
+          const q = encodeURIComponent(type || "");
+          const res = await fetch(`/api/users/by_type?type=${q}`);
+          if (!res.ok) return [];
+          const d = await res.json();
+          return Array.isArray(d) ? d : [];
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+
+      async function fetchPaddyTypes() {
+        try {
+          const res = await fetch("/api/paddy_types");
+          if (!res.ok) return [];
+          const d = await res.json();
+          return Array.isArray(d) ? d : [];
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+
+      function userLabel(u) {
+        return (u.full_name || "") + " (" + (u.user_code || u.id || "") + ")";
+      }
+
+      async function loadRecent(to) {
+        try {
+          const url = to
+            ? `/api/transactions?to=${encodeURIComponent(to)}`
+            : "/api/transactions";
+          const res = await fetch(url);
+          if (!res.ok) return [];
+          const rows = await res.json();
+          return Array.isArray(rows) ? rows : [];
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+
+      // HTML escape helper
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Render purchases table
+      function render() {
+        const tbody = qs("#purchasesTable tbody");
+        tbody.innerHTML = "";
+        purchases
+          .slice()
+          .reverse()
+          .forEach((r) => {
+            const tr = document.createElement("tr");
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const fromDisplay = escapeHtml(String(r.from));
+            const typeDisplay = escapeHtml(r.type || "");
+            const priceDisplay = r.price ? Number(r.price).toFixed(2) : "-";
+            tr.innerHTML = `<td>${new Date(
+              r.datetime || r.created_at
+            ).toLocaleString()}</td><td title="${
+              r.block_hash || ""
+            }">${hashDisplay}</td><td>${fromDisplay}</td><td>${typeDisplay}</td><td>${
+              r.quantity || 0
+            }</td><td>${priceDisplay}</td><td>
+              <button class="btn view-purchase-btn" 
+                data-id="${r.id || ""}" 
+                data-from="${escapeHtml(String(r.from))}" 
+                data-type="${escapeHtml(r.type || "")}" 
+                data-quantity="${r.quantity || 0}" 
+                data-price="${priceDisplay}"
+                data-datetime="${r.datetime || r.created_at || ""}" 
+                data-block-hash="${r.block_hash || ""}" 
+                data-block-number="${r.block_number || ""}" 
+                data-tx-hash="${r.transaction_hash || ""}">View</button>
+              <button class="btn revert-purchase-btn" 
+                data-id="${r.id || ""}" 
+                data-from="${escapeHtml(String(r.from))}" 
+                data-type="${escapeHtml(r.type || "")}" 
+                data-quantity="${r.quantity || 0}" 
+                data-price="${escapeHtml(r.price || 0)}"
+                style="background:#ef4444; color:#fff;">↩️ Revert</button>
+            </td>`;
+            tbody.appendChild(tr);
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const me = await fetchCurrentUser();
+        if (!me) {
+          window.location = "/";
+          return;
+        }
+        currentUser = me;
+
+        const fromSel = qs("#purchaseFromType");
+        const sourceSel = qs("#sourceSelect");
+        const pSel = qs("#paddyType");
+
+        function setupTabs() {
+          const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+          const panels = [
+            qs("#purchase-panel"),
+            qs("#milling-panel"),
+            qs("#damage-panel"),
+            qs("#reports-panel"),
+            qs("#settings-panel"),
+          ];
+          tabs.forEach((tab, i) => {
+            tab.addEventListener("click", (ev) => {
+              ev.preventDefault();
+              tabs.forEach((t) => t.classList.remove("active"));
+              tab.classList.add("active");
+              panels.forEach((p) => (p.hidden = true));
+              if (panels[i]) {
+                panels[i].hidden = false;
+                // Load milling data when milling tab is shown
+                if (i === 1) renderPmbMillingTable();
+              }
+            });
+          });
+        }
+
+        async function populateSource(fromType) {
+          sourceSel.innerHTML = "";
+          const list = await fetchUsersByType(fromType);
+          if (!list.length) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "No " + fromType + "s found";
+            sourceSel.appendChild(opt);
+            return;
+          }
+          const ph = document.createElement("option");
+          ph.value = "";
+          ph.textContent = "Select " + fromType;
+          sourceSel.appendChild(ph);
+          list.forEach((u) => {
+            const o = document.createElement("option");
+            o.value = u.id || u.user_code || "";
+            o.textContent = userLabel(u);
+            o.dataset.full = u.full_name || "";
+            sourceSel.appendChild(o);
+          });
+        }
+
+        // populate paddy types
+        const types = await fetchPaddyTypes();
+        pSel.innerHTML = "";
+        const ph = document.createElement("option");
+        ph.value = "";
+        ph.textContent = "Select paddy type";
+        pSel.appendChild(ph);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          pSel.appendChild(o);
+        });
+
+        await populateSource(fromSel.value);
+
+        // populate damage paddy select
+        const damageSel = qs("#damagePaddyType");
+        damageSel.innerHTML = "";
+        const dph = document.createElement("option");
+        dph.value = "";
+        dph.textContent = "Select paddy type";
+        damageSel.appendChild(dph);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          damageSel.appendChild(o);
+        });
+
+        setupTabs();
+
+        fromSel.addEventListener("change", (e) =>
+          populateSource(e.target.value)
+        );
+
+        // load recent purchases for this user
+        purchases = await loadRecent(currentUser.user_id);
+        render();
+
+        qs("#purchaseForm").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const fromType = fromSel.value;
+          const fromId = sourceSel.value;
+          const ptype = pSel.value;
+          const qty = qs("#qty").value;
+          const price = qs("#price").value;
+          if (!fromId || !ptype || !qty) {
+            alert("Please fill all fields");
+            return;
+          }
+          try {
+            const payload = {
+              from: fromId,
+              to: currentUser.user_id,
+              type: ptype,
+              quantity: Number(qty),
+              price: price ? Number(price) : null,
+              datetime: new Date().toISOString(),
+            };
+            const resp = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const j = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+              alert("Failed: " + (j.error || resp.statusText));
+              return;
+            }
+            // refresh list
+            purchases = await loadRecent(currentUser.user_id);
+            render();
+            qs("#purchaseForm").reset();
+            await populateSource(fromType);
+          } catch (err) {
+            console.error(err);
+            alert("Error saving transaction");
+          }
+        });
+
+        // Damage form handling
+        qs("#damageForm").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const paddyType = qs("#damagePaddyType").value;
+          const qty = qs("#damageQty").value;
+          const reason = qs("#damageReason").value;
+          if (!paddyType || !qty || !reason) {
+            alert("Please fill all fields");
+            return;
+          }
+          try {
+            const kind = qs("#pmbDamageRiceTab").classList.contains("primary")
+              ? "rice"
+              : "paddy";
+            const payload = {
+              user_id: currentUser ? currentUser.user_id : null,
+              paddy_type: paddyType,
+              quantity: qty,
+              reason: reason,
+              damage_date: new Date().toISOString(),
+              kind: kind,
+            };
+            const resp = await fetch("/api/damages", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const j = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+              alert("Failed to record damage: " + (j.error || resp.statusText));
+              return;
+            }
+            // refresh damages list based on active tab
+            if (kind === "rice") {
+              await renderRiceDamageTable();
+            } else {
+              await renderPaddyDamageTable();
+            }
+            qs("#damageForm").reset();
+            alert("Damage recorded successfully");
+          } catch (err) {
+            console.error(err);
+            alert("Error recording damage");
+          }
+        });
+
+        // Populate milling form dropdowns
+        const pmbMillingPaddySel = qs("#pmbMillingPaddyType");
+        pmbMillingPaddySel.innerHTML = "";
+        const millingPh = document.createElement("option");
+        millingPh.value = "";
+        millingPh.textContent = "Select paddy type";
+        pmbMillingPaddySel.appendChild(millingPh);
+        types.forEach((t) => {
+          const o = document.createElement("option");
+          o.value = t.name || t.id || "";
+          o.textContent = t.name || String(t.id || "");
+          pmbMillingPaddySel.appendChild(o);
+        });
+
+        // Set default milling date to today
+        const today = new Date().toISOString().split("T")[0];
+        qs("#pmbMillingDate").value = today;
+
+        // PMB Milling form handler
+        qs("#pmbMillingForm").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const paddyType = qs("#pmbMillingPaddyType").value;
+          const inputQty = qs("#pmbMillingInputQty").value;
+          const outputQty = qs("#pmbMillingOutputQty").value;
+          const dryDuration = qs("#pmbMillingDryDuration").value;
+          const millingDate = qs("#pmbMillingDate").value;
+
+          if (!paddyType || !inputQty || !outputQty || !millingDate) {
+            alert("Please fill all fields");
+            return;
+          }
+
+          const inputNum = parseFloat(inputQty);
+          const outputNum = parseFloat(outputQty);
+          const dryDurationNum = parseFloat(dryDuration) || 0;
+
+          if (outputNum > inputNum) {
+            alert("Output rice quantity cannot exceed input paddy quantity");
+            return;
+          }
+
+          try {
+            const payload = {
+              miller_id: currentUser.user_id,
+              paddy_type: paddyType,
+              input_paddy: inputNum,
+              output_rice: outputNum,
+              drying_duration: dryDurationNum,
+              milling_date: millingDate,
+            };
+            const resp = await fetch("/api/milling", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const j = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+              alert(
+                "Failed to save milling record: " + (j.error || resp.statusText)
+              );
+              return;
+            }
+            // refresh milling table
+            await renderPmbMillingTable();
+            qs("#pmbMillingForm").reset();
+            const newToday = new Date().toISOString().split("T")[0];
+            qs("#pmbMillingDate").value = newToday;
+            alert("Milling record saved successfully");
+          } catch (err) {
+            console.error(err);
+            alert("Error saving milling record");
+          }
+        });
+
+        // initial setup for damage tabs and render paddy damages by default
+        setupDamageTabs();
+        await renderPaddyDamageTable();
+      });
+
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      async function renderPaddyDamageTable() {
+        const dBody = qs("#pmbDamagesPaddyTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = (await fetchCurrentUser())?.user_id || null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}&kind=paddy`
+            : "/api/damages?kind=paddy";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load paddy damages");
+          const damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const hashDisplay = d.block_hash
+              ? String(d.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleString()}</td><td>${escapeHtml(
+              d.paddy_type
+            )}</td><td>${escapeHtml(d.quantity)}</td><td>${escapeHtml(
+              d.reason
+            )}</td><td title="${d.block_hash || ""}">${hashDisplay}</td><td>
+              <button class="btn revert-damage-btn" data-id="${escapeHtml(
+                d.id
+              )}" data-kind="paddy" data-qty="${escapeHtml(
+              d.quantity
+            )}" data-paddy-type="${escapeHtml(
+              d.paddy_type
+            )}" data-user-id="${escapeHtml(
+              d.user_id
+            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+            </td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load paddy damages:", e);
+        }
+      }
+
+      async function renderRiceDamageTable() {
+        const dBody = qs("#pmbDamagesRiceTable tbody");
+        dBody.innerHTML = "";
+        try {
+          const userId = (await fetchCurrentUser())?.user_id || null;
+          const url = userId
+            ? `/api/damages?user_id=${encodeURIComponent(userId)}&kind=rice`
+            : "/api/damages?kind=rice";
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to load rice damages");
+          const damages = await res.json();
+          damages.forEach((d) => {
+            const tr = document.createElement("tr");
+            const displayDate = d.damage_date || d.created_at;
+            const hashDisplay = d.block_hash
+              ? String(d.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleString()}</td><td>${escapeHtml(
+              d.paddy_type || d.rice_type
+            )}</td><td>${escapeHtml(d.quantity)}</td><td>${escapeHtml(
+              d.reason
+            )}</td><td title="${d.block_hash || ""}">${hashDisplay}</td><td>
+              <button class="btn revert-damage-btn" data-id="${escapeHtml(
+                d.id
+              )}" data-kind="rice" data-qty="${escapeHtml(
+              d.quantity
+            )}" data-paddy-type="${escapeHtml(
+              d.paddy_type || d.rice_type
+            )}" data-user-id="${escapeHtml(
+              d.user_id
+            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+            </td>`;
+            dBody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load rice damages:", e);
+        }
+      }
+
+      async function renderPmbMillingTable() {
+        const tbody = qs("#pmbMillingTable tbody");
+        tbody.innerHTML = "";
+        try {
+          const res = await fetch("/api/milling");
+          if (!res.ok) throw new Error("Failed to load milling records");
+          const millingRecords = await res.json();
+
+          // Fetch all users to get miller names
+          const usersRes = await fetch("/api/users");
+          const users = usersRes.ok ? await usersRes.json() : [];
+          const userMap = {};
+          users.forEach((u) => {
+            userMap[u.id] = u.full_name || u.company_name || u.id;
+          });
+
+          millingRecords.forEach((r) => {
+            const inputQty = parseFloat(r.input_paddy) || 0;
+            const outputQty = parseFloat(r.output_rice) || 0;
+            const yield_percent =
+              inputQty > 0 ? ((outputQty / inputQty) * 100).toFixed(2) : 0;
+            const hashDisplay = r.block_hash
+              ? String(r.block_hash).slice(0, 12) + "..."
+              : "Not available";
+            const millerName = userMap[r.miller_id] || r.miller_id;
+            const tr = document.createElement("tr");
+            const displayDate = r.milling_date || r.created_at;
+            tr.innerHTML = `<td>${new Date(
+              displayDate
+            ).toLocaleDateString()}</td>
+                          <td>${millerName}</td>
+                          <td>${r.paddy_type}</td>
+                          <td>${inputQty.toFixed(2)}</td>
+                          <td>${outputQty.toFixed(2)}</td>
+                          <td>${yield_percent}%</td>
+                          <td title="${
+                            r.block_hash || ""
+                          }">${hashDisplay}</td>`;
+            tbody.appendChild(tr);
+          });
+        } catch (e) {
+          console.error("Could not load milling records:", e);
+        }
+      }
+
+      function setupDamageTabs() {
+        const pTab = qs("#pmbDamagePaddyTab");
+        const rTab = qs("#pmbDamageRiceTab");
+        const pPanel = qs("#pmbDamagesPaddyPanel");
+        const rPanel = qs("#pmbDamagesRicePanel");
+
+        pTab.addEventListener("click", async (e) => {
+          e.preventDefault();
+          pTab.classList.add("primary");
+          rTab.classList.remove("primary");
+          pPanel.hidden = false;
+          rPanel.hidden = true;
+          await renderPaddyDamageTable();
+        });
+
+        rTab.addEventListener("click", async (e) => {
+          e.preventDefault();
+          rTab.classList.add("primary");
+          pTab.classList.remove("primary");
+          rPanel.hidden = false;
+          pPanel.hidden = true;
+          await renderRiceDamageTable();
+        });
+      }
+
+      // Revert damage handler
+      document.addEventListener("click", async (e) => {
+        if (e.target && e.target.classList.contains("revert-damage-btn")) {
+          const qty = parseFloat(e.target.dataset.qty) || 0;
+          const paddyType = e.target.dataset.paddyType || "";
+          const userId = e.target.dataset.userId || "";
+          const kind = e.target.dataset.kind || "paddy";
+
+          if (!userId) {
+            alert("Error: User ID not available. Please refresh the page.");
+            return;
+          }
+
+          if (!paddyType) {
+            alert("Error: Paddy type not available.");
+            return;
+          }
+
+          if (
+            !confirm(
+              `Revert damage of ${qty} kg ${paddyType}? This will create a new record with reason "revert".`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const payload = {
+              user_id: userId,
+              paddy_type: paddyType,
+              quantity: qty,
+              reason: "revert",
+              kind: kind,
+              damage_date: new Date().toISOString(),
+            };
+
+            const res = await fetch("/api/damages", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok && result.ok) {
+              alert("Damage reverted successfully. New record created.");
+              if (kind === "rice") {
+                await renderRiceDamageTable();
+              } else {
+                await renderPaddyDamageTable();
+              }
+            } else {
+              alert("Error: " + (result.error || "Failed to revert damage"));
+            }
+          } catch (err) {
+            console.error("Failed to revert damage:", err);
+            alert("Network error during revert: " + err.message);
+          }
+        }
+      });
+
+      // Event delegation for view/update purchase buttons
+      document.addEventListener("click", async (e) => {
+        // View Purchase
+        if (e.target.classList.contains("view-purchase-btn")) {
+          const btn = e.target;
+          const modal = qs("#viewPurchaseModal");
+          qs("#viewPurchaseFrom").textContent = btn.dataset.from || "";
+          qs("#viewPurchaseType").textContent = btn.dataset.type || "";
+          qs("#viewPurchaseQuantity").textContent = btn.dataset.quantity || "";
+          qs("#viewPurchaseDateTime").textContent = btn.dataset.datetime
+            ? new Date(btn.dataset.datetime).toLocaleString()
+            : "";
+          qs("#viewPurchaseBlockHash").textContent =
+            btn.dataset.blockHash || "Not available";
+          qs("#viewPurchaseBlockNumber").textContent =
+            btn.dataset.blockNumber || "Not available";
+          qs("#viewPurchaseTxHash").textContent =
+            btn.dataset.txHash || "Not available";
+          modal.hidden = false;
+        }
+
+        // Revert purchase: create reversal with status=0
+        if (e.target.classList.contains("revert-purchase-btn")) {
+          const btn = e.target;
+          const id = btn.dataset.id;
+          const from = btn.dataset.from;
+          const type = btn.dataset.type;
+          const quantity = parseFloat(btn.dataset.quantity) || 0;
+          const price = parseFloat(btn.dataset.price) || 0;
+
+          if (
+            !confirm(
+              `Revert purchase of ${quantity} kg ${type} from ${from}? This will create a reversal with status=0.`
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const to = currentUser ? currentUser.user_id : "";
+            const payload = {
+              from: from,
+              to: to,
+              type: type,
+              quantity: quantity,
+              price: price,
+              datetime: new Date().toISOString(),
+              status: 0, // Revert transaction
+            };
+
+            const res = await fetch("/api/transactions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok && result.ok) {
+              alert("Purchase reverted successfully");
+              // Reload purchases from server
+              purchases = await loadRecent(currentUser.user_id);
+              render();
+            } else {
+              alert("Error: " + (result.error || "Failed to revert purchase"));
+            }
+          } catch (err) {
+            console.error("Failed to revert purchase:", err);
+            alert("Network error: " + err.message);
+          }
+          return;
+        }
+
+        // Close buttons (delegated) - works even if modal elements are after this script
+        if (e.target && e.target.id === "closeViewPurchase") {
+          qs("#viewPurchaseModal").hidden = true;
+        }
+        if (e.target && e.target.id === "closeUpdatePurchase") {
+          qs("#updatePurchaseModal").hidden = true;
+        }
+      });
+
+      // Close modal handlers
+      qs("#closeViewPurchase")?.addEventListener("click", () => {
+        qs("#viewPurchaseModal").hidden = true;
+      });
+
+      qs("#closeUpdatePurchase")?.addEventListener("click", () => {
+        qs("#updatePurchaseModal").hidden = true;
+      });
+
+      // Update purchase form submit
+      qs("#update-purchase-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = qs("#updatePurchaseId").value;
+        const quantity = qs("#updatePurchaseQuantity").value;
+
+        if (!id || !quantity) {
+          alert("Missing transaction ID or quantity");
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/transactions/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ quantity: parseFloat(quantity) }),
+          });
+
+          const result = await res.json();
+          if (res.ok && result.ok) {
+            alert("Purchase updated successfully");
+            qs("#updatePurchaseModal").hidden = true;
+            // Reload purchases from server
+            purchases = await loadRecent(currentUser.user_id);
+            render();
+          } else {
+            alert("Error: " + (result.error || "Update failed"));
+          }
+        } catch (err) {
+          console.error("Update error:", err);
+          alert("Failed to update purchase");
+        }
+      });
+    </script>
+
+    <!-- View Purchase Modal -->
+    <div id="viewPurchaseModal" class="modal" hidden>
+      <div class="modal-content">
+        <h3>Purchase Details</h3>
+        <p><strong>From:</strong> <span id="viewPurchaseFrom"></span></p>
+        <p><strong>Paddy Type:</strong> <span id="viewPurchaseType"></span></p>
+        <p>
+          <strong>Quantity:</strong> <span id="viewPurchaseQuantity"></span> kg
+        </p>
+        <p>
+          <strong>Date/Time:</strong> <span id="viewPurchaseDateTime"></span>
+        </p>
+        <p>
+          <strong>Block Hash:</strong>
+        </p>
+        <div
+          id="viewPurchaseBlockHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
+        <p>
+          <strong>Block Number:</strong>
+          <span id="viewPurchaseBlockNumber"></span>
+        </p>
+        <p>
+          <strong>Transaction Hash:</strong>
+          <span id="viewPurchaseTxHash"></span>
+        </p>
+        <div class="modal-actions">
+          <button id="closeViewPurchase" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Purchase Modal -->
+    <div id="updatePurchaseModal" class="modal" hidden>
+      <div class="modal-content">
+        <h3>Update Purchase</h3>
+        <form id="update-purchase-form">
+          <input type="hidden" id="updatePurchaseId" />
+          <label for="updatePurchaseQuantity">Quantity (kg)</label>
+          <input
+            type="number"
+            id="updatePurchaseQuantity"
+            min="0"
+            step="0.01"
+            required
+          />
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Update</button>
+            <button type="button" id="closeUpdatePurchase" class="btn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
