@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Division Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #f3f4f6;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      h1 {
+        color: #1f2937;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+      }
+      .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .logout-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+      }
+      .logout-btn:hover {
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+        transform: translateY(-2px);
+      }
+      .welcome-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        color: white;
+        margin-bottom: 32px;
+      }
+      .welcome-card h2 {
+        font-size: 32px;
+        margin: 0 0 12px 0;
+        font-weight: 700;
+      }
+      .welcome-card p {
+        font-size: 16px;
+        margin: 0;
+        opacity: 0.95;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+      .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid #667eea;
+      }
+      .stat-card h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #6b7280;
+        margin: 0 0 12px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+      }
+      .section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        margin-bottom: 24px;
+      }
+      .section h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 20px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        background: #f3f4f6;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+      }
+      tr:hover {
+        background: #f9fafb;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-info {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-section">
+        <h1>🏛️ Division Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      </div>
+
+      <div class="welcome-card">
+        <h2>Welcome to Division Management</h2>
+        <p>
+          Monitor and manage paddy and rice supply chain operations across
+          divisions
+        </p>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Farmers</h3>
+          <p class="stat-value" id="stat-farmers">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Transactions</h3>
+          <p class="stat-value" id="stat-transactions">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Stock (kg)</h3>
+          <p class="stat-value" id="stat-stock">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Users</h3>
+          <p class="stat-value" id="stat-users">0</p>
+        </div>
+      </div>
+
+      <!-- Overview Section -->
+      <div class="section">
+        <h2>📊 System Overview</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Count</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Farmers Registered</td>
+              <td id="farmers-count">--</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>Collectors Active</td>
+              <td id="collectors-count">--</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>Millers Registered</td>
+              <td id="millers-count">--</td>
+              <td><span class="badge badge-success">Active</span></td>
+            </tr>
+            <tr>
+              <td>Pending Inspections</td>
+              <td id="inspections-count">--</td>
+              <td><span class="badge badge-warning">Review</span></td>
+            </tr>
+            <tr>
+              <td>Completed Transactions</td>
+              <td id="completed-count">--</td>
+              <td><span class="badge badge-info">Archived</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Actions Section -->
+      <div class="section">
+        <h2>⚡ Quick Actions</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+          "
+        >
+          <button
+            style="
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+          >
+            📋 View Reports
+          </button>
+          <button
+            style="
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+          >
+            👥 Manage Users
+          </button>
+          <button
+            style="
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+          >
+            📈 Analytics
+          </button>
+          <button
+            style="
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+          >
+            ⚙️ Settings
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Note -->
+      <div
+        style="
+          background: #eff6ff;
+          border-left: 4px solid #3b82f6;
+          padding: 16px;
+          border-radius: 8px;
+          margin-top: 32px;
+          color: #1e40af;
+          font-size: 14px;
+        "
+      >
+        <strong>📌 Note:</strong> This is the Division Officer Dashboard. You
+        have access to monitor and manage operations across your assigned
+        division.
+      </div>
+
+      <!-- User Count Cards by Type -->
+      <div class="stats-grid" style="margin-top: 32px">
+        <div class="stat-card">
+          <h3>👨‍🌾 Farmers</h3>
+          <p class="stat-value" id="count-farmer">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🏪 Collectors</h3>
+          <p class="stat-value" id="count-collector">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🏭 Millers</h3>
+          <p class="stat-value" id="count-miller">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🏢 Wholesalers</h3>
+          <p class="stat-value" id="count-wholesaler">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🛒 Retailers</h3>
+          <p class="stat-value" id="count-retailer">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🍺 Beer</h3>
+          <p class="stat-value" id="count-beer">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🐄 Animal Food</h3>
+          <p class="stat-value" id="count-animalfood">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>✈️ Exporters</h3>
+          <p class="stat-value" id="count-exporter">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>🏛️ PMB</h3>
+          <p class="stat-value" id="count-pmb">0</p>
+        </div>
+      </div>
+
+      <!-- Manage Users Section -->
+      <div class="section" style="margin-top: 32px">
+        <h2>👥 Manage Users</h2>
+
+        <!-- Filters -->
+        <div
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+          "
+        >
+          <label style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 13px; font-weight: 500; color: #374151"
+              >User Type</span
+            >
+            <select
+              id="manage-user-type-filter"
+              style="
+                padding: 8px 12px;
+                font-size: 14px;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                background: white;
+                min-width: 150px;
+              "
+            >
+              <option value="Farmer">Farmer</option>
+              <option value="Collecter">Collector</option>
+              <option value="Miller">Miller</option>
+              <option value="Wholesaler">Wholesaler</option>
+              <option value="Retailer">Retailer</option>
+              <option value="Beer">Beer</option>
+              <option value="Animal Food">Animal Food</option>
+              <option value="Exporter">Exporter</option>
+              <option value="PMB">PMB</option>
+            </select>
+          </label>
+
+          <label style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 13px; font-weight: 500; color: #374151"
+              >Search (ID / Name)</span
+            >
+            <input
+              type="search"
+              id="manage-user-search"
+              placeholder="Enter user ID or name"
+              style="
+                padding: 8px 12px;
+                font-size: 14px;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                min-width: 200px;
+              "
+            />
+          </label>
+
+          <button
+            id="add-user-btn"
+            style="
+              padding: 8px 16px;
+              font-size: 14px;
+              font-weight: 500;
+              border-radius: 8px;
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+              color: white;
+              border: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(16, 185, 129, 0.3)';"
+          >
+            + Add User
+          </button>
+
+          <button
+            id="manage-user-refresh"
+            style="
+              padding: 8px 16px;
+              font-size: 14px;
+              font-weight: 500;
+              border-radius: 8px;
+              background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+              color: white;
+              border: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+          >
+            Refresh
+          </button>
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-left: auto;
+            "
+          >
+            <span style="font-size: 14px; font-weight: 500; color: #6b7280"
+              >Total Users:</span
+            >
+            <span
+              id="user-count-display"
+              style="
+                font-size: 16px;
+                font-weight: 700;
+                color: #1f2937;
+                background: #f3f4f6;
+                padding: 6px 12px;
+                border-radius: 6px;
+              "
+              >0</span
+            >
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div
+          style="
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+          "
+        >
+          <table
+            id="manage-user-table"
+            style="width: 100%; border-collapse: collapse; font-size: 14px"
+          >
+            <thead>
+              <tr
+                style="
+                  background-color: #f3f4f6;
+                  border-bottom: 2px solid #e5e7eb;
+                "
+              >
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  User ID
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  Full Name
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  District
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  Contact
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: center;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody id="manage-user-table-body">
+              <!-- rows will be added here -->
+            </tbody>
+          </table>
+          <div
+            id="manage-user-pagination"
+            style="
+              padding: 12px 16px;
+              background: transparent;
+              display: block;
+              text-align: center;
+            "
+          ></div>
+        </div>
+      </div>
+
+      <!-- User Detail Modal -->
+      <div
+        id="user-detail-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              User Details
+            </h3>
+            <button
+              id="user-detail-close-btn"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+          <div id="user-detail-content" style="display: grid; gap: 12px">
+            <!-- User details will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit User Modal -->
+      <div
+        id="user-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          overflow-y: auto;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            margin: 20px auto;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              id="user-modal-title"
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              Add User
+            </h3>
+            <button
+              id="user-modal-close"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+          <form id="user-form">
+            <div style="margin-bottom: 16px">
+              <label
+                style="
+                  display: block;
+                  font-size: 13px;
+                  font-weight: 500;
+                  color: #374151;
+                  margin-bottom: 6px;
+                "
+                >User Type</label
+              >
+              <select
+                id="user-type-select"
+                name="userType"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  background: white;
+                "
+              >
+                <option value="Farmer">Farmer</option>
+                <option value="Collecter">Collector</option>
+                <option value="Miller">Miller</option>
+                <option value="Wholesaler">Wholesaler</option>
+                <option value="Retailer">Retailer</option>
+                <option value="Beer">Beer</option>
+                <option value="Animal Food">Animal Food</option>
+                <option value="Exporter">Exporter</option>
+                <option value="PMB">PMB</option>
+              </select>
+            </div>
+            <div id="type-fields">
+              <!-- Dynamic fields rendered by JS -->
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 12px;
+                margin-top: 24px;
+                justify-content: flex-end;
+              "
+            >
+              <button
+                type="button"
+                id="user-modal-cancel"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: #e5e7eb;
+                  color: #374151;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div
+        id="loading-overlay"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.7);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        "
+      >
+        <div style="text-align: center; color: white">
+          <div style="font-size: 48px; margin-bottom: 16px">⏳</div>
+          <p id="loading-text" style="font-size: 18px; font-weight: 600">
+            Processing...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          window.location.href = "/";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load statistics
+        async function loadStatistics() {
+          try {
+            // Load users count by type
+            const usersRes = await fetch("/api/users");
+            if (!usersRes.ok) return;
+            const users = await usersRes.json();
+
+            const farmersCount = users.filter(
+              (u) => u.user_type === "FARMER"
+            ).length;
+            const collectorsCount = users.filter(
+              (u) => u.user_type === "COLLECTER"
+            ).length;
+            const millersCount = users.filter(
+              (u) => u.user_type === "MILLER"
+            ).length;
+
+            document.getElementById("stat-farmers").textContent = farmersCount;
+            document.getElementById("stat-users").textContent = users.length;
+            document.getElementById("farmers-count").textContent = farmersCount;
+            document.getElementById("collectors-count").textContent =
+              collectorsCount;
+            document.getElementById("millers-count").textContent = millersCount;
+
+            // Load transactions count
+            const txRes = await fetch("/api/transactions");
+            if (txRes.ok) {
+              const transactions = await txRes.json();
+              document.getElementById("stat-transactions").textContent =
+                transactions.length;
+              document.getElementById("completed-count").textContent =
+                transactions.length;
+            }
+
+            // Placeholder values for other stats
+            document.getElementById("stat-stock").textContent = "0";
+            document.getElementById("inspections-count").textContent = "0";
+          } catch (e) {
+            console.error("Error loading statistics:", e);
+          }
+        }
+
+        // Load statistics on page load
+        loadStatistics();
+
+        // ==================== MANAGE USERS SECTION ====================
+
+        // Helper function to escape HTML
+        function escapeHtml(str) {
+          if (!str) return "";
+          return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        // Load users for Manage User section
+        async function loadManageUsers() {
+          const tbody = document.getElementById("manage-user-table-body");
+          if (!tbody) return;
+
+          const typeFilter = document.getElementById("manage-user-type-filter");
+          const searchInput = document.getElementById("manage-user-search");
+          const selectedType = typeFilter ? typeFilter.value : "";
+          const searchQuery = searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : "";
+
+          try {
+            const resp = await fetch("/api/users");
+            if (!resp.ok) throw new Error("Failed to fetch users");
+            const users = await resp.json();
+
+            tbody.innerHTML = "";
+            const filtered = users.filter((u) => {
+              // Filter by user type (case-insensitive match)
+              if (
+                selectedType &&
+                u.user_type.toLowerCase() !== selectedType.toLowerCase()
+              )
+                return false;
+              // Filter by search query (ID or name)
+              if (searchQuery) {
+                const matchId = (u.id || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                const matchName = (u.full_name || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                const matchCompany = (u.company_name || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                if (!matchId && !matchName && !matchCompany) return false;
+              }
+              return true;
+            });
+
+            filtered.forEach((u) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #e5e7eb";
+
+              // For company-type users, show company name instead of full name
+              const displayName =
+                u.user_type === "Miller" ||
+                u.user_type === "MILLER" ||
+                u.user_type === "Wholesaler" ||
+                u.user_type === "WHOLESALER" ||
+                u.user_type === "Retailer" ||
+                u.user_type === "RETAILER" ||
+                u.user_type === "Beer" ||
+                u.user_type === "BEER" ||
+                u.user_type === "Animal Food" ||
+                u.user_type === "ANIMAL FOOD" ||
+                u.user_type === "Exporter" ||
+                u.user_type === "EXPORTER"
+                  ? u.company_name || ""
+                  : u.full_name || "";
+
+              tr.innerHTML = `
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  u.id || ""
+                )}</td>
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  displayName
+                )}</td>
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  u.district || ""
+                )}</td>
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  u.contact_number || ""
+                )}</td>
+                <td style="padding: 12px; text-align: center;">
+                  <button class="view-user-btn" style="padding: 6px 12px; font-size: 13px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; margin-right: 4px;">👁️ View</button>
+                  <button class="edit-user-btn" style="padding: 6px 12px; font-size: 13px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">✏️ Edit</button>
+                </td>
+              `;
+              tr.dataset.user = JSON.stringify(u);
+              tr.dataset.userId = u.id;
+
+              // Add click event listener to the view button
+              const viewBtn = tr.querySelector(".view-user-btn");
+              viewBtn.addEventListener("click", () => showUserDetail(u));
+
+              // Add click event listener to the edit button
+              const editBtn = tr.querySelector(".edit-user-btn");
+              editBtn.addEventListener("click", () => openEditUserModal(u));
+
+              tbody.appendChild(tr);
+            });
+
+            // Count users by type from ALL users (not filtered)
+            const typeCounts = {
+              farmer: 0,
+              collector: 0,
+              miller: 0,
+              wholesaler: 0,
+              retailer: 0,
+              beer: 0,
+              animalfood: 0,
+              exporter: 0,
+              pmb: 0,
+            };
+
+            users.forEach((u) => {
+              const type = (u.user_type || "").toLowerCase();
+              if (type === "farmer") typeCounts.farmer++;
+              else if (type === "collecter") typeCounts.collector++;
+              else if (type === "miller") typeCounts.miller++;
+              else if (type === "wholesaler") typeCounts.wholesaler++;
+              else if (type === "retailer") typeCounts.retailer++;
+              else if (type === "beer") typeCounts.beer++;
+              else if (type === "animal food") typeCounts.animalfood++;
+              else if (type === "exporter") typeCounts.exporter++;
+              else if (type === "pmb") typeCounts.pmb++;
+            });
+
+            // Update count cards
+            document.getElementById("count-farmer").textContent =
+              typeCounts.farmer;
+            document.getElementById("count-collector").textContent =
+              typeCounts.collector;
+            document.getElementById("count-miller").textContent =
+              typeCounts.miller;
+            document.getElementById("count-wholesaler").textContent =
+              typeCounts.wholesaler;
+            document.getElementById("count-retailer").textContent =
+              typeCounts.retailer;
+            document.getElementById("count-beer").textContent = typeCounts.beer;
+            document.getElementById("count-animalfood").textContent =
+              typeCounts.animalfood;
+            document.getElementById("count-exporter").textContent =
+              typeCounts.exporter;
+            document.getElementById("count-pmb").textContent = typeCounts.pmb;
+
+            // Update user count display
+            const countDisplay = document.getElementById("user-count-display");
+            if (countDisplay) {
+              countDisplay.textContent = filtered.length;
+            }
+
+            setupManageUserPagination();
+          } catch (err) {
+            console.error("Failed to load users", err);
+          }
+        }
+
+        // Show user detail modal
+        function showUserDetail(user) {
+          if (!user) return;
+
+          const detailContent = document.getElementById("user-detail-content");
+          const isCompanyType =
+            user.user_type === "Miller" ||
+            user.user_type === "MILLER" ||
+            user.user_type === "Wholesaler" ||
+            user.user_type === "WHOLESALER" ||
+            user.user_type === "Retailer" ||
+            user.user_type === "RETAILER" ||
+            user.user_type === "Beer" ||
+            user.user_type === "BEER" ||
+            user.user_type === "Animal Food" ||
+            user.user_type === "ANIMAL FOOD" ||
+            user.user_type === "Exporter" ||
+            user.user_type === "EXPORTER";
+
+          const isPMB = user.user_type === "PMB";
+          const isFarmer =
+            user.user_type === "Farmer" || user.user_type === "FARMER";
+
+          detailContent.innerHTML = `
+            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 8px; font-size: 14px;">
+              <strong style="color: #6b7280;">User ID:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.id || ""
+              )}</span>
+              <strong style="color: #6b7280;">User Type:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.user_type || ""
+              )}</span>
+              ${
+                !isCompanyType
+                  ? `<strong style="color: #6b7280;">Full Name:</strong><span style="color: #1f2937;">${escapeHtml(
+                      user.full_name || ""
+                    )}</span>`
+                  : ""
+              }
+              ${
+                isCompanyType
+                  ? `
+                <strong style="color: #6b7280;">Company Name:</strong><span style="color: #1f2937;">${escapeHtml(
+                  user.company_name || ""
+                )}</span>
+                ${
+                  user.user_type !== "Retailer" && user.user_type !== "RETAILER"
+                    ? `<strong style="color: #6b7280;">Register Number:</strong><span style="color: #1f2937;">${escapeHtml(
+                        user.company_register_number || ""
+                      )}</span>`
+                    : ""
+                }
+              `
+                  : ""
+              }
+              ${
+                !isCompanyType && !isPMB
+                  ? `<strong style="color: #6b7280;">NIC:</strong><span style="color: #1f2937;">${escapeHtml(
+                      user.nic || ""
+                    )}</span>`
+                  : ""
+              }
+              <strong style="color: #6b7280;">Address:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.address || ""
+              )}</span>
+              <strong style="color: #6b7280;">District:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.district || ""
+              )}</span>
+              <strong style="color: #6b7280;">Contact Number:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.contact_number || ""
+              )}</span>
+              ${
+                isFarmer
+                  ? `<strong style="color: #6b7280;">Paddy Land Area:</strong><span style="color: #1f2937;">${escapeHtml(
+                      user.total_area_of_paddy_land || ""
+                    )}</span>`
+                  : ""
+              }
+              <strong style="color: #6b7280;">Created At:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.created_at || user.createdAt || ""
+              )}</span>
+              <strong style="color: #6b7280;">Updated At:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.updated_at || user.updatedAt || ""
+              )}</span>
+              <strong style="color: #6b7280;">Block Hash:</strong><span style="word-break: break-all; font-size: 11px; font-family: monospace; color: #1f2937;">${escapeHtml(
+                user.block_hash || user.blockHash || "Not available"
+              )}</span>
+              <strong style="color: #6b7280;">Block Number:</strong><span style="color: #1f2937;">${escapeHtml(
+                user.block_number || user.blockNumber || "Not available"
+              )}</span>
+              <strong style="color: #6b7280;">Transaction Hash:</strong><span style="word-break: break-all; font-size: 11px; font-family: monospace;">${
+                user.transaction_hash || user.transactionHash
+                  ? `<a href="https://sepolia.etherscan.io/tx/${escapeHtml(
+                      user.transaction_hash || user.transactionHash
+                    )}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">${escapeHtml(
+                      user.transaction_hash || user.transactionHash
+                    )}</a>`
+                  : "Not available"
+              }</span>
+            </div>
+          `;
+
+          const modal = document.getElementById("user-detail-modal");
+          modal.style.display = "flex";
+        }
+
+        // Close user detail modal
+        const userDetailModal = document.getElementById("user-detail-modal");
+        const userDetailCloseBtn = document.getElementById(
+          "user-detail-close-btn"
+        );
+        if (userDetailCloseBtn) {
+          userDetailCloseBtn.addEventListener("click", () => {
+            userDetailModal.style.display = "none";
+          });
+        }
+        if (userDetailModal) {
+          userDetailModal.addEventListener("click", (e) => {
+            if (e.target === userDetailModal) {
+              userDetailModal.style.display = "none";
+            }
+          });
+        }
+
+        // Pagination for manage users table
+        function setupManageUserPagination() {
+          const table = document.getElementById("manage-user-table");
+          if (!table) return;
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          const pagination = document.getElementById("manage-user-pagination");
+          if (!pagination) return;
+
+          const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+            (r) => r.style.display !== "none"
+          );
+          const rowsPerPage = 10;
+          const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+          let currentPage = 1;
+
+          function showPage(page) {
+            currentPage = Math.min(Math.max(1, page), totalPages);
+            rows.forEach((r, i) => {
+              r.style.display =
+                i >= (currentPage - 1) * rowsPerPage &&
+                i < currentPage * rowsPerPage
+                  ? ""
+                  : "none";
+            });
+            renderPageNumbers();
+          }
+
+          function renderPageNumbers() {
+            pagination.innerHTML = "";
+            const wrap = document.createElement("div");
+            wrap.style.display = "inline-flex";
+            wrap.style.gap = "8px";
+            wrap.style.alignItems = "center";
+
+            for (let p = 1; p <= totalPages; p++) {
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.textContent = p;
+              btn.style.padding = "6px 10px";
+              btn.style.borderRadius = "6px";
+              btn.style.border = "1px solid #e5e7eb";
+              btn.style.cursor = "pointer";
+              btn.style.background = p === currentPage ? "#4f46e5" : "white";
+              btn.style.color = p === currentPage ? "white" : "#374151";
+              btn.addEventListener("click", () => showPage(p));
+              wrap.appendChild(btn);
+            }
+
+            pagination.appendChild(wrap);
+          }
+
+          showPage(1);
+        }
+
+        // Event listeners for manage user filters
+        const manageUserTypeFilter = document.getElementById(
+          "manage-user-type-filter"
+        );
+        const manageUserSearch = document.getElementById("manage-user-search");
+        const manageUserRefresh = document.getElementById(
+          "manage-user-refresh"
+        );
+
+        if (manageUserTypeFilter) {
+          manageUserTypeFilter.addEventListener("change", loadManageUsers);
+        }
+        if (manageUserSearch) {
+          manageUserSearch.addEventListener("input", loadManageUsers);
+        }
+        if (manageUserRefresh) {
+          manageUserRefresh.addEventListener("click", loadManageUsers);
+        }
+
+        // Load manage users on page load
+        loadManageUsers();
+
+        // ==================== ADD/EDIT USER FUNCTIONALITY ====================
+
+        let editingUserId = null;
+        const userModal = document.getElementById("user-modal");
+        const userModalTitle = document.getElementById("user-modal-title");
+        const userModalClose = document.getElementById("user-modal-close");
+        const userModalCancel = document.getElementById("user-modal-cancel");
+        const userForm = document.getElementById("user-form");
+        const userTypeSelect = document.getElementById("user-type-select");
+        const typeFieldsContainer = document.getElementById("type-fields");
+        const loadingOverlay = document.getElementById("loading-overlay");
+        const loadingText = document.getElementById("loading-text");
+
+        // District options
+        const districtOptions = `
+          <option value="">Select District</option>
+          <option value="Ampara">Ampara</option>
+          <option value="Anuradhapura">Anuradhapura</option>
+          <option value="Badulla">Badulla</option>
+          <option value="Batticaloa">Batticaloa</option>
+          <option value="Colombo">Colombo</option>
+          <option value="Galle">Galle</option>
+          <option value="Gampaha">Gampaha</option>
+          <option value="Hambantota">Hambantota</option>
+          <option value="Jaffna">Jaffna</option>
+          <option value="Kalutara">Kalutara</option>
+          <option value="Kandy">Kandy</option>
+          <option value="Kegalle">Kegalle</option>
+          <option value="Kilinochchi">Kilinochchi</option>
+          <option value="Kurunegala">Kurunegala</option>
+          <option value="Mannar">Mannar</option>
+          <option value="Matale">Matale</option>
+          <option value="Matara">Matara</option>
+          <option value="Monaragala">Monaragala</option>
+          <option value="Mullaitivu">Mullaitivu</option>
+          <option value="Nuwara Eliya">Nuwara Eliya</option>
+          <option value="Polonnaruwa">Polonnaruwa</option>
+          <option value="Puttalam">Puttalam</option>
+          <option value="Ratnapura">Ratnapura</option>
+          <option value="Trincomalee">Trincomalee</option>
+          <option value="Vavuniya">Vavuniya</option>
+        `;
+
+        // Render type-specific fields
+        function renderTypeFields(type) {
+          if (!typeFieldsContainer) return;
+          let html = "";
+          const inputStyle =
+            "width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box;";
+          const labelStyle =
+            "display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;";
+          const fieldStyle = "margin-bottom: 16px;";
+
+          if (type === "Farmer") {
+            html = `
+              <div style="${fieldStyle}"><label style="${labelStyle}">NIC</label><input type="text" name="nic" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Full Name</label><input type="text" name="fullName" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Address</label><input type="text" name="address" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">District</label><select name="district" style="${inputStyle}">${districtOptions}</select></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Contact Number</label><input type="text" name="contactNumber" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Total Area Of Paddy Land</label><input type="text" name="totalAreaOfPaddyLand" style="${inputStyle}" /></div>
+            `;
+          } else if (type === "Collecter") {
+            html = `
+              <div style="${fieldStyle}"><label style="${labelStyle}">NIC</label><input type="text" name="nic" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Name</label><input type="text" name="fullName" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Address</label><input type="text" name="address" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">District</label><select name="district" style="${inputStyle}">${districtOptions}</select></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Contact Number</label><input type="text" name="contactNumber" style="${inputStyle}" /></div>
+            `;
+          } else if (
+            type === "Miller" ||
+            type === "Wholesaler" ||
+            type === "Retailer"
+          ) {
+            html = `
+              <div style="${fieldStyle}"><label style="${labelStyle}">Company Register Number</label><input type="text" name="companyRegisterNumber" style="${inputStyle}" ${
+              type !== "Retailer" ? "required" : ""
+            } /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Company Name</label><input type="text" name="companyName" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Address</label><input type="text" name="address" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">District</label><select name="district" style="${inputStyle}">${districtOptions}</select></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Contact Number</label><input type="text" name="contactNumber" style="${inputStyle}" /></div>
+            `;
+          } else if (
+            type === "Beer" ||
+            type === "Animal Food" ||
+            type === "Exporter"
+          ) {
+            html = `
+              <div style="${fieldStyle}"><label style="${labelStyle}">Company Register Number</label><input type="text" name="companyRegisterNumber" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Company Name</label><input type="text" name="companyName" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Address</label><input type="text" name="address" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">District</label><select name="district" style="${inputStyle}">${districtOptions}</select></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Contact Number</label><input type="text" name="contactNumber" style="${inputStyle}" /></div>
+            `;
+          } else if (type === "PMB") {
+            html = `
+              <div style="${fieldStyle}"><label style="${labelStyle}">Full Name</label><input type="text" name="fullName" style="${inputStyle}" required /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Address</label><input type="text" name="address" style="${inputStyle}" /></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">District</label><select name="district" style="${inputStyle}">${districtOptions}</select></div>
+              <div style="${fieldStyle}"><label style="${labelStyle}">Contact Number</label><input type="text" name="contactNumber" style="${inputStyle}" /></div>
+            `;
+          }
+          typeFieldsContainer.innerHTML = html;
+        }
+
+        // Open Add User Modal
+        function openAddUserModal() {
+          editingUserId = null;
+          userModalTitle.textContent = "Add User";
+          userForm.reset();
+          userTypeSelect.disabled = false;
+          userTypeSelect.value = "Farmer";
+          renderTypeFields("Farmer");
+          userModal.style.display = "flex";
+        }
+
+        // Open Edit User Modal
+        function openEditUserModal(user) {
+          editingUserId = user.id;
+          userModalTitle.textContent = "Edit User";
+          userForm.reset();
+
+          // Set user type and disable changing it
+          const userType = user.user_type;
+          userTypeSelect.value = userType;
+          userTypeSelect.disabled = true;
+          renderTypeFields(userType);
+
+          // Populate fields after rendering
+          setTimeout(() => {
+            if (userType === "Farmer" || userType === "FARMER") {
+              const nicInput = userForm.querySelector('[name="nic"]');
+              const fullNameInput = userForm.querySelector('[name="fullName"]');
+              const addressInput = userForm.querySelector('[name="address"]');
+              const districtInput = userForm.querySelector('[name="district"]');
+              const contactInput = userForm.querySelector(
+                '[name="contactNumber"]'
+              );
+              const paddyLandInput = userForm.querySelector(
+                '[name="totalAreaOfPaddyLand"]'
+              );
+              if (nicInput) nicInput.value = user.nic || "";
+              if (fullNameInput) fullNameInput.value = user.full_name || "";
+              if (addressInput) addressInput.value = user.address || "";
+              if (districtInput) districtInput.value = user.district || "";
+              if (contactInput) contactInput.value = user.contact_number || "";
+              if (paddyLandInput)
+                paddyLandInput.value = user.total_area_of_paddy_land || "";
+            } else if (userType === "Collecter" || userType === "COLLECTER") {
+              const nicInput = userForm.querySelector('[name="nic"]');
+              const fullNameInput = userForm.querySelector('[name="fullName"]');
+              const addressInput = userForm.querySelector('[name="address"]');
+              const districtInput = userForm.querySelector('[name="district"]');
+              const contactInput = userForm.querySelector(
+                '[name="contactNumber"]'
+              );
+              if (nicInput) nicInput.value = user.nic || "";
+              if (fullNameInput) fullNameInput.value = user.full_name || "";
+              if (addressInput) addressInput.value = user.address || "";
+              if (districtInput) districtInput.value = user.district || "";
+              if (contactInput) contactInput.value = user.contact_number || "";
+            } else if (
+              userType === "Miller" ||
+              userType === "MILLER" ||
+              userType === "Wholesaler" ||
+              userType === "WHOLESALER" ||
+              userType === "Retailer" ||
+              userType === "RETAILER" ||
+              userType === "Beer" ||
+              userType === "BEER" ||
+              userType === "Animal Food" ||
+              userType === "ANIMAL FOOD" ||
+              userType === "Exporter" ||
+              userType === "EXPORTER"
+            ) {
+              const companyRegInput = userForm.querySelector(
+                '[name="companyRegisterNumber"]'
+              );
+              const companyNameInput = userForm.querySelector(
+                '[name="companyName"]'
+              );
+              const addressInput = userForm.querySelector('[name="address"]');
+              const districtInput = userForm.querySelector('[name="district"]');
+              const contactInput = userForm.querySelector(
+                '[name="contactNumber"]'
+              );
+              if (companyRegInput)
+                companyRegInput.value = user.company_register_number || "";
+              if (companyNameInput)
+                companyNameInput.value = user.company_name || "";
+              if (addressInput) addressInput.value = user.address || "";
+              if (districtInput) districtInput.value = user.district || "";
+              if (contactInput) contactInput.value = user.contact_number || "";
+            } else if (userType === "PMB") {
+              const fullNameInput = userForm.querySelector('[name="fullName"]');
+              const addressInput = userForm.querySelector('[name="address"]');
+              const districtInput = userForm.querySelector('[name="district"]');
+              const contactInput = userForm.querySelector(
+                '[name="contactNumber"]'
+              );
+              if (fullNameInput) fullNameInput.value = user.full_name || "";
+              if (addressInput) addressInput.value = user.address || "";
+              if (districtInput) districtInput.value = user.district || "";
+              if (contactInput) contactInput.value = user.contact_number || "";
+            }
+          }, 50);
+
+          userModal.style.display = "flex";
+        }
+
+        // Close User Modal
+        function closeUserModal() {
+          userModal.style.display = "none";
+          userForm.reset();
+          editingUserId = null;
+          userTypeSelect.disabled = false;
+        }
+
+        // Event listeners for modal
+        document
+          .getElementById("add-user-btn")
+          .addEventListener("click", openAddUserModal);
+        userModalClose.addEventListener("click", closeUserModal);
+        userModalCancel.addEventListener("click", closeUserModal);
+        userModal.addEventListener("click", (e) => {
+          if (e.target === userModal) closeUserModal();
+        });
+
+        // User type change handler
+        userTypeSelect.addEventListener("change", (e) => {
+          renderTypeFields(e.target.value);
+        });
+
+        // Form submission handler
+        userForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const isEditing = editingUserId !== null;
+          const data = new FormData(userForm);
+          const userType = data.get("userType");
+
+          // Gather form data
+          const nic = (data.get("nic") || "").trim();
+          const companyRegisterNumber = (
+            data.get("companyRegisterNumber") || ""
+          ).trim();
+          const fullName = (data.get("fullName") || "").trim();
+          const companyName = (data.get("companyName") || "").trim();
+          const address = (data.get("address") || "").trim();
+          const contactNumber = (data.get("contactNumber") || "").trim();
+          const totalAreaOfPaddyLand = (
+            data.get("totalAreaOfPaddyLand") || ""
+          ).trim();
+          const district = data.get("district") || "";
+
+          // Validation
+          const lowType = userType.toLowerCase();
+          if (lowType === "farmer" || lowType === "collecter") {
+            if (!nic || !fullName) {
+              alert("NIC and Name are required");
+              return;
+            }
+          } else if (lowType === "pmb") {
+            if (!fullName) {
+              alert("Name is required for PMB");
+              return;
+            }
+          } else if (lowType === "retailer") {
+            if (!companyName) {
+              alert("Company Name is required for Retailer");
+              return;
+            }
+          } else {
+            if (!companyRegisterNumber || !companyName) {
+              alert("Company Register Number and Company Name are required");
+              return;
+            }
+          }
+
+          // Build payload
+          const payload = {
+            userType,
+            nic,
+            companyRegisterNumber,
+            fullName,
+            companyName,
+            address,
+            district,
+            contactNumber,
+            totalAreaOfPaddyLand,
+          };
+
+          try {
+            // Show loading overlay
+            loadingText.textContent = isEditing
+              ? "Updating user..."
+              : "Creating user...";
+            loadingOverlay.style.display = "flex";
+
+            let url = "/api/users";
+            let method = "POST";
+
+            if (isEditing) {
+              url = `/api/users/${encodeURIComponent(editingUserId)}`;
+              method = "PUT";
+            }
+
+            const res = await fetch(url, {
+              method: method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(text || "Failed to save user");
+            }
+
+            alert(
+              isEditing
+                ? "User updated successfully!"
+                : "User created successfully!"
+            );
+            closeUserModal();
+            loadManageUsers();
+            loadStatistics();
+          } catch (err) {
+            console.error("Error saving user:", err);
+            alert("Error: " + err.message);
+          } finally {
+            loadingOverlay.style.display = "none";
+          }
+        });
+
+        // Initialize type fields
+        renderTypeFields("Farmer");
+      });
+    </script>
+  </body>
+</html>

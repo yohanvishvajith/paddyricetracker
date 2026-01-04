@@ -113,6 +113,10 @@ def init_db():
                 cursor.execute("ALTER TABLE `transaction` ADD COLUMN price DECIMAL(14,3) AFTER `quantity`")
             except mysql.connector.Error:
                 pass  # Column already exists
+            try:
+                cursor.execute("ALTER TABLE `transaction` ADD COLUMN is_reverted TINYINT(1) DEFAULT 0 AFTER `status`")
+            except mysql.connector.Error:
+                pass  # Column already exists
         except mysql.connector.Error as e:
             # Log and continue; table creation is best-effort
             print('Could not create transaction table:', e)
@@ -186,6 +190,10 @@ def init_db():
                 pass  # Column already exists
             try:
                 cursor.execute("ALTER TABLE `damage` ADD COLUMN transaction_hash VARCHAR(255) AFTER block_number")
+            except mysql.connector.Error:
+                pass  # Column already exists
+            try:
+                cursor.execute("ALTER TABLE `damage` ADD COLUMN reverted INT DEFAULT 0 AFTER transaction_hash")
             except mysql.connector.Error:
                 pass  # Column already exists
         except mysql.connector.Error as e:
@@ -299,6 +307,10 @@ def init_db():
                 cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN price DECIMAL(14,3) AFTER `quantity`")
             except mysql.connector.Error:
                 pass  # Column already exists
+            try:
+                cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN is_reverted TINYINT(1) DEFAULT 0 AFTER `status`")
+            except mysql.connector.Error:
+                pass  # Column already exists
         except mysql.connector.Error as e:
             print('Could not create rice_transaction table:', e)
         finally:
@@ -333,6 +345,10 @@ def init_db():
                 pass  # Column already exists
             try:
                 cursor.execute("ALTER TABLE `rice_damage` ADD COLUMN transaction_hash VARCHAR(255) AFTER block_number")
+            except mysql.connector.Error:
+                pass  # Column already exists
+            try:
+                cursor.execute("ALTER TABLE `rice_damage` ADD COLUMN reverted INT DEFAULT 0 AFTER transaction_hash")
             except mysql.connector.Error:
                 pass  # Column already exists
             try:
@@ -461,6 +477,27 @@ def api_login():
         session['full_name'] = 'Government (PMB)'
         return jsonify({'ok': True, 'role': 'PMB'})
 
+    # ins user shortcut
+    if username == 'ins' and password == '123456':
+        session['user_id'] = 'ins'
+        session['user_type'] = 'INS'
+        session['full_name'] = 'INS User'
+        return jsonify({'ok': True, 'role': 'INS'})
+
+    # inspector user shortcut
+    if username == 'inspector' and password == '123456':
+        session['user_id'] = 'inspector'
+        session['user_type'] = 'Inspector'
+        session['full_name'] = 'Inspector'
+        return jsonify({'ok': True, 'role': 'Inspector'})
+
+    # division user shortcut
+    if username == 'division' and password == '123456':
+        session['user_id'] = 'division'
+        session['user_type'] = 'Division'
+        session['full_name'] = 'Division Officer'
+        return jsonify({'ok': True, 'role': 'Division'})
+
     # treat username as a string identifier (no numeric validation)
     try:
         conn = get_connection(MYSQL_DATABASE)
@@ -493,6 +530,21 @@ def api_login():
             return jsonify({'ok': False, 'error': 'Role does not match user account'}), 403
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 500
+
+
+@app.route('/blank')
+def blank_page():
+    return render_template('blank.html')
+
+
+@app.route('/inspector')
+def inspector_page():
+    return render_template('inspector.html')
+
+
+@app.route('/division')
+def division_page():
+    return render_template('division.html')
 
 
 @app.route('/collecter')
@@ -794,12 +846,52 @@ def api_get_initial_paddy():
         return jsonify({'error': str(err)}), 500
 
 
-@app.route('/api/initial_rice', methods=['GET'])
+@app.route('/api/initial_rice', methods=['GET', 'POST'])
 def api_get_initial_rice():
-    """Return initial rice data with user information.
+    """GET: Return initial rice data with user information.
     Query params: user_type (optional)
     Response: [ { user_id, user_name, user_type, district, rice_type, quantity, created_at } ]
+    
+    POST: Create a new initial rice record.
+    Body: { user_id, rice_type, quantity }
     """
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            user_id = data.get('user_id')
+            rice_type = data.get('rice_type')
+            quantity = data.get('quantity')
+            
+            if not user_id or not rice_type or quantity is None:
+                return jsonify({'error': 'Missing required fields: user_id, rice_type, quantity'}), 400
+            
+            if float(quantity) < 0:
+                return jsonify({'error': 'Quantity must be non-negative'}), 400
+            
+            conn = get_connection(MYSQL_DATABASE)
+            cursor = conn.cursor()
+            
+            # Insert the new initial rice record
+            query = 'INSERT INTO rice (user_id, rice_type, quantity) VALUES (%s, %s, %s)'
+            cursor.execute(query, (user_id, rice_type, float(quantity)))
+            
+            conn.commit()
+            
+            rice_id = cursor.lastrowid
+            cursor.close()
+            conn.close()
+            
+            return jsonify({
+                'message': 'Initial rice created successfully',
+                'id': rice_id
+            }), 201
+            
+        except mysql.connector.Error as err:
+            return jsonify({'error': str(err)}), 500
+        except Exception as err:
+            return jsonify({'error': str(err)}), 500
+    
+    # GET method handling
     user_type = request.args.get('user_type', '')
     try:
         conn = get_connection(MYSQL_DATABASE)
@@ -1165,6 +1257,64 @@ def api_get_stock_summary():
         return jsonify({'error': str(err)}), 500
 
 
+@app.route('/api/stock_by_type', methods=['GET'])
+def api_get_stock_by_type():
+    """Return aggregated stock amounts by paddy/rice type for a specific user.
+    
+    Query params:
+    - kind: 'paddy' (from stock table) or 'rice' (from rice_stock table)
+    - user_id: (optional) filter by user_id/miller_id. If not provided, returns all stock
+    
+    Response: [ { type/paddy_type: str, quantity: float }, ... ]
+    """
+    try:
+        kind = (request.args.get('kind') or 'paddy').strip().lower()
+        user_id = (request.args.get('user_id') or '').strip()
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor()
+        
+        result = []
+        
+        if kind == 'rice':
+            # Get rice stock aggregated by paddy_type from rice_stock table
+            try:
+                if user_id:
+                    cur.execute("SELECT paddy_type, SUM(quantity) as total FROM `rice_stock` WHERE miller_id = %s GROUP BY paddy_type ORDER BY paddy_type", (user_id,))
+                else:
+                    cur.execute("SELECT paddy_type, SUM(quantity) as total FROM `rice_stock` GROUP BY paddy_type ORDER BY paddy_type")
+                rows = cur.fetchall()
+                for row in rows:
+                    result.append({
+                        'paddy_type': row[0],
+                        'quantity': float(row[1] or 0)
+                    })
+            except Exception as e:
+                print(f"Error fetching rice stock: {e}")
+                return jsonify([])
+        else:
+            # Get paddy stock aggregated by type from stock table
+            try:
+                if user_id:
+                    cur.execute("SELECT `type`, SUM(amount) as total FROM `stock` WHERE user_id = %s GROUP BY `type` ORDER BY `type`", (user_id,))
+                else:
+                    cur.execute("SELECT `type`, SUM(amount) as total FROM `stock` GROUP BY `type` ORDER BY `type`")
+                rows = cur.fetchall()
+                for row in rows:
+                    result.append({
+                        'type': row[0],
+                        'quantity': float(row[1] or 0)
+                    })
+            except Exception as e:
+                print(f"Error fetching paddy stock: {e}")
+                return jsonify([])
+        
+        cur.close()
+        conn.close()
+        return jsonify(result)
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
 @app.route('/api/stock_history', methods=['GET'])
 def api_get_stock_history():
     """Return daily stock amounts by user role for time-series chart.
@@ -1243,7 +1393,7 @@ def api_get_users_by_type():
         conn = get_connection(MYSQL_DATABASE)
         cur = conn.cursor(dictionary=True)
         # Case-insensitive substring match to be forgiving with stored values
-        sql = 'SELECT id, full_name, user_type FROM users WHERE LOWER(user_type) LIKE %s ORDER BY id'
+        sql = 'SELECT id, full_name, company_name, user_type FROM users WHERE LOWER(user_type) LIKE %s ORDER BY id'
         cur.execute(sql, (f"%{typ.lower()}%",))
         rows = cur.fetchall()
 
@@ -1264,11 +1414,33 @@ def api_get_users_by_type():
                 user_code = f"{prefix}{int(r.get('id')):06d}" if r.get('id') is not None else None
             except Exception:
                 user_code = None
-            out.append({'id': r.get('id'), 'full_name': r.get('full_name'), 'user_code': user_code})
+            out.append({'id': r.get('id'), 'full_name': r.get('full_name'), 'company_name': r.get('company_name'), 'user_code': user_code})
 
         cur.close()
         conn.close()
         return jsonify(out)
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/users/<user_id>', methods=['GET'])
+def api_get_user(user_id):
+    """Return user details including contact information.
+    Response: JSON object with {id, full_name, user_type, contact_number, address, district, ...}
+    """
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        sql = 'SELECT id, full_name, user_type, contact_number, address, district FROM users WHERE id = %s LIMIT 1'
+        cur.execute(sql, (user_id,))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        return jsonify(user)
     except mysql.connector.Error as err:
         return jsonify({'error': str(err)}), 500
 
@@ -1320,6 +1492,9 @@ def api_add_transaction():
         except Exception:
             sender_type = None
 
+        # Check if sender is a farmer (farmers don't have stock tracking)
+        is_sender_farmer = isinstance(sender_type, str) and sender_type.strip().lower().startswith('farmer')
+
         # Determine if this is a rice transaction (sender is Miller, PMB, Wholesaler, or Retailer selling rice)
         is_rice_transaction = isinstance(sender_type, str) and (
             'miller' in sender_type.lower() or 
@@ -1333,7 +1508,7 @@ def api_add_transaction():
 
         # If sender is not a Farmer, ensure they have sufficient stock before proceeding (unless reverting)
         try:
-            if not (isinstance(sender_type, str) and sender_type.strip().lower().startswith('farmer')):
+            if not is_sender_farmer:
                 if is_rice_transaction:
                     # For rice transactions, check rice_stock table
                     sel_s_sql = 'SELECT id, quantity FROM `rice_stock` WHERE miller_id = %s AND paddy_type = %s FOR UPDATE'
@@ -1424,7 +1599,9 @@ def api_add_transaction():
             conn.close()
             return jsonify({'ok': False, 'error': 'Failed checking/deducting sender stock: ' + str(e)}), 500
 
-        # Update recipient stock: add for normal transactions, deduct for reversals
+        # Update recipient stock: add for normal transactions, deduct for reversals (only if sender has stock tracking)
+        # For revert: if sender is Farmer, only deduct from recipient (no add to farmer)
+        #            if sender is Collector, deduct from recipient AND add to sender
         try:
             if is_rice_transaction:
                 # For rice transactions, update recipient rice_stock table
@@ -1452,14 +1629,14 @@ def api_add_transaction():
                 else:
                     # No recipient stock row
                     if is_revert:
-                        # Cannot revert if recipient has no stock
+                        # Cannot revert if recipient has no stock to deduct from
                         try:
                             conn.rollback()
                         except Exception:
                             pass
                         cur.close()
                         conn.close()
-                        return jsonify({'ok': False, 'error': 'Cannot revert: recipient has no rice stock for this type'}), 400
+                        return jsonify({'ok': False, 'error': 'Cannot revert: recipient has no rice stock for this type to deduct from'}), 400
                     else:
                         # Normal: create new stock row for recipient
                         ins_sql = 'INSERT INTO `rice_stock` (miller_id, paddy_type, quantity) VALUES (%s, %s, %s)'
@@ -1490,18 +1667,19 @@ def api_add_transaction():
                 else:
                     # No recipient stock row
                     if is_revert:
-                        # Cannot revert if recipient has no stock
+                        # Cannot revert if recipient has no stock to deduct from
                         try:
                             conn.rollback()
                         except Exception:
                             pass
                         cur.close()
                         conn.close()
-                        return jsonify({'ok': False, 'error': 'Cannot revert: recipient has no stock for this paddy type'}), 400
+                        return jsonify({'ok': False, 'error': 'Cannot revert: recipient has no stock for this paddy type to deduct from'}), 400
                     else:
                         # Normal: create new stock row for recipient
                         ins_sql = 'INSERT INTO `stock` (user_id, `type`, amount) VALUES (%s, %s, %s)'
                         cur.execute(ins_sql, (str(to_val), ttype, qty))
+
         except mysql.connector.Error as e:
             try:
                 conn.rollback()
@@ -1569,26 +1747,29 @@ def api_add_transaction():
                 blockchain_transaction_id = None
             
             # Insert into appropriate table based on transaction type
+            # Set is_reverted to 1 if this is a revert transaction (status == 0)
+            is_reverted_val = 1 if is_revert else 0
+            
             if is_rice_transaction:
                 # Insert into rice_transaction table with status and blockchain transaction_id
                 if blockchain_transaction_id:
                     print(f"DEBUG: Inserting rice transaction with blockchain_transaction_id = {blockchain_transaction_id}")
-                    insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
                 else:
                     print(f"DEBUG: Inserting rice transaction WITHOUT blockchain_transaction_id")
-                    insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
             else:
                 # Insert into regular transaction table (paddy) with status and blockchain transaction_id
                 if blockchain_transaction_id:
                     print(f"DEBUG: Inserting paddy transaction with blockchain_transaction_id = {blockchain_transaction_id}")
-                    insert_sql = 'INSERT INTO `transaction` (id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `transaction` (id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
                 else:
                     print(f"DEBUG: Inserting paddy transaction WITHOUT blockchain_transaction_id")
-                    insert_sql = 'INSERT INTO `transaction` (`from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `transaction` (`from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
             last_id = cur.lastrowid
         except mysql.connector.Error as e:
             try:
@@ -1598,6 +1779,20 @@ def api_add_transaction():
             cur.close()
             conn.close()
             return jsonify({'ok': False, 'error': 'Failed inserting transaction: ' + str(e)}), 500
+
+        # If this is a revert transaction, mark the original transaction as reverted
+        original_transaction_id = payload.get('original_transaction_id')
+        if is_revert and original_transaction_id:
+            try:
+                # Update the original transaction's is_reverted field to 1
+                if is_rice_transaction:
+                    update_sql = 'UPDATE `rice_transaction` SET is_reverted = 1 WHERE id = %s'
+                else:
+                    update_sql = 'UPDATE `transaction` SET is_reverted = 1 WHERE id = %s'
+                cur.execute(update_sql, (int(original_transaction_id),))
+            except Exception as e:
+                print(f"Failed to mark original transaction as reverted: {e}")
+                # Continue anyway - revert transaction was created
 
         # commit both transaction insert and stock update
         try:
@@ -1783,32 +1978,32 @@ def api_get_transactions():
         # Query paddy transactions
         paddy_transactions = []
         if to_param:
-            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `to` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `to` = %s ORDER BY id DESC'
             cur.execute(sql, (str(to_param),))
         elif from_param:
-            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `from` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `from` = %s ORDER BY id DESC'
             cur.execute(sql, (str(from_param),))
         elif user_param:
-            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `from` = %s OR `to` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` WHERE `from` = %s OR `to` = %s ORDER BY id DESC'
             cur.execute(sql, (str(user_param), str(user_param)))
         else:
-            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` ORDER BY id DESC LIMIT 200'
+            sql = 'SELECT id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `transaction` ORDER BY id DESC LIMIT 200'
             cur.execute(sql)
         paddy_transactions = cur.fetchall()
         
         # Query rice transactions
         rice_transactions = []
         if to_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `to` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `to` = %s ORDER BY id DESC'
             cur.execute(sql, (str(to_param),))
         elif from_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s ORDER BY id DESC'
             cur.execute(sql, (str(from_param),))
         elif user_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s OR `to` = %s ORDER BY id DESC'
+            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s OR `to` = %s ORDER BY id DESC'
             cur.execute(sql, (str(user_param), str(user_param)))
         else:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` ORDER BY id DESC LIMIT 200'
+            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` ORDER BY id DESC LIMIT 200'
             cur.execute(sql)
         rice_transactions = cur.fetchall()
         
@@ -1826,6 +2021,21 @@ def api_get_transactions():
 @app.route('/api/paddy_types', methods=['GET'])
 def api_get_paddy_types():
     """Return list of paddy types from paddy_type table."""
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        cur.execute('SELECT id, name FROM paddy_type ORDER BY id')
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return jsonify(rows)
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/rice_types', methods=['GET'])
+def api_get_rice_types():
+    """Return list of rice types from paddy_type table."""
     try:
         conn = get_connection(MYSQL_DATABASE)
         cur = conn.cursor(dictionary=True)
@@ -1941,11 +2151,11 @@ def api_revert_rice_transaction(transaction_id):
         try:
             print(f"DEBUG: Inserting revert with price={price}")
             if revert_transaction_id:
-                insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (revert_transaction_id, str(to_party), str(from_party), rice_type, quantity, price, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (revert_transaction_id, str(to_party), str(from_party), rice_type, quantity, price, 0, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
             else:
-                insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(to_party), str(from_party), rice_type, quantity, price, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (str(to_party), str(from_party), rice_type, quantity, price, 0, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
             
             conn.commit()
         except mysql.connector.Error as e:
@@ -1970,7 +2180,7 @@ def api_revert_rice_transaction(transaction_id):
 @app.route('/api/damages', methods=['POST'])
 def api_add_damage():
     """Insert a damage record into the damage table and deduct from stock.
-    Expects JSON body: { user_id, paddy_type, quantity, reason, damage_date }
+    Expects JSON body: { user_id, paddy_type, quantity, reason, damage_date, reverted }
     Validates that sufficient stock exists before recording damage.
     """
     payload = request.get_json() or {}
@@ -1979,6 +2189,7 @@ def api_add_damage():
     quantity = payload.get('quantity')
     reason = payload.get('reason')
     damage_date = payload.get('damage_date')
+    reverted = payload.get('reverted', 0)  # Default to 0 (not reverted)
 
     # basic validation
     if not user_id or not paddy_type or quantity is None or not reason:
@@ -2169,22 +2380,22 @@ def api_add_damage():
         if is_rice_damage:
             # Insert into rice_damage table; include blockchain damage id if provided
             if damage_block_id is not None:
-                insert_sql = 'INSERT INTO `rice_damage` (id, user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_damage` (id, user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = int(damage_block_id)
             else:
-                insert_sql = 'INSERT INTO `rice_damage` (user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_damage` (user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
         else:
             # Insert into regular damage table (paddy); include blockchain damage id if provided
             if damage_block_id is not None:
-                insert_sql = 'INSERT INTO `damage` (id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `damage` (id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = int(damage_block_id)
             else:
-                insert_sql = 'INSERT INTO `damage` (user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `damage` (user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
         
         # Commit transaction
@@ -2220,10 +2431,10 @@ def api_get_damages():
         # Query paddy damages
         paddy_damages = []
         if user_id_param:
-            sql = 'SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `damage` WHERE user_id = %s ORDER BY id DESC'
+            sql = 'SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `damage` WHERE user_id = %s ORDER BY id DESC'
             cur.execute(sql, (str(user_id_param),))
         else:
-            sql = 'SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `damage` ORDER BY id DESC LIMIT 200'
+            sql = 'SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `damage` ORDER BY id DESC LIMIT 200'
             cur.execute(sql)
         paddy_damages = cur.fetchall()
         for r in paddy_damages:
@@ -2236,10 +2447,10 @@ def api_get_damages():
         # Query rice damages
         rice_damages = []
         if user_id_param:
-            sql = 'SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `rice_damage` WHERE user_id = %s ORDER BY id DESC'
+            sql = 'SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `rice_damage` WHERE user_id = %s ORDER BY id DESC'
             cur.execute(sql, (str(user_id_param),))
         else:
-            sql = 'SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `rice_damage` ORDER BY id DESC LIMIT 200'
+            sql = 'SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `rice_damage` ORDER BY id DESC LIMIT 200'
             cur.execute(sql)
         rice_damages = cur.fetchall()
         for r in rice_damages:
@@ -2276,7 +2487,7 @@ def api_get_damage(damage_id):
         cur = conn.cursor(dictionary=True)
 
         if kind == 'rice':
-            cur.execute('SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `rice_damage` WHERE id = %s LIMIT 1', (damage_id,))
+            cur.execute('SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `rice_damage` WHERE id = %s LIMIT 1', (damage_id,))
             row = cur.fetchone()
             if row:
                 row['kind'] = 'rice'
@@ -2285,7 +2496,7 @@ def api_get_damage(damage_id):
                 return jsonify(row)
 
         if kind == 'paddy':
-            cur.execute('SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `damage` WHERE id = %s LIMIT 1', (damage_id,))
+            cur.execute('SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `damage` WHERE id = %s LIMIT 1', (damage_id,))
             row = cur.fetchone()
             if row:
                 row['kind'] = 'paddy'
@@ -2294,7 +2505,7 @@ def api_get_damage(damage_id):
                 return jsonify(row)
 
         # If kind not specified or previous lookup failed, try paddy then rice
-        cur.execute('SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `damage` WHERE id = %s LIMIT 1', (damage_id,))
+        cur.execute('SELECT id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `damage` WHERE id = %s LIMIT 1', (damage_id,))
         row = cur.fetchone()
         if row:
             row['kind'] = 'paddy'
@@ -2302,7 +2513,7 @@ def api_get_damage(damage_id):
             conn.close()
             return jsonify(row)
 
-        cur.execute('SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at FROM `rice_damage` WHERE id = %s LIMIT 1', (damage_id,))
+        cur.execute('SELECT id, user_id, rice_type as paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, created_at, reverted FROM `rice_damage` WHERE id = %s LIMIT 1', (damage_id,))
         row = cur.fetchone()
         if row:
             row['kind'] = 'rice'
@@ -2402,7 +2613,7 @@ def api_update_damage(damage_id):
 
 @app.route('/api/damages/<int:damage_id>/revert', methods=['POST'])
 def api_revert_damage(damage_id):
-    """Revert a damage record by inserting a new reversal record with negative quantity."""
+    """Revert a damage record by updating the reverted status and restoring stock."""
     kind = request.args.get('kind')
     try:
         conn = get_connection(MYSQL_DATABASE)
@@ -2434,7 +2645,7 @@ def api_revert_damage(damage_id):
                     return jsonify({'ok': False, 'error': 'Damage record not found'}), 404
         
         # Get the damage record
-        sql = f'SELECT id, user_id, {type_column} as item_type, quantity, reason, damage_date FROM `{table_name}` WHERE id = %s'
+        sql = f'SELECT id, user_id, {type_column} as item_type, quantity, reason, damage_date, reverted FROM `{table_name}` WHERE id = %s'
         cur.execute(sql, (damage_id,))
         damage = cur.fetchone()
         if not damage:
@@ -2447,6 +2658,7 @@ def api_revert_damage(damage_id):
         quantity = float(damage['quantity'])
         reason = damage['reason']
         damage_date = damage['damage_date']
+        reverted = damage.get('reverted', 0)
         
         # Restore quantity to stock
         if table_name == 'rice_damage':
@@ -2468,24 +2680,30 @@ def api_revert_damage(damage_id):
             else:
                 cur.execute('INSERT INTO `stock` (user_id, `type`, amount) VALUES (%s, %s, %s)', (str(user_id), item_type, quantity))
         
-        # For rice damage, record reversal on blockchain
+        # Update the reverted status to 1
+        update_sql = f'UPDATE `{table_name}` SET reverted = 1 WHERE id = %s'
+        cur.execute(update_sql, (damage_id,))
+        
+        # Insert a new reversal record for tracking purposes
+        # Record reversal on blockchain for both rice and paddy damage
         block_hash = None
         block_number = None
         transaction_hash = None
-        rice_damage_id = None
-        if table_name == 'rice_damage':
-            try:
-                # Convert damage_date to timestamp if needed
-                from datetime import datetime
-                if isinstance(damage_date, str):
-                    try:
-                        dt = datetime.strptime(damage_date, '%Y-%m-%d')
-                        date_timestamp = int(dt.timestamp())
-                    except:
-                        date_timestamp = int(datetime.now().timestamp())
-                else:
-                    date_timestamp = int(damage_date.timestamp()) if hasattr(damage_date, 'timestamp') else int(damage_date)
-                
+        damage_id_result = None
+        
+        try:
+            # Convert damage_date to timestamp if needed
+            from datetime import datetime
+            if isinstance(damage_date, str):
+                try:
+                    dt = datetime.strptime(damage_date, '%Y-%m-%d')
+                    date_timestamp = int(dt.timestamp())
+                except:
+                    date_timestamp = int(datetime.now().timestamp())
+            else:
+                date_timestamp = int(damage_date.timestamp()) if hasattr(damage_date, 'timestamp') else int(damage_date)
+            
+            if table_name == 'rice_damage':
                 result = record_rice_damage(
                     str(user_id),
                     item_type,
@@ -2497,25 +2715,44 @@ def api_revert_damage(damage_id):
                     block_hash = result.get('block_hash')
                     block_number = result.get('block_number')
                     transaction_hash = result.get('transaction_hash')
-                    rice_damage_id = result.get('transaction_id')
-                print(f"Blockchain rice damage revert recorded. Block hash: {block_hash}, Rice Damage ID: {rice_damage_id}")
-            except Exception as e:
-                print(f"Failed to record rice damage revert on blockchain: {e}")
-                # Continue with database insert even if blockchain fails
-                block_hash = None
-                block_number = None
-                transaction_hash = None
-                rice_damage_id = None
+                    damage_id_result = result.get('transaction_id')
+                print(f"Blockchain rice damage revert recorded. Block hash: {block_hash}, Damage ID: {damage_id_result}")
+            else:
+                # For paddy damage, call record_damage
+                result = record_damage(
+                    str(user_id),
+                    item_type,
+                    int(quantity),
+                    date_timestamp,
+                    'revert'
+                )
+                if result and isinstance(result, dict):
+                    block_hash = result.get('block_hash')
+                    block_number = result.get('block_number')
+                    transaction_hash = result.get('transaction_hash')
+                    damage_id_result = result.get('damage_id')
+                print(f"Blockchain paddy damage revert recorded. Block hash: {block_hash}, Damage ID: {damage_id_result}")
+        except Exception as e:
+            print(f"Failed to record damage revert on blockchain: {e}")
+            # Continue with database insert even if blockchain fails
+            block_hash = None
+            block_number = None
+            transaction_hash = None
+            damage_id_result = None
         
-        # Insert a new reversal record with reason "revert"
-        if table_name == 'rice_damage':
-            # For rice damage, use blockchain id
-            insert_sql = f'INSERT INTO `{table_name}` (id, user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cur.execute(insert_sql, (rice_damage_id, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash))
+        # Insert a new reversal record with reason "revert" and reverted=0
+        if table_name == 'rice_damage' and damage_id_result is not None:
+            # For rice damage, use blockchain id if available
+            insert_sql = f'INSERT INTO `{table_name}` (id, user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
+        elif table_name == 'damage' and damage_id_result is not None:
+            # For paddy damage, use blockchain id if available
+            insert_sql = f'INSERT INTO `{table_name}` (id, user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
         else:
-            # For paddy damage, use auto-increment
-            insert_sql = f'INSERT INTO `{table_name}` (user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-            cur.execute(insert_sql, (str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash))
+            # Fallback: use auto-increment if blockchain id not available
+            insert_sql = f'INSERT INTO `{table_name}` (user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            cur.execute(insert_sql, (str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
         
         conn.commit()
         cur.close()
@@ -2744,6 +2981,370 @@ def api_get_stock_by_user():
         return jsonify(out)
     except mysql.connector.Error as err:
         return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/stock_by_user_type', methods=['GET'])
+def api_get_stock_by_user_type():
+    """Return stock grouped by user_type (Miller, Collecter, PMB) and paddy type.
+    Optional query param: paddy_type to filter by specific paddy type.
+    
+    Response: {
+        paddy_types: [...],
+        data: {
+            MILLER: { paddy_type: amount, ... },
+            COLLECTER: { paddy_type: amount, ... },
+            PMB: { paddy_type: amount, ... }
+        }
+    }
+    """
+    paddy_type = request.args.get('paddy_type', '').strip()
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor()
+        
+        # Query for stock grouped by user_type and paddy_type
+        if paddy_type:
+            sql = '''
+                SELECT UPPER(u.user_type) as user_type, s.type as paddy_type, SUM(s.amount) as total
+                FROM stock s
+                JOIN users u ON s.user_id = u.id
+                WHERE s.type = %s
+                GROUP BY UPPER(u.user_type), s.type
+                ORDER BY UPPER(u.user_type), s.type
+            '''
+            cur.execute(sql, (paddy_type,))
+        else:
+            sql = '''
+                SELECT UPPER(u.user_type) as user_type, s.type as paddy_type, SUM(s.amount) as total
+                FROM stock s
+                JOIN users u ON s.user_id = u.id
+                GROUP BY UPPER(u.user_type), s.type
+                ORDER BY UPPER(u.user_type), s.type
+            '''
+            cur.execute(sql)
+        
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        # Organize data
+        all_paddy_types = set()
+        user_type_data = {}  # {user_type: {paddy_type: amount}}
+        
+        for row in rows:
+            user_type = str(row[0] or 'UNKNOWN')
+            ptype = str(row[1] or 'Unknown')
+            amount = float(row[2] or 0)
+            
+            all_paddy_types.add(ptype)
+            if user_type not in user_type_data:
+                user_type_data[user_type] = {}
+            user_type_data[user_type][ptype] = amount
+        
+        # Ensure all user types are present
+        for ut in ['MILLER', 'COLLECTER', 'PMB']:
+            if ut not in user_type_data:
+                user_type_data[ut] = {}
+        
+        all_paddy_types = sorted(all_paddy_types)
+        
+        return jsonify({
+            'paddy_types': all_paddy_types,
+            'data': user_type_data
+        })
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/farmer_lookup', methods=['GET'])
+def api_farmer_lookup():
+    """Get farmer contribution details with transactions grouped by paddy type and destination.
+    Query params:
+      - farmer_id (required): The farmer's user ID
+      - date_from (optional): Start date filter (YYYY-MM-DD)
+      - date_to (optional): End date filter (YYYY-MM-DD)
+    
+    Response: {
+        farmer: { id, full_name, field_area },
+        summary: { total_paddy, to_collector, to_miller, to_pmb, transaction_count },
+        breakdown: [{ paddy_type, to_collector, to_miller, to_pmb, total }],
+        transactions: [{ date, paddy_type, to_party, to_party_type, quantity }]
+    }
+    """
+    print("=== Farmer Lookup API Called ===")
+    farmer_id = request.args.get('farmer_id', '').strip()
+    date_from = request.args.get('date_from', '').strip()
+    date_to = request.args.get('date_to', '').strip()
+    
+    print(f"Farmer ID: {farmer_id}")
+    print(f"Date From: {date_from}")
+    print(f"Date To: {date_to}")
+    
+    if not farmer_id:
+        print("ERROR: farmer_id is required")
+        return jsonify({'error': 'farmer_id is required'}), 400
+    
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        
+        # Get farmer details
+        print(f"Querying farmer with ID: {farmer_id}")
+        cur.execute('SELECT id, full_name, total_area_of_paddy_land FROM users WHERE id = %s LIMIT 1', (farmer_id,))
+        farmer = cur.fetchone()
+        print(f"Farmer found: {farmer}")
+        
+        if not farmer:
+            cur.close()
+            conn.close()
+            print("ERROR: Farmer not found")
+            return jsonify({'error': 'Farmer not found'}), 404
+        
+        # Build query for transactions where farmer is sender (include all, even reverted)
+        sql = '''
+            SELECT t.id, t.`from`, t.`to`, t.`type` as paddy_type, t.quantity, t.price, t.status, t.is_reverted, 
+                   t.`datetime`, t.created_at, t.block_hash, t.block_number, t.transaction_hash,
+                   u.user_type as to_user_type, u.full_name as to_full_name, u.company_name as to_company_name
+            FROM `transaction` t
+            LEFT JOIN users u ON t.`to` = u.id
+            WHERE t.`from` = %s
+        '''
+        params = [farmer_id]
+        
+        if date_from:
+            sql += ' AND DATE(t.`datetime`) >= %s'
+            params.append(date_from)
+        if date_to:
+            sql += ' AND DATE(t.`datetime`) <= %s'
+            params.append(date_to)
+        
+        sql += ' ORDER BY t.`datetime` DESC'
+        
+        print(f"Executing SQL: {sql}")
+        print(f"With params: {params}")
+        
+        cur.execute(sql, tuple(params))
+        transactions = cur.fetchall()
+        
+        print(f"Found {len(transactions)} transactions")
+        
+        cur.close()
+        conn.close()
+        
+        # Process data
+        breakdown_data = {}  # {paddy_type: {to_collector, to_miller, to_pmb, total}}
+        transaction_list = []
+        
+        total_paddy = 0
+        to_collector = 0
+        to_miller = 0
+        to_pmb = 0
+        
+        for tx in transactions:
+            paddy_type = tx['paddy_type'] if tx['paddy_type'] else None
+            if not paddy_type:  # Skip transactions without paddy type
+                print(f"Skipping transaction {tx['id']} - no paddy type")
+                continue
+                
+            qty = float(tx['quantity']) if tx['quantity'] else 0
+            to_user_type = tx['to_user_type'].upper() if tx['to_user_type'] else 'UNKNOWN'
+            to_party_name = tx['to_company_name'] if tx['to_company_name'] else (tx['to_full_name'] if tx['to_full_name'] else tx['to'])
+            
+            # Check if transaction is reverted - only check status = 0
+            is_reverted = tx.get('status', 1) == 0
+            
+            print(f"Processing tx {tx['id']}: {paddy_type}, {qty} kg to {to_user_type}, status={tx.get('status')}, reverted={is_reverted}")
+            
+            # Initialize breakdown for this paddy type if needed
+            if paddy_type not in breakdown_data:
+                breakdown_data[paddy_type] = {
+                    'to_collector': 0,
+                    'to_miller': 0,
+                    'to_pmb': 0,
+                    'total': 0
+                }
+            
+            # Determine if we add or subtract based on revert status
+            multiplier = -1 if is_reverted else 1
+            adjusted_qty = qty * multiplier
+            
+            # Accumulate by destination type (add if active, subtract if reverted)
+            if to_user_type == 'COLLECTER':
+                breakdown_data[paddy_type]['to_collector'] += adjusted_qty
+                to_collector += adjusted_qty
+            elif to_user_type == 'MILLER':
+                breakdown_data[paddy_type]['to_miller'] += adjusted_qty
+                to_miller += adjusted_qty
+            elif to_user_type == 'PMB':
+                breakdown_data[paddy_type]['to_pmb'] += adjusted_qty
+                to_pmb += adjusted_qty
+            
+            breakdown_data[paddy_type]['total'] += adjusted_qty
+            total_paddy += adjusted_qty
+            
+            # Add ALL transactions to the transaction list (including reverted)
+            tx_date = tx['datetime'] if tx['datetime'] else tx['created_at']
+            transaction_list.append({
+                'date': tx_date.isoformat() if tx_date else '',
+                'paddy_type': paddy_type,
+                'to_party': to_party_name,
+                'to_party_id': tx['to'],
+                'to_party_type': to_user_type,
+                'quantity': qty,
+                'price': float(tx['price']) if tx['price'] else 0,
+                'block_hash': tx['block_hash'] or '',
+                'block_number': tx['block_number'] or '',
+                'transaction_hash': tx['transaction_hash'] or '',
+                'is_reverted': is_reverted
+            })
+        
+        # Convert breakdown to list
+        breakdown_list = []
+        for paddy_type, data in breakdown_data.items():
+            breakdown_list.append({
+                'paddy_type': paddy_type,
+                'to_collector': data['to_collector'],
+                'to_miller': data['to_miller'],
+                'to_pmb': data['to_pmb'],
+                'total': data['total']
+            })
+        
+        # Sort breakdown by paddy type
+        breakdown_list.sort(key=lambda x: x['paddy_type'])
+        
+        result = {
+            'farmer': {
+                'id': farmer['id'],
+                'full_name': farmer['full_name'],
+                'field_area': float(farmer['total_area_of_paddy_land']) if farmer.get('total_area_of_paddy_land') else 0
+            },
+            'summary': {
+                'total_paddy': total_paddy,
+                'to_collector': to_collector,
+                'to_miller': to_miller,
+                'to_pmb': to_pmb,
+                'transaction_count': len(transaction_list)
+            },
+            'breakdown': breakdown_list,
+            'transactions': transaction_list
+        }
+        
+        print(f"Returning result with {len(breakdown_list)} paddy types and {len(transaction_list)} transactions")
+        return jsonify(result)
+        
+    except mysql.connector.Error as err:
+        print(f"MySQL Error: {err}")
+        return jsonify({'error': str(err)}), 500
+    except Exception as e:
+        print(f"General Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/damage_lookup', methods=['GET'])
+def api_damage_lookup():
+    """Retrieve damage records with optional filtering by user_type, paddy_type, and date range.
+    Query params:
+    - user_type: COLLECTER, MILLER, PMB (optional)
+    - paddy_type: Filter by paddy type (optional)
+    - date_from: Start date (optional)
+    - date_to: End date (optional)
+    
+    Returns: List of damage records sorted by quantity (ascending)
+    """
+    try:
+        user_type = request.args.get('user_type', '').strip()
+        paddy_type = request.args.get('paddy_type', '').strip()
+        date_from = request.args.get('date_from', '').strip()
+        date_to = request.args.get('date_to', '').strip()
+        
+        print(f"=== Damage Lookup Debug ===")
+        print(f"User Type: {user_type}")
+        print(f"Paddy Type: {paddy_type}")
+        print(f"Date From: {date_from}")
+        print(f"Date To: {date_to}")
+        
+        conn = get_connection(MYSQL_DATABASE)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Build query
+        query = '''
+            SELECT 
+                d.id,
+                d.user_id,
+                d.paddy_type,
+                d.quantity,
+                d.reason,
+                d.damage_date,
+                d.block_hash,
+                d.block_number,
+                d.transaction_hash,
+                u.full_name as user_name,
+                u.user_type
+            FROM damage d
+            LEFT JOIN users u ON d.user_id = u.id
+            WHERE 1=1
+        '''
+        params = []
+        
+        # Add filters
+        if user_type:
+            query += ' AND u.user_type = %s'
+            params.append(user_type)
+        
+        if paddy_type:
+            query += ' AND d.paddy_type = %s'
+            params.append(paddy_type)
+        
+        if date_from:
+            query += ' AND DATE(d.damage_date) >= %s'
+            params.append(date_from)
+        
+        if date_to:
+            query += ' AND DATE(d.damage_date) <= %s'
+            params.append(date_to)
+        
+        query += ' ORDER BY d.quantity ASC'
+        
+        print(f"Query: {query}")
+        print(f"Params: {params}")
+        
+        cursor.execute(query, params)
+        damage_records = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        print(f"Found {len(damage_records)} damage records")
+        
+        # Process results
+        result = []
+        for dmg in damage_records:
+            result.append({
+                'id': dmg.get('id'),
+                'user_id': dmg.get('user_id'),
+                'user_name': dmg.get('user_name'),
+                'user_type': dmg.get('user_type'),
+                'paddy_type': dmg.get('paddy_type'),
+                'quantity': float(dmg.get('quantity', 0)),
+                'reason': dmg.get('reason') or '',
+                'damage_date': dmg.get('damage_date').isoformat() if dmg.get('damage_date') else None,
+                'block_hash': dmg.get('block_hash') or '',
+                'block_number': dmg.get('block_number'),
+                'transaction_hash': dmg.get('transaction_hash') or ''
+            })
+        
+        return jsonify(result)
+        
+    except mysql.connector.Error as err:
+        print(f"MySQL Error: {err}")
+        return jsonify({'error': str(err)}), 500
+    except Exception as e:
+        print(f"General Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/stock_user_detail', methods=['GET'])

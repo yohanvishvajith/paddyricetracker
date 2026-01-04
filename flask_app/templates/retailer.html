@@ -8,16 +8,348 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      /* Header Styles */
+      header.site-header {
+        position: relative;
+        background: linear-gradient(135deg, #0b3d91 0%, #1e5a96 100%);
+        color: white;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(11, 61, 145, 0.2);
+      }
+
+      .site-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: white;
+      }
+
+      /* Logout button styles */
+      .logout-top {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .logout-top:hover {
+        background: white;
+        color: #0b3d91;
+        border-color: white;
+      }
+
+      /* Tab Navigation */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tabs ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tab a {
+        display: inline-block;
+        padding: 10px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid transparent;
+      }
+
+      .tab a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .tab.active a {
+        background: white;
+        color: #0b3d91;
+        border-color: white;
+        font-weight: 600;
+      }
+
+      /* Main Content */
+      main.content {
+        padding: 32px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .panel {
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .panel h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0b3d91;
+        margin-bottom: 24px;
+      }
+
+      .panel h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 32px !important;
+        margin-bottom: 16px;
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      .card form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        background: white;
+        border-color: #0b3d91;
+        box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #9ca3af;
+      }
+
+      /* Modal Actions */
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .btn:hover {
+        background: #e5e7eb;
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, #0b3d91, #1e5a96);
+        color: white;
+        box-shadow: 0 4px 12px rgba(11, 61, 145, 0.3);
+      }
+
+      .btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(11, 61, 145, 0.4);
+      }
+
+      .btn.primary:active {
+        transform: translateY(0);
+      }
+
+      .btn.small {
+        padding: 8px 16px;
+        font-size: 13px;
+        border-radius: 6px;
+        margin-right: 4px;
+      }
+
+      /* Table Styles */
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      .data-table thead {
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-bottom: 2px solid #d1d5db;
+      }
+
+      .data-table th {
+        padding: 16px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #0b3d91;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .data-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f3f4f6;
+        color: #4b5563;
+      }
+
+      .data-table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+
+      .data-table tbody tr:hover {
+        background-color: #f9fafb;
+      }
+
+      .data-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        animation: slideUp 0.3s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #0b3d91, #1e5a96);
+        color: white;
+        padding: 20px;
+        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid rgba(11, 61, 145, 0.2);
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
-      <h1 class="site-title">Retailer Dashboard</h1>
+      <h1 class="site-title">🛍️ Retailer Dashboard</h1>
       <nav class="tabs" aria-label="Retailer tabs">
         <ul>
-          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
-          <li class="tab"><a href="#" data-index="1">History</a></li>
+          <li class="tab active">
+            <a href="#" data-index="0">📦 Purchases</a>
+          </li>
+          <li class="tab"><a href="#" data-index="1">📋 History</a></li>
+          <li class="tab"><a href="#" data-index="2">🌾 Rice Stock</a></li>
         </ul>
       </nav>
+      <a href="/logout" class="logout-top" aria-label="Logout">Logout</a>
     </header>
 
     <main class="content">
@@ -37,19 +369,20 @@
             </select>
 
             <label for="qty">Quantity (kg)</label>
-            <input id="qty" type="number" min="0" step="0.01" required />
+            <input id="qty" type="number" min="0" step="0.001" required />
 
             <label for="price">Price (per kg)</label>
             <input id="price" type="number" min="0" step="0.01" />
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Save Purchase</button>
-              <a href="/" class="btn">Back to home</a>
+              <button type="submit" class="btn primary">
+                💾 Save Purchase
+              </button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <h3 style="margin-top: 18px">📊 Recent Purchases</h3>
         <div class="table-wrap">
           <table class="data-table" id="purchasesTable">
             <thead>
@@ -96,22 +429,72 @@
           </div>
         </div>
       </section>
+
+      <section class="panel" id="ricestock-panel" hidden>
+        <h2>🌾 Rice Stock</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="riceStockTable">
+            <thead>
+              <tr>
+                <th>Rice Type</th>
+                <th>Quantity (kg)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
     </main>
 
     <!-- Modal for viewing rice purchase details -->
     <div
       id="purchaseModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document">
+        <header class="modal-header">
+          <h3>Rice Purchase Details</h3>
+        </header>
+        <div style="padding: 20px">
+          <div
+            id="purchaseDetails"
+            style="margin: 20px 0; font-size: 14px; line-height: 1.8"
+          >
+            <!-- Details will be populated here -->
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              gap: 12px;
+              margin-top: 20px;
+            "
+          >
+            <button class="btn" onclick="closePurchaseModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-verification-modal"
       style="
-        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
+        z-index: 1001;
+        display: none;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
       "
     >
       <div
@@ -119,20 +502,48 @@
           background: white;
           padding: 30px;
           border-radius: 8px;
-          max-width: 500px;
+          max-width: 400px;
           width: 90%;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 1002;
         "
       >
-        <h2>Rice Purchase Details</h2>
-        <div id="purchaseDetails" style="margin: 20px 0">
-          <!-- Details will be populated here -->
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 20px">
-          <button class="btn primary" onclick="closePurchaseModal()">
-            Close
-          </button>
-        </div>
+        <h2>Verify OTP</h2>
+        <p style="margin: 15px 0; color: #666">
+          Enter the OTP sent to
+          <strong>****<span id="otp-phone-digits"></span></strong>
+        </p>
+        <form id="otp-verification-form">
+          <input
+            type="password"
+            id="otp-input-field"
+            placeholder="Enter OTP"
+            required
+            autofocus
+            style="
+              width: 100%;
+              padding: 10px;
+              margin: 10px 0;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+              font-size: 16px;
+              box-sizing: border-box;
+            "
+          />
+          <div style="display: flex; gap: 10px; margin-top: 20px">
+            <button type="submit" class="btn primary" style="flex: 1">
+              Verify
+            </button>
+            <button
+              type="button"
+              id="close-otp-modal"
+              class="btn secondary"
+              style="flex: 1"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -143,6 +554,13 @@
 
       function qs(sel) {
         return document.querySelector(sel);
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
       }
 
       async function fetchWholesalers() {
@@ -267,18 +685,21 @@
 
           // Show appropriate party name and action buttons
           let displayName = isPurchase ? r.fromName : r.toName;
-          let displayLabel = isPurchase ? "Purchase" : "Revert";
           let displayQty = isPurchase ? r.qty : -r.qty;
           const actionBtns = isPurchase
-            ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})">Revert</button>`
-            : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+            ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+            : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})" style="padding:4px 8px; background:#3b82f6; color:#fff;">👁️ View</button>`;
 
           const qtyColor = isPurchase ? "black" : "red";
           tr.innerHTML = `<td>${new Date(
             r.when
-          ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
+          ).toLocaleString()}</td><td>${escapeHtml(
+            displayName
+          )}</td><td>${escapeHtml(
             r.riceType
-          }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
+          )}</td><td style="color: ${qtyColor};">${displayQty.toFixed(
+            3
+          )}</td><td>${priceDisplay}</td><td title="${
             r.block_hash || ""
           }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
           pBody.appendChild(tr);
@@ -300,16 +721,19 @@
 
             // Show appropriate party name and action buttons
             let displayName = isPurchase ? r.fromName : r.toName;
-            let displayLabel = isPurchase ? "Purchase" : "Revert";
             let displayQty = isPurchase ? r.qty : -r.qty;
-            const actionBtns = `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+            const actionBtns = `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})" style="padding:4px 8px; background:#3b82f6; color:#fff;">👁️ View</button>`;
 
             const qtyColor = isPurchase ? "black" : "red";
             tr.innerHTML = `<td>${new Date(
               r.when
-            ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
+            ).toLocaleString()}</td><td>${escapeHtml(
+              displayName
+            )}</td><td>${escapeHtml(
               r.riceType
-            }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
+            )}</td><td style="color: ${qtyColor};">${displayQty.toFixed(
+              3
+            )}</td><td title="${
               r.block_hash || ""
             }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
             hBody.appendChild(tr);
@@ -318,7 +742,11 @@
 
       function setupTabs() {
         const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
-        const panels = [qs("#purchases-panel"), qs("#history-panel")];
+        const panels = [
+          qs("#purchases-panel"),
+          qs("#history-panel"),
+          qs("#ricestock-panel"),
+        ];
         tabs.forEach((tab, i) => {
           tab.addEventListener("click", (ev) => {
             ev.preventDefault();
@@ -326,6 +754,10 @@
             tab.classList.add("active");
             panels.forEach((p) => (p.hidden = true));
             panels[i].hidden = false;
+            // Load rice stock when switching to rice stock tab
+            if (i === 2) {
+              loadRiceStock();
+            }
           });
         });
       }
@@ -337,6 +769,39 @@
         purchaseBtn.addEventListener("click", () => {
           purchaseBtn.classList.add("primary");
           purchasePanel.hidden = false;
+        });
+      }
+
+      async function loadRiceStock() {
+        try {
+          const res = await fetch(
+            `/api/stock_by_type?kind=rice&user_id=${encodeURIComponent(
+              currentUser.user_id
+            )}`
+          );
+          if (!res.ok) throw new Error("Failed to fetch rice stock");
+          const data = await res.json();
+          renderRiceStockTable(data);
+        } catch (err) {
+          console.error("Error loading rice stock:", err);
+        }
+      }
+
+      function renderRiceStockTable(stocks) {
+        const tbody = qs("#riceStockTable tbody");
+        tbody.innerHTML = "";
+        if (!stocks || stocks.length === 0) {
+          tbody.innerHTML =
+            "<tr><td colspan='2' style='text-align: center; color: #999;'>No rice stock available</td></tr>";
+          return;
+        }
+        stocks.forEach((stock) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${stock.paddy_type || "Unknown"}</td>
+            <td>${parseFloat(stock.quantity || 0).toFixed(2)}</td>
+          `;
+          tbody.appendChild(row);
         });
       }
 
@@ -390,38 +855,45 @@
           }
 
           const detailsHtml = `
-            <div style="font-size: 14px; line-height: 1.8;">
-              <p><strong>Transaction ID:</strong> ${purchase.tx_id}</p>
-              <p><strong>Date/Time:</strong> ${new Date(
-                purchase.when
-              ).toLocaleString()}</p>
-              <p><strong>From:</strong> ${purchase.fromName}</p>
-              <p><strong>To:</strong> ${purchase.toName}</p>
-              <p><strong>Rice Type:</strong> ${purchase.riceType}</p>
-              <p><strong>Quantity:</strong> ${purchase.qty} kg</p>
-              <p><strong>Block Number:</strong> ${
-                purchase.block_number || "Not available"
-              }</p>
-              <p><strong>Transaction Hash:</strong> ${
-                purchase.transaction_hash
-                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${purchase.transaction_hash}</span>`
-                  : "Not available"
-              }</p>
-              <p><strong>Block Hash:</strong> ${
-                purchase.block_hash
-                  ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${purchase.block_hash}</span>`
-                  : "Not available"
-              }</p>
-            </div>
+            <p><strong>Transaction ID:</strong> ${escapeHtml(
+              purchase.tx_id
+            )}</p>
+            <p><strong>Date/Time:</strong> ${new Date(
+              purchase.when
+            ).toLocaleString()}</p>
+            <p><strong>From:</strong> ${escapeHtml(purchase.fromName)}</p>
+            <p><strong>To:</strong> ${escapeHtml(purchase.toName)}</p>
+            <p><strong>Rice Type:</strong> ${escapeHtml(purchase.riceType)}</p>
+            <p><strong>Quantity:</strong> ${purchase.qty.toFixed(3)} kg</p>
+            <p><strong>Price (per kg):</strong> ${
+              purchase.price ? purchase.price.toFixed(2) : "-"
+            }</p>
+            <p><strong>Block Number:</strong> ${
+              purchase.block_number || "Not available"
+            }</p>
+            <p><strong>Transaction Hash:</strong> ${
+              purchase.transaction_hash
+                ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${escapeHtml(
+                    purchase.transaction_hash
+                  )}</span>`
+                : "Not available"
+            }</p>
+            <p><strong>Block Hash:</strong> ${
+              purchase.block_hash
+                ? `<span style="word-break: break-all; font-family: monospace; font-size: 12px;">${escapeHtml(
+                    purchase.block_hash
+                  )}</span>`
+                : "Not available"
+            }</p>
           `;
 
           qs("#purchaseDetails").innerHTML = detailsHtml;
-          qs("#purchaseModal").style.display = "flex";
+          qs("#purchaseModal").hidden = false;
         };
 
         // Close purchase modal
         window.closePurchaseModal = function () {
-          qs("#purchaseModal").style.display = "none";
+          qs("#purchaseModal").hidden = true;
         };
 
         // Close modal when clicking outside
@@ -441,45 +913,57 @@
             return;
           }
 
-          try {
-            console.log(`Reverting rice transaction: ${transactionId}`);
-            const resp = await fetch(
-              `/api/rice_transactions/${transactionId}/revert`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-              }
-            );
-
-            if (!resp.ok) {
-              const errData = await resp.json();
-              throw new Error(errData.error || "Failed to revert purchase");
-            }
-
-            const respData = await resp.json();
-
-            if (respData.ok) {
-              alert(
-                `✓ Rice Purchase reverted successfully!\nBlock Hash: ${
-                  respData.block_hash
-                    ? respData.block_hash.substring(0, 10) + "..."
-                    : "Processing..."
-                }`
-              );
-            } else {
-              alert(
-                `⚠ Revert saved but blockchain recording may have failed: ${
-                  respData.error || "Unknown error"
-                }`
-              );
-            }
-
-            await loadServerTransactions();
-            renderPurchaseTables();
-          } catch (err) {
-            console.error("Error reverting purchase", err);
-            alert("Error reverting purchase: " + err.message);
+          // Find the transaction to get wholesaler details
+          const transaction = purchases.find((p) => p.tx_id === transactionId);
+          if (!transaction) {
+            alert("Transaction not found");
+            return;
           }
+
+          // Store revert data for OTP verification
+          window.pendingRevertData = {
+            transactionId: transactionId,
+            wholesalerId: transaction.from,
+          };
+
+          // Fetch current user details to get phone number
+          (async () => {
+            try {
+              const res = await fetch(
+                `/api/users/${encodeURIComponent(currentUser.user_id)}`
+              );
+              const user = res.ok ? await res.json() : null;
+              let phoneNumber = "****";
+              if (user && user.contact_number) {
+                const phone = String(user.contact_number).trim();
+                if (phone.length >= 4) {
+                  phoneNumber = phone.slice(-4);
+                }
+              }
+
+              // Show OTP modal for revert verification
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent =
+                phoneNumber;
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.style.display = "flex";
+            } catch (err) {
+              console.error("Failed to fetch user details:", err);
+              // Fallback: show OTP modal anyway
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent = "****";
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.style.display = "flex";
+            }
+          })();
         };
 
         // Purchase form handler
@@ -497,29 +981,186 @@
             return;
           }
 
-          try {
-            const payload = {
-              from: wholesalerId,
-              to: currentUser.user_id,
-              type: riceType,
-              quantity: parseFloat(qty),
-              price: price ? parseFloat(price) : null,
-              datetime: new Date().toISOString(),
-            };
-            const resp = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            if (!resp.ok) throw new Error("Failed to save purchase");
-            alert("Purchase saved successfully");
-            qs("#purchaseForm").reset();
-            await loadServerTransactions();
-            renderPurchaseTables();
-          } catch (err) {
-            console.error("Error saving purchase", err);
-            alert("Error saving purchase");
+          // Store purchase data for OTP verification
+          window.pendingPurchaseData = {
+            from: wholesalerId,
+            type: riceType,
+            quantity: parseFloat(qty),
+            price: price ? parseFloat(price) : null,
+          };
+
+          // Fetch wholesaler details to get phone number
+          (async () => {
+            try {
+              const res = await fetch(
+                `/api/users/${encodeURIComponent(wholesalerId)}`
+              );
+              const user = res.ok ? await res.json() : null;
+              let phoneNumber = "****";
+              if (user && user.contact_number) {
+                const phone = String(user.contact_number).trim();
+                if (phone.length >= 4) {
+                  phoneNumber = phone.slice(-4);
+                }
+              }
+
+              // Show OTP modal for purchase verification with phone number
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent =
+                phoneNumber;
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "purchase";
+              otpModal.style.display = "flex";
+            } catch (err) {
+              console.error("Failed to fetch user details:", err);
+              // Fallback: show OTP modal anyway
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent = "****";
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "purchase";
+              otpModal.style.display = "flex";
+            }
+          })();
+        });
+
+        // OTP form handler
+        qs("#otp-verification-form").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const otpInput = qs("#otp-input-field").value;
+          const otpModal = qs("#otp-verification-modal");
+          const action =
+            qs("#otp-verification-form").dataset.action || "purchase";
+
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Transaction cancelled.");
+            otpModal.style.display = "none";
+            window.pendingPurchaseData = null;
+            window.pendingRevertData = null;
+            return;
           }
+
+          otpModal.style.display = "none";
+
+          // Handle purchase action
+          if (action === "purchase") {
+            // OTP verified - proceed with purchase
+            const data = window.pendingPurchaseData;
+            if (!data) {
+              alert("No pending purchase data");
+              return;
+            }
+
+            try {
+              console.log(
+                `Recording Rice Purchase: From=${data.from}, To=${currentUser.user_id}, Type=${data.type}, Qty=${data.quantity}`
+              );
+              const payload = {
+                from: data.from,
+                to: currentUser.user_id,
+                type: data.type,
+                quantity: data.quantity,
+                price: data.price,
+                datetime: new Date().toISOString(),
+              };
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!resp.ok) {
+                const errData = await resp.json();
+                throw new Error(errData.error || "Failed to save purchase");
+              }
+              const respData = await resp.json();
+
+              if (respData.ok) {
+                alert(
+                  `✓ Rice Purchase recorded successfully!\nBlock Hash: ${
+                    respData.block_hash
+                      ? respData.block_hash.substring(0, 10) + "..."
+                      : "Processing..."
+                  }`
+                );
+              } else {
+                alert(
+                  `⚠ Purchase saved but blockchain recording may have failed: ${
+                    respData.error || "Unknown error"
+                  }`
+                );
+              }
+
+              qs("#purchaseForm").reset();
+              await loadServerTransactions();
+              renderPurchaseTables();
+              window.pendingPurchaseData = null;
+            } catch (err) {
+              console.error("Error saving purchase", err);
+              alert("Error saving purchase: " + err.message);
+            }
+          }
+          // Handle revert action
+          else if (action === "revert") {
+            const data = window.pendingRevertData;
+            if (!data) {
+              alert("No pending revert data");
+              return;
+            }
+
+            try {
+              console.log(`Reverting rice transaction: ${data.transactionId}`);
+              const resp = await fetch(
+                `/api/rice_transactions/${data.transactionId}/revert`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                }
+              );
+
+              if (!resp.ok) {
+                const errData = await resp.json();
+                throw new Error(errData.error || "Failed to revert purchase");
+              }
+
+              const respData = await resp.json();
+
+              if (respData.ok) {
+                alert(
+                  `✓ Rice Purchase reverted successfully!\nBlock Hash: ${
+                    respData.block_hash
+                      ? respData.block_hash.substring(0, 10) + "..."
+                      : "Processing..."
+                  }`
+                );
+              } else {
+                alert(
+                  `⚠ Revert saved but blockchain recording may have failed: ${
+                    respData.error || "Unknown error"
+                  }`
+                );
+              }
+
+              await loadServerTransactions();
+              renderPurchaseTables();
+              window.pendingRevertData = null;
+            } catch (err) {
+              console.error("Error reverting purchase", err);
+              alert("Error reverting purchase: " + err.message);
+            }
+          }
+        });
+
+        // Close OTP modal button
+        qs("#close-otp-modal").addEventListener("click", () => {
+          qs("#otp-verification-modal").style.display = "none";
+          window.pendingPurchaseData = null;
+          window.pendingRevertData = null;
         });
       }
 

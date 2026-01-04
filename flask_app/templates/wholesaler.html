@@ -8,23 +8,326 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      /* Header Styles */
+      header.site-header {
+        position: relative;
+        background: linear-gradient(135deg, #1e40af 0%, #1e5a96 100%);
+        color: white;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(30, 64, 175, 0.2);
+      }
+
+      .site-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: white;
+      }
+
+      /* Logout button styles */
+      .logout-top {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .logout-top:hover {
+        background: white;
+        color: #1e40af;
+        border-color: white;
+      }
+
+      /* Tab Navigation */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tabs ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tab a {
+        display: inline-block;
+        padding: 10px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid transparent;
+      }
+
+      .tab a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .tab.active a {
+        background: white;
+        color: #1e40af;
+        border-color: white;
+        font-weight: 600;
+      }
+
+      /* Main Content */
+      main.content {
+        padding: 32px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .panel {
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .panel h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 24px;
+      }
+
+      .panel h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 32px !important;
+        margin-bottom: 16px;
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      .card form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      input[type="date"]:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        background: white;
+        border-color: #1e40af;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #9ca3af;
+      }
+
+      /* Modal Actions */
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+        margin-top: 24px;
+      }
+
+      /* Button Styles */
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #e5e7eb;
+        color: #1f2937;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .btn:hover {
+        background: #d1d5db;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, #1e40af 0%, #1e5a96 100%);
+        color: white;
+      }
+
+      .btn.primary:hover {
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e4675 100%);
+      }
+
+      /* Table Styles */
+      .table-wrap {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table thead {
+        background: linear-gradient(135deg, #1e40af 0%, #1e5a96 100%);
+        color: white;
+      }
+
+      .data-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #1e40af;
+      }
+
+      .data-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .data-table tbody tr {
+        transition: all 0.2s ease;
+      }
+
+      .data-table tbody tr:hover {
+        background: #f9fafb;
+      }
+
+      .data-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .tabs ul {
+          flex-direction: column;
+        }
+
+        .tab a {
+          width: 100%;
+          text-align: center;
+        }
+
+        .modal-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .data-table {
+          font-size: 12px;
+        }
+
+        .data-table th,
+        .data-table td {
+          padding: 10px 8px;
+        }
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
-      <h1 class="site-title">Wholesaler Dashboard</h1>
+      <h1 class="site-title">🏪 Wholesaler Dashboard</h1>
+      <a href="/logout" class="logout-top">🔒 Logout</a>
       <nav class="tabs" aria-label="Wholesaler tabs">
         <ul>
-          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
-          <li class="tab"><a href="#" data-index="1">Sales</a></li>
-          <li class="tab"><a href="#" data-index="2">Damage</a></li>
-          <li class="tab"><a href="#" data-index="3">History</a></li>
+          <li class="tab active">
+            <a href="#" data-index="0">📦 Purchases</a>
+          </li>
+          <li class="tab"><a href="#" data-index="1">⚠️ Damage</a></li>
+          <li class="tab"><a href="#" data-index="2">🌾 Rice Stock</a></li>
         </ul>
       </nav>
     </header>
 
     <main class="content">
       <section class="panel" id="purchases-panel">
-        <h2>Record Rice Purchase</h2>
+        <h2>📦 Record Rice Purchase</h2>
 
         <div class="card">
           <form id="purchaseForm">
@@ -52,9 +355,8 @@
 
             <div class="modal-actions">
               <button type="submit" class="btn primary">
-                Record Rice Purchase (Blockchain)
+                💾 Record Rice Purchase
               </button>
-              <a href="/" class="btn">Back to home</a>
             </div>
           </form>
         </div>
@@ -78,27 +380,8 @@
         </div>
       </section>
 
-      <section class="panel" id="sales-panel" hidden>
-        <h2>Sales</h2>
-
-        <h3 style="margin-top: 18px">Recent Sales</h3>
-        <div class="table-wrap">
-          <table class="data-table" id="salesTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Rice Type</th>
-                <th>Qty (kg)</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
       <section class="panel" id="damage-panel" hidden>
-        <h2>Record Damaged Rice</h2>
+        <h2>⚠️ Record Damaged Rice</h2>
 
         <div class="card">
           <form id="damageForm">
@@ -117,7 +400,7 @@
             <input id="damageDate" type="date" required />
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Save Damage</button>
+              <button type="submit" class="btn primary">💾 Save Damage</button>
             </div>
           </form>
         </div>
@@ -140,52 +423,18 @@
         </div>
       </section>
 
-      <section class="panel" id="history-panel" hidden>
-        <h2>History</h2>
-
-        <div style="display: flex; gap: 10px; margin-bottom: 20px">
-          <button id="historyPurchaseBtn" class="btn primary" style="flex: 1">
-            Purchases
-          </button>
-          <button id="historySalesBtn" class="btn" style="flex: 1">
-            Sales
-          </button>
-        </div>
-
-        <div id="historyPurchasePanel">
-          <h3>Purchase History</h3>
-          <div class="table-wrap">
-            <table class="data-table" id="historyPurchaseTable">
-              <thead>
-                <tr>
-                  <th>When</th>
-                  <th>Miller</th>
-                  <th>Rice Type</th>
-                  <th>Qty (kg)</th>
-                  <th>Block ID</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div id="historySalesPanel" hidden>
-          <h3>Sales History</h3>
-          <div class="table-wrap">
-            <table class="data-table" id="historySalesTable">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Customer</th>
-                  <th>Rice Type</th>
-                  <th>Qty (kg)</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+      <section class="panel" id="ricestock-panel" hidden>
+        <h2>🌾 Rice Stock</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="riceStockTable">
+            <thead>
+              <tr>
+                <th>Rice Type</th>
+                <th>Quantity (kg)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </section>
     </main>
@@ -225,6 +474,73 @@
             Close
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-verification-modal"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 1002;
+        "
+      >
+        <h2>Verify OTP</h2>
+        <p style="margin: 15px 0; color: #666">
+          Enter the OTP sent to
+          <strong>****<span id="otp-phone-digits"></span></strong>
+        </p>
+        <form id="otp-verification-form">
+          <input
+            type="password"
+            id="otp-input-field"
+            placeholder="Enter OTP"
+            required
+            autofocus
+            style="
+              width: 100%;
+              padding: 10px;
+              margin: 10px 0;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+              font-size: 16px;
+              box-sizing: border-box;
+            "
+          />
+          <div style="display: flex; gap: 10px; margin-top: 20px">
+            <button type="submit" class="btn primary" style="flex: 1">
+              Verify
+            </button>
+            <button
+              type="button"
+              id="close-otp-modal"
+              class="btn secondary"
+              style="flex: 1"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -282,6 +598,7 @@
           const res = await fetch("/api/users/by_type?type=Miller");
           if (!res.ok) throw new Error("Failed to load millers");
           const data = await res.json();
+          console.log("Fetched millers data:", data);
           return Array.isArray(data) ? data : [];
         } catch (e) {
           console.error("Could not fetch millers:", e);
@@ -335,11 +652,17 @@
           millers.forEach((m) => {
             const o = document.createElement("option");
             o.value = m.id;
-            o.textContent =
-              (m.full_name || m.name || "") +
-              " (" +
-              (m.user_code || m.id || "") +
-              ")";
+            const millerName =
+              m.company_name?.trim() ||
+              m.full_name?.trim() ||
+              m.name?.trim() ||
+              "";
+            console.log("Miller object:", m);
+            console.log("Miller name being used:", millerName);
+            // Show Miller ID, and if name exists, add it after a dash
+            o.textContent = millerName
+              ? (m.id || "") + " - " + millerName
+              : m.id || "";
             sel.appendChild(o);
           });
         }
@@ -372,6 +695,7 @@
             block_number: t.block_number || null,
             transaction_hash: t.transaction_hash || null,
             status: t.status || 1,
+            is_reverted: t.is_reverted || 0,
           }));
         } catch (e) {
           console.error("Could not load server transactions", e);
@@ -381,10 +705,8 @@
 
       function renderPurchaseTables() {
         const pBody = qs("#purchasesTable tbody");
-        const hBody = qs("#historyPurchaseTable tbody");
         const userId = currentUser ? currentUser.user_id : null;
         pBody.innerHTML = "";
-        hBody.innerHTML = "";
 
         const recent = purchases.slice().reverse().slice(0, 10);
         recent.forEach((r) => {
@@ -396,90 +718,33 @@
 
           // Determine if this is a purchase (user is recipient) or revert (user is sender)
           const isPurchase = r.to === userId;
-          const isRevert = r.from === userId && r.status === 0;
+          const isRevert = r.from === userId && r.is_reverted === 1;
 
           // Show appropriate party name and action buttons
           let displayName = isPurchase ? r.fromName : r.toName;
-          let displayLabel = isPurchase ? "Purchase" : "Revert";
           let displayQty = isPurchase ? r.qty : -r.qty;
-          const actionBtns = isPurchase
-            ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})">Revert</button>`
-            : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+          let actionBtns = `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
+          if (isPurchase && r.is_reverted === 0) {
+            actionBtns += ` <button class="btn small" style="background-color: #ff9999; color: white;" onclick="revertPurchase(event, ${r.tx_id})">Revert</button>`;
+          }
 
           const qtyColor = isPurchase ? "black" : "red";
+          const bgColor =
+            r.is_reverted === 1 ? "background-color: #FFE6E6;" : "";
+          const statusDisplay =
+            r.is_reverted === 1
+              ? '<span style="color: red; font-weight: bold;">Reverted</span>'
+              : '<span style="color: green; font-weight: bold;">Normal</span>';
+          tr.style.cssText = bgColor;
           tr.innerHTML = `<td>${new Date(
             r.when
-          ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
+          ).toLocaleString()}</td><td>${displayName}</td><td>${
             r.riceType
           }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
             r.block_hash || ""
           }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
           pBody.appendChild(tr);
         });
-
-        purchases
-          .slice()
-          .reverse()
-          .forEach((r) => {
-            const tr = document.createElement("tr");
-            const blockIdDisplay = r.block_hash
-              ? r.block_hash.substring(0, 10) + "..."
-              : "Not available";
-            const priceDisplay = r.price ? r.price.toFixed(2) : "-";
-
-            // Determine if this is a purchase (user is recipient) or revert (user is sender)
-            const isPurchase = r.to === userId;
-            const isRevert = r.from === userId && r.status === 0;
-
-            // Show appropriate party name and action buttons
-            let displayName = isPurchase ? r.fromName : r.toName;
-            let displayLabel = isPurchase ? "Purchase" : "Revert";
-            let displayQty = isPurchase ? r.qty : -r.qty;
-            const actionBtns = isPurchase
-              ? `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button> <button class="btn small" onclick="revertPurchase(${r.tx_id})">Revert</button>`
-              : `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
-
-            const qtyColor = isPurchase ? "black" : "red";
-            tr.innerHTML = `<td>${new Date(
-              r.when
-            ).toLocaleString()}</td><td>${displayName} <span style="font-size: 12px; color: #666;">(${displayLabel})</span></td><td>${
-              r.riceType
-            }</td><td style="color: ${qtyColor};">${displayQty}</td><td>${priceDisplay}</td><td title="${
-              r.block_hash || ""
-            }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
-            hBody.appendChild(tr);
-          });
-      }
-
-      function renderSalesTables() {
-        const sBody = qs("#salesTable tbody");
-        const hBody = qs("#historySalesTable tbody");
-        sBody.innerHTML = "";
-        hBody.innerHTML = "";
-
-        const recent = sales.slice().reverse().slice(0, 10);
-        recent.forEach((s) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${new Date(
-            s.date
-          ).toLocaleDateString()}</td><td>${s.customer}</td><td>${
-            s.riceType
-          }</td><td>${s.qty}</td>`;
-          sBody.appendChild(tr);
-        });
-
-        sales
-          .slice()
-          .reverse()
-          .forEach((s) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `<td>${new Date(
-              s.date
-            ).toLocaleDateString()}</td><td>${s.customer}</td><td>${
-              s.riceType
-            }</td><td>${s.qty}</td>`;
-            hBody.appendChild(tr);
-          });
       }
 
       async function renderDamageTable() {
@@ -499,7 +764,14 @@
             const blockIdDisplay = d.block_hash
               ? d.block_hash.substring(0, 10) + "..."
               : "Not available";
-            const actionBtns = `<button class="btn small" onclick="viewDamage(event, ${d.id})">View</button> <button class="btn small" onclick="revertDamage(${d.id})">Revert</button>`;
+            const isReverted = d.reason === "revert";
+            const actionBtns = `<button class="btn small" onclick="viewDamage(event, ${
+              d.id
+            })">View</button>${
+              !isReverted
+                ? ` <button class="btn small" onclick="revertDamage(${d.id})">Revert</button>`
+                : ""
+            }`;
             tr.innerHTML = `<td>${new Date(displayDate).toLocaleString()}</td>
                           <td>${d.paddy_type}</td>
                           <td>${d.quantity}</td>
@@ -518,9 +790,8 @@
         const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
         const panels = [
           qs("#purchases-panel"),
-          qs("#sales-panel"),
           qs("#damage-panel"),
-          qs("#history-panel"),
+          qs("#ricestock-panel"),
         ];
         tabs.forEach((tab, i) => {
           tab.addEventListener("click", (ev) => {
@@ -529,34 +800,53 @@
             tab.classList.add("active");
             panels.forEach((p) => (p.hidden = true));
             panels[i].hidden = false;
+            // Load rice stock when switching to rice stock tab
+            if (i === 2) {
+              loadRiceStock();
+            }
           });
         });
       }
 
       function setupHistoryTabs() {
-        const purchaseBtn = qs("#historyPurchaseBtn");
-        const salesBtn = qs("#historySalesBtn");
-        const purchasePanel = qs("#historyPurchasePanel");
-        const salesPanel = qs("#historySalesPanel");
+        // History tabs functionality removed - only purchase history available
+      }
 
-        purchaseBtn.addEventListener("click", () => {
-          purchaseBtn.classList.add("primary");
-          salesBtn.classList.remove("primary");
-          purchasePanel.hidden = false;
-          salesPanel.hidden = true;
-        });
+      async function loadRiceStock() {
+        try {
+          const res = await fetch(
+            `/api/stock_by_type?kind=rice&user_id=${encodeURIComponent(
+              currentUser.user_id
+            )}`
+          );
+          if (!res.ok) throw new Error("Failed to fetch rice stock");
+          const data = await res.json();
+          renderRiceStockTable(data);
+        } catch (err) {
+          console.error("Error loading rice stock:", err);
+        }
+      }
 
-        salesBtn.addEventListener("click", () => {
-          salesBtn.classList.add("primary");
-          purchaseBtn.classList.remove("primary");
-          salesPanel.hidden = false;
-          purchasePanel.hidden = true;
+      function renderRiceStockTable(stocks) {
+        const tbody = qs("#riceStockTable tbody");
+        tbody.innerHTML = "";
+        if (!stocks || stocks.length === 0) {
+          tbody.innerHTML =
+            "<tr><td colspan='2' style='text-align: center; color: #999;'>No rice stock available</td></tr>";
+          return;
+        }
+        stocks.forEach((stock) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${stock.paddy_type || "Unknown"}</td>
+            <td>${parseFloat(stock.quantity || 0).toFixed(2)}</td>
+          `;
+          tbody.appendChild(row);
         });
       }
 
       async function init() {
         setupTabs();
-        setupHistoryTabs();
 
         const me = await fetchCurrentUser();
         if (!me) {
@@ -617,52 +907,52 @@
             return;
           }
 
-          try {
-            console.log(
-              `Recording Rice Purchase: From=${millerId}, To=${currentUser.user_id}, Type=${riceType}, Qty=${qty}`
-            );
-            const payload = {
-              from: millerId,
-              to: currentUser.user_id,
-              type: riceType,
-              quantity: parseFloat(qty),
-              price: price ? parseFloat(price) : null,
-              datetime: new Date().toISOString(),
-            };
-            const resp = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            if (!resp.ok) {
-              const errData = await resp.json();
-              throw new Error(errData.error || "Failed to save purchase");
-            }
-            const respData = await resp.json();
+          // Store purchase data for OTP verification
+          window.pendingPurchaseData = {
+            from: millerId,
+            type: riceType,
+            quantity: parseFloat(qty),
+            price: price ? parseFloat(price) : null,
+          };
 
-            if (respData.ok) {
-              alert(
-                `✓ Rice Purchase recorded successfully!\nBlock Hash: ${
-                  respData.block_hash
-                    ? respData.block_hash.substring(0, 10) + "..."
-                    : "Processing..."
-                }`
+          // Fetch miller details to get phone number
+          (async () => {
+            try {
+              const res = await fetch(
+                `/api/users/${encodeURIComponent(millerId)}`
               );
-            } else {
-              alert(
-                `⚠ Purchase saved but blockchain recording may have failed: ${
-                  respData.error || "Unknown error"
-                }`
-              );
-            }
+              const user = res.ok ? await res.json() : null;
+              let phoneNumber = "****";
+              if (user && user.contact_number) {
+                const phone = String(user.contact_number).trim();
+                if (phone.length >= 4) {
+                  phoneNumber = phone.slice(-4);
+                }
+              }
 
-            qs("#purchaseForm").reset();
-            await loadServerTransactions();
-            renderPurchaseTables();
-          } catch (err) {
-            console.error("Error saving purchase", err);
-            alert("Error saving purchase: " + err.message);
-          }
+              // Show OTP modal for purchase verification with phone number
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent =
+                phoneNumber;
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "purchase";
+              otpModal.style.display = "flex";
+            } catch (err) {
+              console.error("Failed to fetch user details:", err);
+              // Fallback: show OTP modal anyway
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent = "****";
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "purchase";
+              otpModal.style.display = "flex";
+            }
+          })();
         });
 
         // Revert rice purchase function
@@ -735,16 +1025,10 @@
           const detailsHtml = `
             <div style="font-size: 14px; line-height: 1.8;">
               <p><strong>Transaction ID:</strong> ${purchase.tx_id}</p>
-              <p><strong>Type:</strong> <span style="color: ${
-                isPurchase ? "green" : "red"
-              }; font-weight: bold;">${
-            isPurchase ? "PURCHASE" : "REVERT"
-          }</span></p>
               <p><strong>Date/Time:</strong> ${new Date(
                 purchase.when
               ).toLocaleString()}</p>
               <p><strong>From:</strong> ${purchase.fromName}</p>
-              <p><strong>To:</strong> ${purchase.toName}</p>
               <p><strong>Rice Type:</strong> ${purchase.riceType}</p>
               <p><strong>Quantity:</strong> ${
                 isPurchase ? purchase.qty : -purchase.qty
@@ -780,6 +1064,67 @@
             closePurchaseModal();
           }
         });
+
+        // Revert rice purchase function
+        window.revertPurchase = function (event, transactionId) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const userId = currentUser ? currentUser.user_id : null;
+          const purchase = purchases.find((p) => p.tx_id === transactionId);
+          if (!purchase) {
+            alert("Purchase details not found");
+            return;
+          }
+
+          // Store revert data for OTP verification
+          window.pendingRevertData = {
+            transactionId: transactionId,
+            from: purchase.from,
+            to: purchase.to,
+            quantity: purchase.qty,
+            riceType: purchase.riceType,
+          };
+
+          // Fetch user (wholesaler) contact number for OTP
+          (async () => {
+            try {
+              const res = await fetch(
+                `/api/users/${encodeURIComponent(userId)}`
+              );
+              const user = res.ok ? await res.json() : null;
+              let phoneNumber = "****";
+              if (user && user.contact_number) {
+                const phone = String(user.contact_number).trim();
+                if (phone.length >= 4) {
+                  phoneNumber = phone.slice(-4);
+                }
+              }
+
+              // Show OTP modal for revert verification
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent =
+                phoneNumber;
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.style.display = "flex";
+            } catch (err) {
+              console.error("Failed to fetch user details:", err);
+              // Fallback: show OTP modal anyway
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent = "****";
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.style.display = "flex";
+            }
+          })();
+        };
 
         // View damage details function
         window.viewDamage = function (event, damageId) {
@@ -835,6 +1180,13 @@
 
         // Revert damage record function
         window.revertDamage = async function (damageId) {
+          // Find the damage record to get its kind (rice or paddy)
+          const damageRecord = damages.find((d) => d.id === damageId);
+          if (!damageRecord) {
+            alert("Damage record not found");
+            return;
+          }
+
           if (
             !confirm(
               "Are you sure you want to revert this damage record? This will restore the rice quantity to your stock."
@@ -845,10 +1197,14 @@
 
           try {
             console.log(`Reverting damage record: ${damageId}`);
-            const resp = await fetch(`/api/damages/${damageId}/revert`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-            });
+            const kind = damageRecord.kind || "rice"; // Default to rice if not specified
+            const resp = await fetch(
+              `/api/damages/${damageId}/revert?kind=${kind}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }
+            );
 
             if (!resp.ok) {
               const errData = await resp.json();
@@ -883,6 +1239,144 @@
         // Sales form removed: form submission handled elsewhere or disabled
 
         // Damage form handler
+        qs("#otp-verification-form").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const otpInput = qs("#otp-input-field").value;
+          const otpModal = qs("#otp-verification-modal");
+          const action =
+            qs("#otp-verification-form").dataset.action || "purchase";
+
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Transaction cancelled.");
+            otpModal.style.display = "none";
+            window.pendingPurchaseData = null;
+            window.pendingRevertData = null;
+            return;
+          }
+
+          otpModal.style.display = "none";
+
+          // Handle purchase action
+          if (action === "purchase") {
+            // OTP verified - proceed with purchase
+            const data = window.pendingPurchaseData;
+            if (!data) {
+              alert("No pending purchase data");
+              return;
+            }
+
+            try {
+              console.log(
+                `Recording Rice Purchase: From=${data.from}, To=${currentUser.user_id}, Type=${data.type}, Qty=${data.quantity}`
+              );
+              const payload = {
+                from: data.from,
+                to: currentUser.user_id,
+                type: data.type,
+                quantity: data.quantity,
+                price: data.price,
+                datetime: new Date().toISOString(),
+              };
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!resp.ok) {
+                const errData = await resp.json();
+                throw new Error(errData.error || "Failed to save purchase");
+              }
+              const respData = await resp.json();
+
+              if (respData.ok) {
+                alert(
+                  `✓ Rice Purchase recorded successfully!\nBlock Hash: ${
+                    respData.block_hash
+                      ? respData.block_hash.substring(0, 10) + "..."
+                      : "Processing..."
+                  }`
+                );
+              } else {
+                alert(
+                  `⚠ Purchase saved but blockchain recording may have failed: ${
+                    respData.error || "Unknown error"
+                  }`
+                );
+              }
+
+              qs("#purchaseForm").reset();
+              await loadServerTransactions();
+              renderPurchaseTables();
+              window.pendingPurchaseData = null;
+            } catch (err) {
+              console.error("Error saving purchase", err);
+              alert("Error saving purchase: " + err.message);
+            }
+          }
+          // Handle revert action
+          else if (action === "revert") {
+            const data = window.pendingRevertData;
+            if (!data) {
+              alert("No pending revert data");
+              return;
+            }
+
+            try {
+              console.log(
+                `Reverting Rice Purchase: Transaction ID=${data.transactionId}`
+              );
+              const payload = {
+                from: data.from,
+                to: data.to,
+                type: data.riceType,
+                quantity: data.quantity,
+                datetime: new Date().toISOString(),
+                status: 0,
+              };
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!resp.ok) {
+                const errData = await resp.json();
+                throw new Error(errData.error || "Failed to revert purchase");
+              }
+              const respData = await resp.json();
+
+              if (respData.ok) {
+                alert(
+                  `✓ Rice Purchase reverted successfully!\nBlock Hash: ${
+                    respData.block_hash
+                      ? respData.block_hash.substring(0, 10) + "..."
+                      : "Processing..."
+                  }`
+                );
+              } else {
+                alert(
+                  `⚠ Revert saved but blockchain recording may have failed: ${
+                    respData.error || "Unknown error"
+                  }`
+                );
+              }
+
+              await loadServerTransactions();
+              renderPurchaseTables();
+              window.pendingRevertData = null;
+            } catch (err) {
+              console.error("Error reverting purchase", err);
+              alert("Error reverting purchase: " + err.message);
+            }
+          }
+        });
+
+        // Close OTP modal button
+        qs("#close-otp-modal")?.addEventListener("click", () => {
+          qs("#otp-verification-modal").style.display = "none";
+          window.pendingPurchaseData = null;
+        });
+
         qs("#damageForm").addEventListener("submit", async (ev) => {
           ev.preventDefault();
           const riceType = qs("#damageRiceType").value;
@@ -917,17 +1411,6 @@
             alert("Error saving damage");
           }
         });
-
-        // Load sales from localStorage
-        try {
-          const stored = localStorage.getItem("wholesaler_sales");
-          if (stored) {
-            sales = JSON.parse(stored);
-            renderSalesTables();
-          }
-        } catch (e) {
-          console.error("Could not load sales from localStorage", e);
-        }
 
         await renderDamageTable();
       }

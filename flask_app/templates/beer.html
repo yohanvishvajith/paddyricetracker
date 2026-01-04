@@ -3,203 +3,263 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Beer Dashboard</title>
+    <title>Beer Dashboard - Sri Lanka Rice Supply Chain</title>
     <link rel="stylesheet" href="/static/style.css" />
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f4f7fa;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
       }
+
+      /* Header Styles */
       .top-bar {
-        background: linear-gradient(90deg, #4caf50, #2e7d32);
+        position: relative;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
-        padding: 16px 24px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        padding: 30px 24px;
+        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
       }
+
       .top-bar h1 {
+        font-size: 32px;
+        font-weight: 700;
         margin: 0;
-        font-size: 24px;
+        color: white;
       }
+
       .top-bar .logout {
-        background: white;
-        color: #2e7d32;
-        border: none;
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         padding: 8px 16px;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
+        transition: all 0.2s ease;
       }
+
+      .top-bar .logout:hover {
+        background: white;
+        color: #f59e0b;
+        border-color: white;
+      }
+
       .container {
-        max-width: 1400px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 24px;
+        padding: 32px 24px;
       }
-      @media (min-width: 768px) {
-        .container {
-          padding: 40px;
-        }
-      }
-      @media (min-width: 1024px) {
-        .container {
-          padding: 60px;
-        }
-      }
+
+      /* Tab Navigation */
       .tabs {
         display: flex;
         gap: 8px;
-        margin-bottom: 24px;
-        border-bottom: 2px solid #ccc;
+        margin-bottom: 32px;
+        border-bottom: none;
       }
+
       .tabs button {
         background: white;
-        border: none;
-        padding: 12px 24px;
+        border: 2px solid transparent;
+        padding: 12px 32px;
         cursor: pointer;
-        font-size: 14px;
-        border-radius: 8px 8px 0 0;
-        transition: background 0.3s;
+        font-size: 15px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        color: #374151;
       }
+
+      .tabs button:hover {
+        background: #fef3c7;
+        color: #f59e0b;
+      }
+
       .tabs button.active {
-        background: #4caf50;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
+        border-color: #f59e0b;
+        font-weight: 600;
       }
+
+      /* Panel Content */
       .tab-content {
         display: none;
-        background: white;
-        padding: 24px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.4s ease-out;
       }
+
       .tab-content.active {
         display: block;
       }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .tab-content h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #f59e0b;
+        margin-bottom: 24px;
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
       form {
         display: flex;
         flex-direction: column;
         gap: 16px;
       }
+
       form label {
         display: flex;
         flex-direction: column;
-        font-weight: bold;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
       }
+
       form input,
       form select {
-        margin-top: 4px;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        margin-top: 8px;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        background: #f9fafb;
+        transition: all 0.3s ease;
       }
+
+      form input:focus,
+      form select:focus {
+        outline: none;
+        background: white;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+      }
+
       form button {
-        background: #4caf50;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
         border: none;
-        padding: 12px;
-        border-radius: 4px;
+        padding: 14px 28px;
+        border-radius: 8px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        margin-top: 8px;
       }
+
       form button:hover {
-        background: #388e3c;
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
       }
+
+      /* Table Styles */
+      .table-wrap {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-top: 24px;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 16px;
       }
+
       table thead {
-        background: #4caf50;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
       }
-      table th,
-      table td {
-        padding: 12px;
+
+      table th {
+        padding: 16px;
         text-align: left;
-        border-bottom: 1px solid #ddd;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #f59e0b;
       }
+
+      table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      table tbody tr {
+        transition: all 0.2s ease;
+      }
+
       table tbody tr:hover {
-        background: #f1f1f1;
+        background: #fef3c7;
       }
-    </style>
-  </head>
-  <body>
-    <div class="top-bar">
-      <h1>Beer Dashboard</h1>
-      <button class="logout" onclick="logout()">Logout</button>
-    </div>
 
-    <div class="container">
-      <div class="tabs">
-        <button class="active" onclick="openTab(event, 'purchases')">
-          Purchases
-        </button>
-        <button onclick="openTab(event, 'history')">History</button>
-      </div>
+      table tbody tr:last-child td {
+        border-bottom: none;
+      }
 
-      <!-- Purchases Tab -->
-      <div id="purchases" class="tab-content active">
-        <h2>Purchase Rice</h2>
-        <form id="purchase-form">
-          <label>
-            Purchase From Type
-            <select name="sourceType" id="source-type" required>
-              <option value="">Select Source Type</option>
-              <option value="Miller">Miller</option>
-              <option value="Wholesaler">Wholesaler</option>
-            </select>
-          </label>
-          <label>
-            Select Supplier
-            <select name="supplierId" id="supplier-select" required>
-              <option value="">First select source type</option>
-            </select>
-          </label>
-          <label>
-            Rice Type
-            <select name="riceType" required>
-              <option value="">Loading rice types...</option>
-            </select>
-          </label>
-          <label>
-            Quantity (kg)
-            <input type="number" name="quantity" step="0.01" required />
-          </label>
-          <label>
-            Price (per kg)
-            <input type="number" name="price" step="0.01" />
-          </label>
-          <button type="submit">Purchase Rice</button>
-        </form>
-      </div>
+      /* Button Styles */
+      .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 13px;
+      }
 
-      <!-- Damage tab removed -->
+      .btn:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      }
 
-      <!-- History Tab -->
-      <div id="history" class="tab-content">
-        <h2>Transaction History</h2>
-        <table id="history-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Rice Type</th>
-              <th>Quantity (kg)</th>
-              <th>Price (per kg)</th>
-              <th>Block ID</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
+      .btn.small {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
 
-    <!-- View Transaction Modal -->
-    <div
-      id="viewTransactionModal"
-      style="
+      /* Modal Styles */
+      .modal {
         display: none;
         position: fixed;
         top: 0;
@@ -210,17 +270,159 @@
         z-index: 1000;
         justify-content: center;
         align-items: center;
-      "
-    >
-      <div
-        style="
-          background: white;
-          padding: 24px;
-          border-radius: 8px;
-          max-width: 500px;
-          width: 90%;
-        "
-      >
+      }
+
+      .modal-content {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-content h3 {
+        font-size: 24px;
+        color: #f59e0b;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      .modal-content p {
+        margin: 12px 0;
+        line-height: 1.6;
+      }
+
+      .modal-content strong {
+        color: #374151;
+        display: inline-block;
+        min-width: 140px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .top-bar h1 {
+          font-size: 24px;
+        }
+
+        .tabs {
+          flex-direction: column;
+        }
+
+        .tabs button {
+          width: 100%;
+        }
+
+        .container {
+          padding: 24px 16px;
+        }
+
+        table {
+          font-size: 12px;
+        }
+
+        table th,
+        table td {
+          padding: 10px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <h1>🍺 Beer Dashboard</h1>
+      <button class="logout" onclick="logout()">🔒 Logout</button>
+    </div>
+
+    <div class="container">
+      <div class="tabs">
+        <button class="active" onclick="openTab(event, 'purchases')">
+          📦 Purchases
+        </button>
+        <button onclick="openTab(event, 'history')">📋 History</button>
+        <button onclick="openTab(event, 'stock')">🌾 Stock</button>
+      </div>
+
+      <!-- Purchases Tab -->
+      <div id="purchases" class="tab-content active">
+        <h2>📦 Purchase Rice</h2>
+        <div class="card">
+          <form id="purchase-form">
+            <label>
+              Purchase From Type
+              <select name="sourceType" id="source-type" required>
+                <option value="">Select Source Type</option>
+                <option value="Miller">Miller</option>
+                <option value="Wholesaler">Wholesaler</option>
+              </select>
+            </label>
+            <label>
+              Select Supplier
+              <select name="supplierId" id="supplier-select" required>
+                <option value="">First select source type</option>
+              </select>
+            </label>
+            <label>
+              Rice Type
+              <select name="riceType" required>
+                <option value="">Loading rice types...</option>
+              </select>
+            </label>
+            <label>
+              Quantity (kg)
+              <input type="number" name="quantity" step="0.01" required />
+            </label>
+            <label>
+              Price (per kg)
+              <input type="number" name="price" step="0.01" />
+            </label>
+            <button type="submit">💾 Purchase Rice</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="history" class="tab-content">
+        <h2>📋 Transaction History</h2>
+        <div class="table-wrap">
+          <table id="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Rice Type</th>
+                <th>Quantity (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Stock Tab -->
+      <div id="stock" class="tab-content">
+        <h2>🌾 Rice Stock</h2>
+        <div class="table-wrap">
+          <table id="stock-table">
+            <thead>
+              <tr>
+                <th>Rice Type</th>
+                <th>Quantity (kg)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Transaction Modal -->
+    <div id="viewTransactionModal" class="modal">
+      <div class="modal-content">
         <h3>Transaction Details</h3>
         <p><strong>From:</strong> <span id="viewTxFrom"></span></p>
         <p><strong>To:</strong> <span id="viewTxTo"></span></p>
@@ -246,19 +448,49 @@
           ></span>
         </p>
         <button
+          class="btn"
           onclick="document.getElementById('viewTransactionModal').style.display='none'"
-          style="
-            background: #4caf50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 16px;
-          "
         >
           Close
         </button>
+      </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otp-modal" class="modal">
+      <div class="modal-content">
+        <h3>Verify OTP</h3>
+        <p>
+          Enter the OTP sent to
+          <strong>****<span id="otp-phone-digits"></span></strong>
+        </p>
+        <form id="otp-form">
+          <label>
+            OTP
+            <input
+              type="password"
+              id="otp-input"
+              placeholder="Enter OTP"
+              required
+              autofocus
+            />
+          </label>
+          <button
+            type="submit"
+            class="btn"
+            style="background: #10b981; color: white"
+          >
+            Verify
+          </button>
+          <button
+            type="button"
+            class="btn"
+            onclick="document.getElementById('otp-modal').style.display='none'"
+            style="background: #6b7280; color: white"
+          >
+            Cancel
+          </button>
+        </form>
       </div>
     </div>
 
@@ -300,6 +532,8 @@
           loadPurchases();
         } else if (tabName === "history") {
           loadHistory();
+        } else if (tabName === "stock") {
+          loadStock();
         }
       }
 
@@ -366,7 +600,9 @@
           const riceTypeName = paddyMap[riceTypeId] || riceTypeId;
           const quantity = parseFloat(formData.get("quantity"));
           const price = formData.get("price");
-          const payload = {
+
+          // Store pending purchase data
+          window.pendingPurchaseData = {
             from: supplierId,
             to: loggedInUser.user_code,
             type: riceTypeName,
@@ -375,22 +611,86 @@
             datetime: new Date().toISOString(),
           };
 
+          // Fetch supplier contact to show in OTP modal
           try {
-            const response = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) throw new Error("Failed to record purchase");
-            alert("Purchase recorded successfully!");
-            e.target.reset();
-            document.getElementById("supplier-select").innerHTML =
-              '<option value="">First select source type</option>';
-            loadPurchases();
+            const userRes = await fetch(`/api/users/${supplierId}`);
+            const user = userRes.ok ? await userRes.json() : null;
+            const phoneNumber = user?.contact_number?.slice(-4) || "****";
+            document.getElementById("otp-phone-digits").textContent =
+              phoneNumber;
           } catch (err) {
-            console.error(err);
-            alert("Error recording purchase");
+            console.error("Failed to fetch supplier contact", err);
+            document.getElementById("otp-phone-digits").textContent = "****";
+          }
+
+          // Show OTP modal
+          document.getElementById("otp-input").value = "";
+          document.getElementById("otp-form").dataset.action = "purchase";
+          document.getElementById("otp-modal").style.display = "flex";
+        });
+
+      // OTP Form Submit Handler
+      document
+        .getElementById("otp-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const otpInput = document.getElementById("otp-input").value.trim();
+          const action = e.target.dataset.action || "purchase";
+
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Please try again.");
+            document.getElementById("otp-input").value = "";
+            return;
+          }
+
+          // Close modal
+          document.getElementById("otp-modal").style.display = "none";
+
+          if (action === "purchase" && window.pendingPurchaseData) {
+            try {
+              const response = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(window.pendingPurchaseData),
+              });
+
+              if (!response.ok) throw new Error("Failed to record purchase");
+              alert("Purchase recorded successfully!");
+              document.getElementById("purchase-form").reset();
+              document.getElementById("supplier-select").innerHTML =
+                '<option value="">First select source type</option>';
+              window.pendingPurchaseData = null;
+              loadHistory();
+            } catch (err) {
+              console.error(err);
+              alert("Error recording purchase");
+              window.pendingPurchaseData = null;
+            }
+          } else if (action === "revert" && window.pendingRevertData) {
+            try {
+              const response = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(window.pendingRevertData),
+              });
+
+              const result = await response.json();
+              if (response.ok && result.ok) {
+                alert("Purchase reverted successfully!");
+                window.pendingRevertData = null;
+                loadHistory();
+              } else {
+                alert(
+                  "Error: " + (result.error || "Failed to revert purchase")
+                );
+                window.pendingRevertData = null;
+              }
+            } catch (err) {
+              console.error("Failed to revert purchase:", err);
+              alert("Network error: " + err.message);
+              window.pendingRevertData = null;
+            }
           }
         });
 
@@ -429,6 +729,43 @@
 
       // loadDamages removed (feature not shown in UI)
 
+      async function showRevertOTP(from, type, quantity, price) {
+        if (
+          !confirm(
+            `Revert purchase of ${quantity} kg ${type} from ${from}? This will create a reversal with status=0.`
+          )
+        ) {
+          return;
+        }
+
+        // Store pending revert data
+        window.pendingRevertData = {
+          from: from,
+          to: loggedInUser.user_code,
+          type: type,
+          quantity: quantity,
+          price: price,
+          datetime: new Date().toISOString(),
+          status: 0, // Revert transaction
+        };
+
+        // Fetch supplier contact to show in OTP modal
+        try {
+          const userRes = await fetch(`/api/users/${from}`);
+          const user = userRes.ok ? await userRes.json() : null;
+          const phoneNumber = user?.contact_number?.slice(-4) || "****";
+          document.getElementById("otp-phone-digits").textContent = phoneNumber;
+        } catch (err) {
+          console.error("Failed to fetch supplier contact", err);
+          document.getElementById("otp-phone-digits").textContent = "****";
+        }
+
+        // Show OTP modal
+        document.getElementById("otp-input").value = "";
+        document.getElementById("otp-form").dataset.action = "revert";
+        document.getElementById("otp-modal").style.display = "flex";
+      }
+
       function viewTransaction(transaction) {
         document.getElementById("viewTxFrom").textContent =
           transaction.from || "N/A";
@@ -453,7 +790,7 @@
         document.getElementById("viewTransactionModal").style.display = "flex";
       }
 
-      async function revertTransaction(id, from, type, quantity, price) {
+      async function showRevertOTP(from, type, quantity, price) {
         if (
           !confirm(
             `Revert purchase of ${quantity} kg ${type} from ${from}? This will create a reversal with status=0.`
@@ -462,6 +799,35 @@
           return;
         }
 
+        // Store pending revert data
+        window.pendingRevertData = {
+          from: from,
+          to: loggedInUser.user_code,
+          type: type,
+          quantity: quantity,
+          price: price,
+          datetime: new Date().toISOString(),
+          status: 0, // Revert transaction
+        };
+
+        // Fetch supplier contact to show in OTP modal
+        try {
+          const userRes = await fetch(`/api/users/${from}`);
+          const user = userRes.ok ? await userRes.json() : null;
+          const phoneNumber = user?.contact_number?.slice(-4) || "****";
+          document.getElementById("otp-phone-digits").textContent = phoneNumber;
+        } catch (err) {
+          console.error("Failed to fetch supplier contact", err);
+          document.getElementById("otp-phone-digits").textContent = "****";
+        }
+
+        // Show OTP modal
+        document.getElementById("otp-input").value = "";
+        document.getElementById("otp-form").dataset.action = "revert";
+        document.getElementById("otp-modal").style.display = "flex";
+      }
+
+      async function revertTransaction(from, type, quantity, price) {
         try {
           const payload = {
             from: from,
@@ -527,9 +893,9 @@
             ).replace(/'/g, "&#39;")})'>View</button>`;
 
             const revertBtn = showRevertBtn
-              ? `<button class="btn" style="background:#ef4444; color:#fff; padding:4px 8px; font-size:12px;" onclick="revertTransaction(${
-                  t.id
-                }, '${t.from}', '${t.type}', ${t.quantity}, ${
+              ? `<button class="btn" style="background:#ef4444; color:#fff; padding:4px 8px; font-size:12px;" onclick="showRevertOTP('${
+                  t.from
+                }', '${t.type}', ${t.quantity}, ${
                   t.price || 0
                 })">↩️ Revert</button>`
               : "";
@@ -548,6 +914,38 @@
         } catch (err) {
           console.error(err);
         }
+      }
+
+      async function loadStock() {
+        try {
+          const response = await fetch(
+            `/api/stock_by_type?kind=rice&user_id=${encodeURIComponent(
+              loggedInUser.user_code
+            )}`
+          );
+          if (!response.ok) throw new Error("Failed to load stock");
+          const data = await response.json();
+          renderStockTable(data);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function renderStockTable(stocks) {
+        const tbody = document.querySelector("#stock-table tbody");
+        tbody.innerHTML = "";
+        if (!stocks || stocks.length === 0) {
+          tbody.innerHTML =
+            "<tr><td colspan='2' style='text-align: center; color: #999;'>No rice stock available</td></tr>";
+          return;
+        }
+        stocks.forEach((stock) => {
+          const row = tbody.insertRow();
+          row.innerHTML = `
+            <td>${stock.paddy_type || "Unknown"}</td>
+            <td>${parseFloat(stock.quantity || 0).toFixed(2)}</td>
+          `;
+        });
       }
 
       // Initial load: fetch paddy types then load user and purchases

@@ -390,6 +390,13 @@
               </select>
             </label>
             <button
+              id="add-initial-rice-btn"
+              class="btn primary"
+              style="margin-top: 18px"
+            >
+              + Add Rice
+            </button>
+            <button
               id="initial-rice-refresh"
               class="btn"
               style="margin-top: 18px"
@@ -461,35 +468,78 @@
         </div>
 
         <div id="analytics-paddy-panel">
-          <div style="margin-top: 12px">
+          <div
+            style="
+              margin-top: 20px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">📊</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Paddy Type Analysis
+              </h3>
+            </div>
+
             <label
               for="analytics-paddy-type-select"
               style="
                 display: block;
-                margin-bottom: 6px;
-                font-size: 13px;
-                color: #374151;
+                margin-bottom: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
               "
-              >Paddy Type (Analytics)</label
+              >Filter by Paddy Type</label
             >
             <select
               id="analytics-paddy-type-select"
               style="
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
-                min-width: 220px;
-                margin-bottom: 8px;
+                padding: 10px 14px;
+                border-radius: 8px;
+                border: 2px solid #e0e7ff;
+                min-width: 280px;
+                margin-bottom: 16px;
+                font-size: 14px;
+                background-color: white;
+                font-weight: 500;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
               "
+              onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+              onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
             >
               <option value="">All paddy types</option>
             </select>
             <div
               style="
-                height: 260px;
-                max-width: 900px;
-                margin-top: 8px;
+                height: 600px;
+                width: 90%;
+                margin: 0 auto;
                 position: relative;
+                background-color: white;
+                border-radius: 10px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
               "
             >
               <canvas
@@ -499,44 +549,1027 @@
             </div>
           </div>
 
+          <!-- Farmer Contribution Lookup Section -->
           <div
             style="
               margin-top: 32px;
-              border-top: 1px solid #e5e7eb;
-              padding-top: 24px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             "
           >
-            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
-              District-based Stock Analysis
-            </h3>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">👨‍🌾</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Farmer Contribution Lookup
+              </h3>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr auto;
+                gap: 16px;
+                margin-bottom: 20px;
+                align-items: end;
+              "
+            >
+              <div>
+                <label
+                  for="farmer-lookup-select"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Select Farmer
+                </label>
+                <select
+                  id="farmer-lookup-select"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                >
+                  <option value="">-- Select a farmer --</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="farmer-lookup-date-from"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  id="farmer-lookup-date-from"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="farmer-lookup-date-to"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  id="farmer-lookup-date-to"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                />
+              </div>
+
+              <button
+                id="farmer-lookup-btn"
+                style="
+                  padding: 10px 24px;
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  color: white;
+                  border: none;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+                  white-space: nowrap;
+                "
+                onmouseover="this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.6)'; this.style.transform='translateY(-2px)';"
+                onmouseout="this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.4)'; this.style.transform='translateY(0)';"
+              >
+                🔍 Lookup
+              </button>
+            </div>
+
+            <!-- Farmer Lookup Results -->
+            <div
+              id="farmer-lookup-results"
+              style="display: none; margin-top: 20px"
+            >
+              <div
+                style="
+                  background-color: white;
+                  border-radius: 10px;
+                  padding: 20px;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                "
+              >
+                <h4
+                  style="
+                    margin-top: 0;
+                    margin-bottom: 16px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Farmer Contribution Summary
+                </h4>
+
+                <!-- Summary Stats -->
+                <div
+                  id="farmer-summary-stats"
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 16px;
+                    margin-bottom: 24px;
+                  "
+                >
+                  <!-- Stats will be populated here -->
+                </div>
+
+                <!-- Paddy Type Breakdown Table -->
+                <h4
+                  style="
+                    margin-top: 20px;
+                    margin-bottom: 12px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Paddy Type Breakdown
+                </h4>
+                <div style="overflow-x: auto">
+                  <table
+                    id="farmer-paddy-breakdown-table"
+                    style="
+                      width: 100%;
+                      border-collapse: collapse;
+                      font-size: 14px;
+                    "
+                  >
+                    <thead>
+                      <tr
+                        style="
+                          background-color: #f3f4f6;
+                          border-bottom: 2px solid #e5e7eb;
+                        "
+                      >
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Paddy Type
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          To Collector (kg)
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          To Miller (kg)
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          To PMB (kg)
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Total (kg)
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="farmer-paddy-tbody">
+                      <!-- Paddy type rows will be populated here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- All Transactions -->
+                <h4
+                  style="
+                    margin-top: 24px;
+                    margin-bottom: 12px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  All Related Transactions
+                </h4>
+                <div style="overflow-x: auto">
+                  <table
+                    id="farmer-transactions-table"
+                    style="
+                      width: 100%;
+                      border-collapse: collapse;
+                      font-size: 14px;
+                    "
+                  >
+                    <thead>
+                      <tr
+                        style="
+                          background-color: #f3f4f6;
+                          border-bottom: 2px solid #e5e7eb;
+                        "
+                      >
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Date
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Paddy Type
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          To Party
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Quantity (kg)
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: center;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="farmer-transactions-tbody">
+                      <!-- Transaction rows will be populated here -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Farmer Transaction Detail Modal -->
+          <div
+            id="farmer-transaction-modal"
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-hidden="true"
+            hidden
+            style="
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: rgba(0, 0, 0, 0.5);
+              display: none;
+              align-items: center;
+              justify-content: center;
+              z-index: 9999;
+            "
+          >
+            <div
+              style="
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  border-bottom: 2px solid #e5e7eb;
+                  padding-bottom: 12px;
+                "
+              >
+                <h3
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1f2937;
+                  "
+                >
+                  Transaction Details
+                </h3>
+                <button
+                  id="farmer-transaction-modal-close"
+                  style="
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #6b7280;
+                  "
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div
+                id="farmer-transaction-detail-content"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Damage Detection Section -->
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #ffe0e0 0%, #ffb3b3 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">⚠️</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Damage Detection
+              </h3>
+            </div>
+
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr auto;
+                gap: 16px;
+                margin-bottom: 20px;
+                align-items: end;
+              "
+            >
+              <div>
+                <label
+                  for="damage-user-type-select"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  User Type
+                </label>
+                <select
+                  id="damage-user-type-select"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                >
+                  <option value="">-- All Types --</option>
+                  <option value="COLLECTER">Collecter</option>
+                  <option value="MILLER">Miller</option>
+                  <option value="PMB">PMB</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="damage-paddy-type-select"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Paddy Type
+                </label>
+                <select
+                  id="damage-paddy-type-select"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                >
+                  <option value="">-- All Types --</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="damage-date-from"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  id="damage-date-from"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="damage-date-to"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  id="damage-date-to"
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    font-size: 14px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                />
+              </div>
+
+              <button
+                id="damage-lookup-btn"
+                style="
+                  padding: 10px 24px;
+                  background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+                  color: white;
+                  border: none;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+                  white-space: nowrap;
+                "
+                onmouseover="this.style.boxShadow='0 4px 12px rgba(220, 38, 38, 0.6)'; this.style.transform='translateY(-2px)';"
+                onmouseout="this.style.boxShadow='0 2px 8px rgba(220, 38, 38, 0.4)'; this.style.transform='translateY(0)';"
+              >
+                🔍 Search
+              </button>
+            </div>
+
+            <!-- Damage Detection Results -->
+            <div
+              id="damage-lookup-results"
+              style="display: none; margin-top: 20px"
+            >
+              <div
+                style="
+                  background-color: white;
+                  border-radius: 10px;
+                  padding: 20px;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                "
+              >
+                <h4
+                  style="
+                    margin-top: 0;
+                    margin-bottom: 16px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Damage Records (Sorted by Damage Quantity - Ascending)
+                </h4>
+
+                <div style="margin-bottom: 16px">
+                  <input
+                    type="text"
+                    id="damage-search-input"
+                    placeholder="🔍 Search by username or name..."
+                    style="
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      width: 100%;
+                      max-width: 400px;
+                      font-size: 14px;
+                      background-color: white;
+                      color: #374151;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  />
+                </div>
+
+                <div style="overflow-x: auto">
+                  <table
+                    id="damage-table"
+                    style="
+                      width: 100%;
+                      border-collapse: collapse;
+                      font-size: 14px;
+                    "
+                  >
+                    <thead>
+                      <tr
+                        style="
+                          background-color: #f3f4f6;
+                          border-bottom: 2px solid #e5e7eb;
+                        "
+                      >
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Date
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          User
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Paddy Type
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: right;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Damage Qty (kg)
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: left;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Reason
+                        </th>
+                        <th
+                          style="
+                            padding: 12px;
+                            text-align: center;
+                            font-weight: 600;
+                            color: #374151;
+                          "
+                        >
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="damage-tbody">
+                      <!-- Damage records will be populated here -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div
+                  id="damage-no-results"
+                  style="
+                    text-align: center;
+                    padding: 40px;
+                    color: #6b7280;
+                    font-size: 16px;
+                  "
+                >
+                  No damage records found
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Damage Detail Modal -->
+          <div
+            id="damage-detail-modal"
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-hidden="true"
+            hidden
+            style="
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-color: rgba(0, 0, 0, 0.5);
+              display: none;
+              align-items: center;
+              justify-content: center;
+              z-index: 9999;
+            "
+          >
+            <div
+              style="
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  border-bottom: 2px solid #e5e7eb;
+                  padding-bottom: 12px;
+                "
+              >
+                <h3
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #1f2937;
+                  "
+                >
+                  Damage Details
+                </h3>
+                <button
+                  id="damage-modal-close"
+                  style="
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #6b7280;
+                  "
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div
+                id="damage-detail-content"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+              >
+                <!-- Details will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">�</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                User Type Stock Distribution by Paddy Type
+              </h3>
+            </div>
+
+            <label
+              for="user-type-paddy-filter"
+              style="
+                display: block;
+                margin-bottom: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
+              "
+              >Filter by Paddy Type</label
+            >
+            <select
+              id="user-type-paddy-filter"
+              style="
+                padding: 10px 14px;
+                border-radius: 8px;
+                border: 2px solid #e0e7ff;
+                min-width: 280px;
+                margin-bottom: 16px;
+                font-size: 14px;
+                background-color: white;
+                font-weight: 500;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+              "
+              onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+              onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+            >
+              <option value="">All paddy types</option>
+            </select>
+            <div
+              style="
+                height: 400px;
+                width: 90%;
+                margin: 0 auto;
+                position: relative;
+                background-color: white;
+                border-radius: 10px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
+              <canvas
+                id="user-type-stock-chart"
+                aria-label="User type stock distribution by paddy type"
+              ></canvas>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">�🗺️</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                District-based Stock Analysis
+              </h3>
+            </div>
             <label
               for="district-paddy-type-select"
               style="
                 display: block;
-                margin-bottom: 6px;
-                font-size: 13px;
-                color: #374151;
+                margin-bottom: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
               "
               >Filter by Paddy Type</label
             >
             <select
               id="district-paddy-type-select"
               style="
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
-                min-width: 220px;
-                margin-bottom: 8px;
+                padding: 10px 14px;
+                border-radius: 8px;
+                border: 2px solid #e0e7ff;
+                min-width: 280px;
+                margin-bottom: 16px;
+                font-size: 14px;
+                background-color: white;
+                font-weight: 500;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
               "
+              onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+              onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
             >
               <option value="">All paddy types</option>
             </select>
             <div
               style="
-                height: 320px;
-                max-width: 900px;
-                margin-top: 8px;
+                height: 600px;
+                width: 90%;
+                margin: 0 auto;
                 position: relative;
+                background-color: white;
+                border-radius: 10px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
               "
             >
               <canvas
@@ -549,52 +1582,185 @@
           <div
             style="
               margin-top: 32px;
-              border-top: 1px solid #e5e7eb;
-              padding-top: 24px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             "
           >
-            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
-              User Stock Analysis
-            </h3>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">👥</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                User Stock Analysis
+              </h3>
+            </div>
             <div
               class="controls"
               style="
                 display: flex;
-                gap: 8px;
-                align-items: center;
-                margin-bottom: 12px;
+                gap: 12px;
+                align-items: flex-end;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
               "
             >
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 User Type
-                <select id="filter-user-type">
+                <select
+                  id="filter-user-type"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    margin-top: 4px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
                   <option value="collect">Collectors</option>
                   <option value="miller">Millers</option>
                 </select>
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 Paddy Type
-                <select id="filter-paddy-type"></select>
+                <select
+                  id="filter-paddy-type"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    margin-top: 4px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                ></select>
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 District (Optional)
-                <select id="filter-district">
+                <select
+                  id="filter-district"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    margin-top: 4px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
                   <option value="">All Districts</option>
                 </select>
               </label>
 
-              <button id="filter-refresh" class="btn">Refresh</button>
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Search
+                <input
+                  id="filter-search"
+                  placeholder="Search by ID or name"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                  "
+                />
+              </label>
+
+              <button
+                id="filter-refresh"
+                class="btn primary"
+                style="
+                  padding: 8px 16px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+              >
+                Refresh
+              </button>
             </div>
 
-            <div class="table-wrap">
+            <div
+              class="table-wrap"
+              style="
+                background-color: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
               <table
                 id="user-table"
                 class="data-table"
@@ -615,34 +1781,83 @@
                   <!-- rows will be added here -->
                 </tbody>
               </table>
+              <div
+                id="user-table-pagination"
+                style="
+                  padding: 12px 16px;
+                  background: transparent;
+                  display: block;
+                  text-align: center;
+                "
+              ></div>
             </div>
           </div>
 
           <div
             style="
               margin-top: 32px;
-              border-top: 1px solid #e5e7eb;
-              padding-top: 24px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             "
           >
-            <h3 style="font-size: 16px; margin-bottom: 12px; color: #374151">
-              Transaction History
-            </h3>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">💱</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Transaction History
+              </h3>
+            </div>
             <div
               class="controls"
               style="
                 display: flex;
                 flex-wrap: wrap;
-                gap: 8px;
+                gap: 12px;
                 align-items: flex-end;
-                margin-bottom: 12px;
+                margin-bottom: 20px;
               "
             >
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 Transaction Type
-                <select id="transaction-type-filter">
+                <select
+                  id="transaction-type-filter"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
                   <option value="">All Types</option>
                   <option value="farmer-collector">Farmer → Collector</option>
                   <option value="farmer-pmb">Farmer → PMB</option>
@@ -655,46 +1870,97 @@
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 Paddy Type
-                <select id="transaction-paddy-filter">
+                <select
+                  id="transaction-paddy-filter"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
                   <option value="">All Paddy Types</option>
                 </select>
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 From Date
                 <input
                   id="transaction-date-from"
                   type="date"
                   style="
-                    padding: 6px;
-                    border-radius: 6px;
-                    border: 1px solid #d1d5db;
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
                   "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
                 />
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 To Date
                 <input
                   id="transaction-date-to"
                   type="date"
                   style="
-                    padding: 6px;
-                    border-radius: 6px;
-                    border: 1px solid #d1d5db;
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
                   "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
                 />
               </label>
 
               <label
-                style="display: flex; flex-direction: column; font-size: 13px"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
               >
                 Search (From/To)
                 <input
@@ -702,17 +1968,126 @@
                   type="search"
                   placeholder="Enter user ID"
                   style="
-                    padding: 6px;
-                    border-radius: 6px;
-                    border: 1px solid #d1d5db;
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    transition: all 0.3s ease;
                   "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
                 />
               </label>
 
-              <button id="transaction-refresh" class="btn">Refresh</button>
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Transaction ID
+                <input
+                  id="transaction-id-search"
+                  type="search"
+                  placeholder="Search by Transaction ID"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Price Filter
+                <div style="display: flex; gap: 8px; margin-top: 4px">
+                  <select
+                    id="price-comparison"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 13px;
+                      background-color: white;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      flex: 0 0 auto;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  >
+                    <option value="">-- No Filter --</option>
+                    <option value="upper">Greater Than (≥)</option>
+                    <option value="lower">Less Than (≤)</option>
+                  </select>
+                  <input
+                    id="price-value"
+                    type="number"
+                    placeholder="0.00"
+                    step="0.01"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 13px;
+                      flex: 1;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  />
+                </div>
+              </label>
+
+              <button
+                id="transaction-refresh"
+                class="btn primary"
+                style="
+                  padding: 8px 16px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+              >
+                Refresh
+              </button>
             </div>
 
-            <div class="table-wrap">
+            <div
+              class="table-wrap"
+              style="
+                background-color: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
               <table
                 id="transaction-table"
                 class="data-table"
@@ -728,13 +2103,24 @@
                     <th scope="col">To</th>
                     <th scope="col">Paddy Type</th>
                     <th scope="col">Quantity (kg)</th>
+                    <th scope="col">Price</th>
                     <th scope="col">Date/Time</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <!-- rows will be added here -->
                 </tbody>
               </table>
+              <div
+                id="transaction-table-pagination"
+                style="
+                  padding: 12px 16px;
+                  background: transparent;
+                  display: block;
+                  text-align: center;
+                "
+              ></div>
             </div>
           </div>
         </div>
@@ -792,6 +2178,198 @@
             </table>
             <div style="margin-top: 12px; text-align: right">
               <button id="stock-close-btn" class="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction detail modal -->
+      <div
+        id="transaction-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document" style="max-width: 600px">
+          <header class="modal-header">
+            <h3>Transaction Details</h3>
+          </header>
+          <div style="padding: 20px">
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+            >
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Transaction ID</label
+                >
+                <p
+                  id="tx-detail-id"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >From</label
+                >
+                <p
+                  id="tx-detail-from"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >To</label
+                >
+                <p
+                  id="tx-detail-to"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Paddy Type</label
+                >
+                <p
+                  id="tx-detail-type"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Quantity (kg)</label
+                >
+                <p
+                  id="tx-detail-qty"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Date/Time</label
+                >
+                <p
+                  id="tx-detail-datetime"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Transaction Hash</label
+                >
+                <p
+                  id="tx-detail-tx-hash"
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #374151;
+                    word-break: break-all;
+                  "
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Block Hash</label
+                >
+                <p
+                  id="tx-detail-block-hash"
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #374151;
+                    word-break: break-all;
+                  "
+                ></p>
+              </div>
+              <div>
+                <label
+                  style="
+                    display: block;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                  "
+                  >Block Number</label
+                >
+                <p
+                  id="tx-detail-block-number"
+                  style="margin: 0; font-size: 14px; color: #374151"
+                ></p>
+              </div>
+            </div>
+            <div style="margin-top: 20px; text-align: right">
+              <button
+                id="transaction-close-btn"
+                class="btn"
+                style="
+                  background: #6b7280;
+                  color: white;
+                  padding: 8px 16px;
+                  border-radius: 6px;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -948,6 +2526,102 @@
                 Cancel
               </button>
               <button type="submit" class="btn primary">Add Paddy</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Add Initial Rice Modal -->
+      <div
+        id="add-initial-rice-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="modal-content" role="document">
+          <header class="modal-header">
+            <h3>Add Initial Rice</h3>
+          </header>
+          <form id="add-initial-rice-form" style="padding: 16px">
+            <label style="display: block; margin-bottom: 12px">
+              User Type
+              <select
+                id="initial-rice-user-type"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select User Type</option>
+                <option value="Miller">Miller</option>
+                <option value="Wholesaler">Wholesaler</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              User Name
+              <select
+                id="initial-rice-user-select"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select User</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              Rice Type
+              <select
+                id="initial-rice-type-select"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                "
+                required
+              >
+                <option value="">Select Rice Type</option>
+              </select>
+            </label>
+
+            <label style="display: block; margin-bottom: 12px">
+              Quantity (kg)
+              <input
+                type="number"
+                id="initial-rice-quantity"
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                  box-sizing: border-box;
+                "
+                required
+                min="0"
+                step="0.01"
+              />
+            </label>
+
+            <div class="modal-actions">
+              <button type="button" id="add-rice-cancel-btn" class="btn">
+                Cancel
+              </button>
+              <button type="submit" class="btn primary">Add Rice</button>
             </div>
           </form>
         </div>
@@ -1244,10 +2918,28 @@
         const filterPaddyType = document.getElementById("filter-paddy-type");
         const filterSearch = document.getElementById("filter-search");
         const filterRefresh = document.getElementById("filter-refresh");
+        let filterSearchDebounce = null;
+
+        if (filterSearch) {
+          filterSearch.addEventListener("input", function () {
+            if (filterSearchDebounce) clearTimeout(filterSearchDebounce);
+            filterSearchDebounce = setTimeout(() => {
+              try {
+                applyUserSearch();
+              } catch (e) {
+                console.warn("search failed", e);
+              }
+            }, 250);
+          });
+        }
         const stockModal = document.getElementById("stock-modal");
         const stockCloseBtn = document.getElementById("stock-close-btn");
         const stockDetailBody = document.querySelector(
           "#stock-detail-table tbody"
+        );
+        const transactionModal = document.getElementById("transaction-modal");
+        const transactionCloseBtn = document.getElementById(
+          "transaction-close-btn"
         );
         let lastFocused = null;
 
@@ -1267,6 +2959,26 @@
             if (e.target === stockModal) {
               stockModal.hidden = true;
               stockModal.removeAttribute("aria-hidden");
+            }
+          });
+        }
+
+        // Close transaction modal
+        if (transactionCloseBtn) {
+          transactionCloseBtn.addEventListener("click", () => {
+            if (transactionModal) {
+              transactionModal.hidden = true;
+              transactionModal.removeAttribute("aria-hidden");
+            }
+          });
+        }
+
+        // Close transaction modal when clicking outside
+        if (transactionModal) {
+          transactionModal.addEventListener("click", function (e) {
+            if (e.target === transactionModal) {
+              transactionModal.hidden = true;
+              transactionModal.removeAttribute("aria-hidden");
             }
           });
         }
@@ -2277,6 +3989,146 @@
           });
         }
 
+        // Get references to rice modal elements
+        const addInitialRiceModal = document.getElementById(
+          "add-initial-rice-modal"
+        );
+        const addRiceCancelBtn = document.getElementById("add-rice-cancel-btn");
+        const addInitialRiceForm = document.getElementById(
+          "add-initial-rice-form"
+        );
+        const initialRiceUserTypeSelect = document.getElementById(
+          "initial-rice-user-type"
+        );
+        const initialRiceUserSelect = document.getElementById(
+          "initial-rice-user-select"
+        );
+        const initialRiceTypeSelect = document.getElementById(
+          "initial-rice-type-select"
+        );
+
+        // Fetch rice types on demand
+        async function fetchRiceTypesForModal() {
+          try {
+            const resp = await fetch("/api/rice_types");
+            if (!resp.ok) throw new Error("Failed to fetch rice types");
+            const types = await resp.json();
+            initialRiceTypeSelect.innerHTML =
+              '<option value="">Select Rice Type</option>';
+            types.forEach((t) => {
+              const opt = document.createElement("option");
+              opt.value = t.name || t.id || "";
+              opt.textContent = t.name || String(t.id || "");
+              initialRiceTypeSelect.appendChild(opt);
+            });
+          } catch (err) {
+            console.error("Failed to fetch rice types:", err);
+          }
+        }
+
+        // Load users based on selected user type for rice modal
+        async function loadUsersForRiceModal() {
+          const userType = initialRiceUserTypeSelect.value;
+          initialRiceUserSelect.innerHTML =
+            '<option value="">Select User</option>';
+
+          if (!userType) return;
+
+          try {
+            const resp = await fetch(
+              `/api/users?user_type=${encodeURIComponent(userType)}`
+            );
+            if (!resp.ok) throw new Error("Failed to fetch users");
+            const users = await resp.json();
+
+            users.forEach((u) => {
+              const opt = document.createElement("option");
+              opt.value = u.id || "";
+              const displayName =
+                u.full_name || u.company_name || u.name || u.user_code || "";
+              const idPart =
+                u.id !== undefined && u.id !== null ? String(u.id) : "";
+              opt.textContent = idPart
+                ? `${idPart} - ${displayName || idPart}`
+                : displayName || idPart;
+              initialRiceUserSelect.appendChild(opt);
+            });
+          } catch (err) {
+            console.error("Failed to load users for rice modal:", err);
+          }
+        }
+
+        // Open Add Rice Modal
+        const addInitialRiceBtn = document.getElementById(
+          "add-initial-rice-btn"
+        );
+        if (addInitialRiceBtn) {
+          addInitialRiceBtn.addEventListener("click", () => {
+            addInitialRiceModal.hidden = false;
+            fetchRiceTypesForModal();
+          });
+        }
+
+        // Close Add Rice Modal
+        if (addRiceCancelBtn) {
+          addRiceCancelBtn.addEventListener("click", () => {
+            addInitialRiceModal.hidden = true;
+            addInitialRiceForm.reset();
+          });
+        }
+
+        // User type change handler for rice modal
+        if (initialRiceUserTypeSelect) {
+          initialRiceUserTypeSelect.addEventListener(
+            "change",
+            loadUsersForRiceModal
+          );
+        }
+
+        // Form submission handler for rice
+        if (addInitialRiceForm) {
+          addInitialRiceForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const userId = initialRiceUserSelect.value;
+            const riceType = initialRiceTypeSelect.value;
+            const quantity = document.getElementById(
+              "initial-rice-quantity"
+            ).value;
+
+            if (!userId || !riceType || !quantity) {
+              alert("Please fill in all fields");
+              return;
+            }
+
+            try {
+              const resp = await fetch("/api/initial_rice", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: userId,
+                  rice_type: riceType,
+                  quantity: parseFloat(quantity),
+                }),
+              });
+
+              if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(error.message || "Failed to add initial rice");
+              }
+
+              const result = await resp.json();
+              alert("Initial rice added successfully!");
+              addInitialRiceModal.hidden = true;
+              addInitialRiceForm.reset();
+              loadInitialRice();
+            } catch (err) {
+              console.error("Error adding initial rice:", err);
+              alert(`Error: ${err.message}`);
+            }
+          });
+        }
+
         // Populate filter paddy type dropdown for Analytics
         async function populateFilterPaddyType() {
           try {
@@ -2427,8 +4279,127 @@
               });
               userTableBody.appendChild(tr);
             });
+
+            // initialize frontend-only pagination for user table
+            try {
+              if (typeof setupTablePagination === "function") {
+                setupTablePagination("#user-table", 10);
+              }
+            } catch (e) {
+              console.warn("Pagination init failed", e);
+            }
           } catch (err) {
             console.error("Failed loading users", err);
+          }
+        }
+
+        // Client-side pagination helper for `#user-table`
+        function setupTablePagination(
+          tableSelector,
+          rowsPerPage = 10,
+          paginationId = null
+        ) {
+          const table = document.querySelector(tableSelector);
+          if (!table) return;
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          // determine pagination container: explicit id, derived from table id, or fallback
+          let pagination = null;
+          if (paginationId) pagination = document.getElementById(paginationId);
+          if (!pagination) {
+            const tid = table.id || String(tableSelector).replace(/^#/, "");
+            pagination = document.getElementById(tid + "-pagination");
+          }
+          if (!pagination)
+            pagination = document.getElementById("user-table-pagination");
+          if (!pagination) return;
+
+          const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+            (r) => r.style.display !== "none"
+          );
+          const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+          let currentPage = 1;
+
+          function showPage(page) {
+            currentPage = Math.min(Math.max(1, page), totalPages);
+            rows.forEach((r, i) => {
+              r.style.display =
+                i >= (currentPage - 1) * rowsPerPage &&
+                i < currentPage * rowsPerPage
+                  ? ""
+                  : "none";
+            });
+            renderPageNumbers();
+          }
+
+          function renderPageNumbers() {
+            pagination.innerHTML = "";
+            // always show a minimum set of page buttons (dummy pagination)
+            const minPages = 1;
+            const displayPages = Math.max(totalPages, minPages);
+            const wrap = document.createElement("div");
+            wrap.style.display = "inline-flex";
+            wrap.style.gap = "8px";
+            wrap.style.alignItems = "center";
+
+            for (let p = 1; p <= displayPages; p++) {
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.textContent = p;
+              btn.className = "pagination-btn";
+              btn.style.padding = "6px 10px";
+              btn.style.borderRadius = "6px";
+              btn.style.border = "1px solid #e5e7eb";
+              // disable styling for pages beyond actual total
+              const isReal = p <= totalPages;
+              btn.style.cursor = isReal ? "pointer" : "default";
+              btn.style.opacity = isReal ? "1" : "0.5";
+              btn.style.background = p === currentPage ? "#4f46e5" : "white";
+              btn.style.color = p === currentPage ? "white" : "#374151";
+              if (isReal) {
+                btn.addEventListener("click", () => showPage(p));
+              } else {
+                btn.disabled = true;
+              }
+              wrap.appendChild(btn);
+            }
+
+            pagination.appendChild(wrap);
+          }
+
+          // initially show first page
+          showPage(1);
+        }
+
+        // apply search filtering for user table (filters by ID or name)
+        function applyUserSearch() {
+          const tbl = document.querySelector("#user-table");
+          if (!tbl) return;
+          const qel = document.getElementById("filter-search");
+          const q = qel ? (qel.value || "").trim().toLowerCase() : "";
+          const tbody = tbl.querySelector("tbody");
+          if (!tbody) return;
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          if (!q) {
+            rows.forEach((r) => (r.style.display = ""));
+          } else {
+            rows.forEach((r) => {
+              const cols = r.querySelectorAll("td");
+              const id = ((cols[0] && cols[0].textContent) || "")
+                .trim()
+                .toLowerCase();
+              const name = ((cols[1] && cols[1].textContent) || "")
+                .trim()
+                .toLowerCase();
+              const match = id.includes(q) || name.includes(q);
+              r.style.display = match ? "" : "none";
+            });
+          }
+          // re-init pagination to account for visible rows only
+          try {
+            setupTablePagination("#user-table", 10);
+          } catch (e) {
+            console.warn("pagination refresh failed", e);
           }
         }
 
@@ -3301,6 +5272,7 @@
           // load paddy analytics content
           setTimeout(() => {
             loadAnalyticsChart();
+            loadUserTypeStockChart();
             loadDistrictChart();
             loadStockUsers();
             loadTransactions();
@@ -3473,6 +5445,135 @@
           }
         }
 
+        // --- User type stock distribution chart ---
+        let userTypeStockChart = null;
+        async function loadUserTypeStockChart() {
+          try {
+            const sel = document.getElementById("user-type-paddy-filter");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_by_user_type";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+
+            const paddyTypes = d.paddy_types || [];
+            const userData = d.data || {};
+
+            const userTypes = ["MILLER", "COLLECTER", "PMB"];
+            const colors = {
+              MILLER: "rgba(245,158,11,0.8)",
+              COLLECTER: "rgba(11,132,255,0.8)",
+              PMB: "rgba(16,185,129,0.8)",
+            };
+            const borderColors = {
+              MILLER: "rgba(245,158,11,1)",
+              COLLECTER: "rgba(11,132,255,1)",
+              PMB: "rgba(16,185,129,1)",
+            };
+
+            let datasets = [];
+            userTypes.forEach((ut) => {
+              const data = paddyTypes.map(
+                (pt) => (userData[ut] && userData[ut][pt]) || 0
+              );
+              datasets.push({
+                label:
+                  ut === "COLLECTER"
+                    ? "Collectors"
+                    : ut === "PMB"
+                    ? "PMB"
+                    : "Millers",
+                data: data,
+                backgroundColor: colors[ut],
+                borderColor: borderColors[ut],
+                borderWidth: 1,
+              });
+            });
+
+            await ensureChartJs();
+            const ctx = document
+              .getElementById("user-type-stock-chart")
+              .getContext("2d");
+
+            if (userTypeStockChart) {
+              userTypeStockChart.data.labels = paddyTypes;
+              userTypeStockChart.data.datasets = datasets;
+              userTypeStockChart.update();
+              return;
+            }
+
+            userTypeStockChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: paddyTypes,
+                datasets: datasets,
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: {
+                    title: { display: true, text: "Paddy Type" },
+                    stacked: false,
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Total Stock (kg)" },
+                    stacked: false,
+                  },
+                },
+                plugins: {
+                  legend: { display: true, position: "bottom" },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          context.parsed.y.toFixed(2) +
+                          " kg"
+                        );
+                      },
+                    },
+                  },
+                },
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
+                barPercentage: 0.8,
+                categoryPercentage: 0.9,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load user type stock chart", e);
+          }
+        }
+
+        // Populate user type paddy filter
+        async function populateUserTypePaddyFilter() {
+          try {
+            const sel = document.getElementById("user-type-paddy-filter");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", loadUserTypeStockChart);
+          } catch (e) {
+            console.error("Failed to populate user type paddy filter", e);
+          }
+        }
+
+        populateUserTypePaddyFilter();
+
         // When analytics tab is activated, load both charts and user stock table
         const analyticsTabAnchor = document.getElementById("tab-analytics");
         if (analyticsTabAnchor) {
@@ -3505,6 +5606,717 @@
 
         populateTransactionPaddyFilter();
 
+        // Populate farmer dropdown for farmer lookup
+        async function populateFarmerLookupSelect() {
+          try {
+            const sel = document.getElementById("farmer-lookup-select");
+            if (!sel) return;
+            const res = await fetch("/api/users?user_type=FARMER");
+            if (!res.ok) return;
+            const farmers = await res.json();
+            sel.innerHTML = '<option value="">-- Select a farmer --</option>';
+            farmers.forEach((f) => {
+              const o = document.createElement("option");
+              o.value = f.id || "";
+              o.textContent = (f.full_name || "") + " (" + (f.id || "") + ")";
+              sel.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate farmer lookup select", e);
+          }
+        }
+
+        populateFarmerLookupSelect();
+
+        // Farmer lookup function
+        async function performFarmerLookup() {
+          try {
+            const farmerId = document.getElementById(
+              "farmer-lookup-select"
+            ).value;
+            const dateFrom = document.getElementById(
+              "farmer-lookup-date-from"
+            ).value;
+            const dateTo = document.getElementById(
+              "farmer-lookup-date-to"
+            ).value;
+
+            console.log("=== Farmer Lookup Debug ===");
+            console.log("Farmer ID:", farmerId);
+            console.log("Date From:", dateFrom);
+            console.log("Date To:", dateTo);
+
+            if (!farmerId) {
+              alert("Please select a farmer");
+              return;
+            }
+
+            // Build API URL
+            let url = `/api/farmer_lookup?farmer_id=${encodeURIComponent(
+              farmerId
+            )}`;
+            if (dateFrom) url += `&date_from=${encodeURIComponent(dateFrom)}`;
+            if (dateTo) url += `&date_to=${encodeURIComponent(dateTo)}`;
+
+            console.log("API URL:", url);
+
+            // Fetch data from API
+            const res = await fetch(url);
+            console.log("Response status:", res.status);
+            console.log("Response ok:", res.ok);
+
+            if (!res.ok) {
+              const errorText = await res.text();
+              console.error("Error response:", errorText);
+              throw new Error(
+                `Failed to fetch farmer data (${res.status}): ${errorText}`
+              );
+            }
+
+            const data = await res.json();
+            console.log("Received data:", data);
+
+            // Display results
+            displayFarmerLookupResults(data);
+          } catch (e) {
+            console.error("Failed to perform farmer lookup", e);
+            alert("Error performing lookup: " + e.message);
+          }
+        }
+
+        // Display farmer lookup results
+        function displayFarmerLookupResults(data) {
+          console.log("=== Display Farmer Lookup Results ===");
+          console.log("Data received:", data);
+
+          try {
+            const resultsDiv = document.getElementById("farmer-lookup-results");
+            const summaryDiv = document.getElementById("farmer-summary-stats");
+            const paddyTbody = document.getElementById("farmer-paddy-tbody");
+            const txTbody = document.getElementById(
+              "farmer-transactions-tbody"
+            );
+
+            console.log("DOM elements found:", {
+              resultsDiv: !!resultsDiv,
+              summaryDiv: !!summaryDiv,
+              paddyTbody: !!paddyTbody,
+              txTbody: !!txTbody,
+            });
+
+            const farmer = data.farmer || {};
+            const summary = data.summary || {};
+            const breakdown = data.breakdown || [];
+            const transactions = data.transactions || [];
+
+            console.log("Parsed data:", {
+              farmer,
+              summary,
+              breakdown: breakdown.length,
+              transactions: transactions.length,
+            });
+
+            // Build summary stats
+            summaryDiv.innerHTML = `
+            <div style="background-color: #dbeafe; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+              <div style="font-size: 12px; color: #1e40af; font-weight: 500;">Total Paddy</div>
+              <div style="font-size: 24px; font-weight: 700; color: #1e3a8a;">${summary.total_paddy.toFixed(
+                2
+              )} kg</div>
+            </div>
+            <div style="background-color: #e0e7ff; padding: 16px; border-radius: 8px; border-left: 4px solid #6366f1;">
+              <div style="font-size: 12px; color: #312e81; font-weight: 500;">To Collectors</div>
+              <div style="font-size: 24px; font-weight: 700; color: #1e1b4b;">${summary.to_collector.toFixed(
+                2
+              )} kg</div>
+            </div>
+            <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+              <div style="font-size: 12px; color: #92400e; font-weight: 500;">To Millers</div>
+              <div style="font-size: 24px; font-weight: 700; color: #451a03;">${summary.to_miller.toFixed(
+                2
+              )} kg</div>
+            </div>
+            <div style="background-color: #d1fae5; padding: 16px; border-radius: 8px; border-left: 4px solid #10b981;">
+              <div style="font-size: 12px; color: #065f46; font-weight: 500;">To PMB</div>
+              <div style="font-size: 24px; font-weight: 700; color: #022c22;">${summary.to_pmb.toFixed(
+                2
+              )} kg</div>
+            </div>
+            <div style="background-color: #fce7f3; padding: 16px; border-radius: 8px; border-left: 4px solid #ec4899;">
+              <div style="font-size: 12px; color: #831843; font-weight: 500;">Field Area</div>
+              <div style="font-size: 24px; font-weight: 700; color: #500724;">${farmer.field_area.toFixed(
+                2
+              )} acres</div>
+            </div>
+            <div style="background-color: #f3e8ff; padding: 16px; border-radius: 8px; border-left: 4px solid #a855f7;">
+              <div style="font-size: 12px; color: #581c87; font-weight: 500;">No. of Transactions</div>
+              <div style="font-size: 24px; font-weight: 700; color: #2e1065;">${
+                summary.transaction_count
+              }</div>
+            </div>
+          `;
+
+            console.log("Summary stats rendered");
+
+            // Build paddy type breakdown table
+            paddyTbody.innerHTML = "";
+            breakdown.forEach((item) => {
+              const row = document.createElement("tr");
+              row.style.borderBottom = "1px solid #e5e7eb";
+              row.innerHTML = `
+              <td style="padding: 12px; color: #374151; font-weight: 500;">${
+                item.paddy_type
+              }</td>
+              <td style="padding: 12px; text-align: right; color: #0b84ff; font-weight: 500;">${item.to_collector.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; color: #f59e0b; font-weight: 500;">${item.to_miller.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; color: #10b981; font-weight: 500;">${item.to_pmb.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; font-weight: 600; color: #1f2937; background-color: #f9fafb;">${item.total.toFixed(
+                2
+              )}</td>
+            `;
+              paddyTbody.appendChild(row);
+            });
+
+            // Add total row
+            if (breakdown.length > 0) {
+              const totalRow = document.createElement("tr");
+              totalRow.style.borderTop = "2px solid #9ca3af";
+              totalRow.style.backgroundColor = "#f3f4f6";
+              totalRow.innerHTML = `
+              <td style="padding: 12px; color: #111827; font-weight: 700;">TOTAL</td>
+              <td style="padding: 12px; text-align: right; color: #0b84ff; font-weight: 700;">${summary.to_collector.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; color: #f59e0b; font-weight: 700;">${summary.to_miller.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; color: #10b981; font-weight: 700;">${summary.to_pmb.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: right; font-weight: 700; color: #111827; background-color: #e5e7eb;">${summary.total_paddy.toFixed(
+                2
+              )}</td>
+            `;
+              paddyTbody.appendChild(totalRow);
+            }
+
+            console.log("Breakdown table rendered");
+
+            // Build transactions table
+            txTbody.innerHTML = "";
+            transactions.forEach((tx) => {
+              const row = document.createElement("tr");
+              row.style.borderBottom = "1px solid #e5e7eb";
+
+              // Apply red background for reverted transactions
+              if (tx.is_reverted) {
+                row.style.backgroundColor = "#fee2e2";
+                row.style.opacity = "0.7";
+              }
+
+              const txDate = tx.date
+                ? new Date(tx.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "";
+
+              const revertedLabel = tx.is_reverted
+                ? ' <span style="color: #dc2626; font-weight: 600; font-size: 11px;">(REVERTED)</span>'
+                : "";
+
+              row.innerHTML = `
+              <td style="padding: 12px; color: #6b7280;">${txDate}</td>
+              <td style="padding: 12px; color: #374151; font-weight: 500;">${
+                tx.paddy_type
+              }${revertedLabel}</td>
+              <td style="padding: 12px; color: #374151;">${tx.to_party} (${
+                tx.to_party_id
+              })</td>
+              <td style="padding: 12px; text-align: right; font-weight: 500; color: #1f2937;">${tx.quantity.toFixed(
+                2
+              )}</td>
+              <td style="padding: 12px; text-align: center;">
+                <button class="farmer-tx-view-btn" style="
+                  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+                  color: white;
+                  border: none;
+                  padding: 6px 12px;
+                  border-radius: 6px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+                "
+                onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.5)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.3)';"
+                data-tx='${JSON.stringify(tx)}'
+                >View</button>
+              </td>
+            `;
+              txTbody.appendChild(row);
+            });
+
+            // Wire up View buttons
+            document.querySelectorAll(".farmer-tx-view-btn").forEach((btn) => {
+              btn.addEventListener("click", function () {
+                const tx = JSON.parse(this.getAttribute("data-tx"));
+                showFarmerTransactionModal(tx);
+              });
+            });
+
+            console.log("Transactions table rendered");
+
+            // Show results
+            resultsDiv.style.display = "block";
+            console.log("Results displayed successfully");
+          } catch (error) {
+            console.error("Error in displayFarmerLookupResults:", error);
+            alert("Error displaying results: " + error.message);
+          }
+        }
+
+        // Wire up farmer lookup button
+        const farmerLookupBtn = document.getElementById("farmer-lookup-btn");
+        if (farmerLookupBtn) {
+          farmerLookupBtn.addEventListener("click", performFarmerLookup);
+        }
+
+        // Show farmer transaction detail modal
+        function showFarmerTransactionModal(tx) {
+          const modal = document.getElementById("farmer-transaction-modal");
+          const contentDiv = document.getElementById(
+            "farmer-transaction-detail-content"
+          );
+
+          const txDate = tx.date
+            ? new Date(tx.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "";
+
+          const revertedBadge = tx.is_reverted
+            ? '<span style="color: white; background-color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">REVERTED</span>'
+            : '<span style="color: white; background-color: #10b981; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ACTIVE</span>';
+
+          contentDiv.innerHTML = `
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Date</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${txDate}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Status</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${revertedBadge}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Paddy Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.paddy_type
+              }</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Quantity (kg)</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${tx.quantity.toFixed(
+                2
+              )}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Price</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${tx.price.toFixed(
+                2
+              )}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Number</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                tx.block_number || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">To Party</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.to_party
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Party ID</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                tx.to_party_id
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Party Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.to_party_type === "COLLECTER"
+                  ? "Collector"
+                  : tx.to_party_type === "MILLER"
+                  ? "Miller"
+                  : tx.to_party_type
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Transaction Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                tx.transaction_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                tx.block_hash || "N/A"
+              }</div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+        }
+
+        // Wire up modal close button
+        const txModalCloseBtn = document.getElementById(
+          "farmer-transaction-modal-close"
+        );
+        if (txModalCloseBtn) {
+          txModalCloseBtn.addEventListener("click", function () {
+            document.getElementById("farmer-transaction-modal").style.display =
+              "none";
+          });
+        }
+
+        // Close modal on background click
+        const txModal = document.getElementById("farmer-transaction-modal");
+        if (txModal) {
+          txModal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.style.display = "none";
+            }
+          });
+        }
+
+        // ========== DAMAGE DETECTION FUNCTIONS ==========
+
+        // Populate paddy type select for damage detection
+        async function populateDamagePaddySelect() {
+          try {
+            const sel = document.getElementById("damage-paddy-type-select");
+            if (!sel) return;
+            const res = await fetch("/api/paddy_types");
+            if (!res.ok) return;
+            const types = await res.json();
+            sel.innerHTML = '<option value="">-- All Types --</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || "";
+              o.textContent = t.name || "";
+              sel.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate damage paddy select", e);
+          }
+        }
+
+        populateDamagePaddySelect();
+
+        // Perform damage lookup
+        async function performDamageLookup() {
+          try {
+            const userType = document.getElementById(
+              "damage-user-type-select"
+            ).value;
+            const paddyType = document.getElementById(
+              "damage-paddy-type-select"
+            ).value;
+            const dateFrom = document.getElementById("damage-date-from").value;
+            const dateTo = document.getElementById("damage-date-to").value;
+
+            console.log("=== Damage Lookup Debug ===");
+            console.log("User Type:", userType);
+            console.log("Paddy Type:", paddyType);
+            console.log("Date From:", dateFrom);
+            console.log("Date To:", dateTo);
+
+            // Build API URL
+            let url = `/api/damage_lookup?`;
+            const params = [];
+            if (userType)
+              params.push(`user_type=${encodeURIComponent(userType)}`);
+            if (paddyType)
+              params.push(`paddy_type=${encodeURIComponent(paddyType)}`);
+            if (dateFrom)
+              params.push(`date_from=${encodeURIComponent(dateFrom)}`);
+            if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
+            url += params.join("&");
+
+            console.log("API URL:", url);
+
+            // Fetch data from API
+            const res = await fetch(url);
+            console.log("Response status:", res.status);
+
+            if (!res.ok) {
+              const errorText = await res.text();
+              console.error("Error response:", errorText);
+              throw new Error(
+                `Failed to fetch damage data (${res.status}): ${errorText}`
+              );
+            }
+
+            const data = await res.json();
+            console.log("Damage data received:", data);
+
+            displayDamageLookupResults(data);
+          } catch (e) {
+            console.error("Damage lookup error:", e);
+            alert("Error fetching damage data: " + e.message);
+          }
+        }
+
+        // Display damage lookup results
+        function displayDamageLookupResults(data) {
+          const resultsDiv = document.getElementById("damage-lookup-results");
+          const tableBody = document.getElementById("damage-tbody");
+          const noResults = document.getElementById("damage-no-results");
+
+          console.log("Displaying damage results, count:", data.length);
+
+          resultsDiv.style.display = "block";
+
+          if (!data || data.length === 0) {
+            tableBody.innerHTML = "";
+            noResults.style.display = "block";
+            return;
+          }
+
+          noResults.style.display = "none";
+
+          // Sort by quantity ascending
+          data.sort((a, b) => (a.quantity || 0) - (b.quantity || 0));
+
+          tableBody.innerHTML = "";
+          data.forEach((dmg) => {
+            const dateObj = dmg.damage_date ? new Date(dmg.damage_date) : null;
+            const dmgDate = dateObj
+              ? dateObj.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }) +
+                " " +
+                dateObj.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })
+              : "";
+
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid #e5e7eb";
+            tr.style.transition = "all 0.3s ease";
+            tr.onmouseover = function () {
+              this.style.backgroundColor = "#f9fafb";
+            };
+            tr.onmouseout = function () {
+              this.style.backgroundColor = "transparent";
+            };
+
+            const userDisplay = dmg.user_name
+              ? `${dmg.user_name} (${dmg.user_id})`
+              : dmg.user_id || "N/A";
+
+            const reasonText = dmg.reason || "";
+            const reasonColor =
+              reasonText.toLowerCase() === "revert" ? "#dc2626" : "#374151";
+            const reasonStyle =
+              reasonText.toLowerCase() === "revert" ? "font-weight: 600;" : "";
+
+            tr.innerHTML = `
+              <td style="padding: 12px; color: #374151;">${dmgDate}</td>
+              <td style="padding: 12px; color: #374151;">${userDisplay}</td>
+              <td style="padding: 12px; color: #374151;">${
+                dmg.paddy_type || ""
+              }</td>
+              <td style="padding: 12px; color: #374151; text-align: right; font-weight: 600;">${(
+                dmg.quantity || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; color: ${reasonColor}; ${reasonStyle}">${reasonText}</td>
+              <td style="padding: 12px; text-align: center;">
+                <button
+                  style="
+                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                    color: white;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+                  "
+                  data-dmg='${JSON.stringify(dmg)}'
+                  onmouseover="this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.5)'; this.style.transform='scale(1.05)';"
+                  onmouseout="this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.3)'; this.style.transform='scale(1)';"
+                >
+                  View
+                </button>
+              </td>
+            `;
+
+            // Add click handler to View button
+            tr.querySelector("button").addEventListener("click", function () {
+              const dmgObj = JSON.parse(this.getAttribute("data-dmg"));
+              showDamageModal(dmgObj);
+            });
+
+            tableBody.appendChild(tr);
+          });
+        }
+
+        // Show damage detail modal
+        function showDamageModal(dmg) {
+          const contentDiv = document.getElementById("damage-detail-content");
+          const modal = document.getElementById("damage-detail-modal");
+
+          const dateObj = dmg.damage_date ? new Date(dmg.damage_date) : null;
+          const dmgDate = dateObj
+            ? dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }) +
+              " " +
+              dateObj.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })
+            : "";
+
+          const userDisplay = dmg.user_name
+            ? `${dmg.user_name} (${dmg.user_id})`
+            : dmg.user_id || "N/A";
+
+          contentDiv.innerHTML = `
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Date</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${dmgDate}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">User</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${userDisplay}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Paddy Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                dmg.paddy_type || ""
+              }</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Damage Quantity (kg)</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${(
+                dmg.quantity || 0
+              ).toFixed(2)}</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Reason</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                dmg.reason || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Transaction Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                dmg.transaction_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                dmg.block_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Number</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                dmg.block_number || "N/A"
+              }</div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+        }
+
+        // Wire up damage modal close button
+        const dmgModalCloseBtn = document.getElementById("damage-modal-close");
+        if (dmgModalCloseBtn) {
+          dmgModalCloseBtn.addEventListener("click", function () {
+            document.getElementById("damage-detail-modal").style.display =
+              "none";
+          });
+        }
+
+        // Close damage modal on background click
+        const dmgModal = document.getElementById("damage-detail-modal");
+        if (dmgModal) {
+          dmgModal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.style.display = "none";
+            }
+          });
+        }
+
+        // Damage search filter function
+        function filterDamageTableBySearch() {
+          const searchInput = document.getElementById("damage-search-input");
+          const tableBody = document.getElementById("damage-tbody");
+          const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+
+          if (!tableBody) return;
+
+          const rows = tableBody.querySelectorAll("tr");
+          rows.forEach((row) => {
+            const userCell = row.querySelector("td:nth-child(2)");
+            if (userCell) {
+              const userName = userCell.textContent.toLowerCase();
+              if (searchTerm === "" || userName.includes(searchTerm)) {
+                row.style.display = "";
+              } else {
+                row.style.display = "none";
+              }
+            }
+          });
+        }
+
+        // Wire up damage search input
+        const damageSearchInput = document.getElementById(
+          "damage-search-input"
+        );
+        if (damageSearchInput) {
+          damageSearchInput.addEventListener(
+            "keyup",
+            filterDamageTableBySearch
+          );
+          damageSearchInput.addEventListener(
+            "change",
+            filterDamageTableBySearch
+          );
+        }
+
+        // Wire up damage lookup button
+        const damageBtn = document.getElementById("damage-lookup-btn");
+        if (damageBtn) {
+          damageBtn.addEventListener("click", performDamageLookup);
+        }
+
         // Transaction filter event listeners
         const transactionTypeFilter = document.getElementById(
           "transaction-type-filter"
@@ -3519,6 +6331,11 @@
           "transaction-date-to"
         );
         const transactionSearch = document.getElementById("transaction-search");
+        const transactionIdSearch = document.getElementById(
+          "transaction-id-search"
+        );
+        const priceComparison = document.getElementById("price-comparison");
+        const priceValue = document.getElementById("price-value");
         const transactionRefresh = document.getElementById(
           "transaction-refresh"
         );
@@ -3534,6 +6351,15 @@
         }
         if (transactionSearch) {
           transactionSearch.addEventListener("input", loadTransactions);
+        }
+        if (transactionIdSearch) {
+          transactionIdSearch.addEventListener("input", loadTransactions);
+        }
+        if (priceComparison) {
+          priceComparison.addEventListener("change", loadTransactions);
+        }
+        if (priceValue) {
+          priceValue.addEventListener("input", loadTransactions);
         }
         if (transactionRefresh) {
           transactionRefresh.addEventListener("click", loadTransactions);
@@ -3561,12 +6387,18 @@
             );
             const dateToInput = document.getElementById("transaction-date-to");
             const searchInput = document.getElementById("transaction-search");
+            const transactionIdSearchInput = document.getElementById(
+              "transaction-id-search"
+            );
             const selectedType = typeFilter ? typeFilter.value : "";
             const selectedPaddy = paddyFilter ? paddyFilter.value : "";
             const dateFrom = dateFromInput ? dateFromInput.value : "";
             const dateTo = dateToInput ? dateToInput.value : "";
             const searchQuery = searchInput
               ? searchInput.value.trim().toLowerCase()
+              : "";
+            const transactionIdQuery = transactionIdSearchInput
+              ? transactionIdSearchInput.value.trim().toLowerCase()
               : "";
 
             const res = await fetch("/api/transactions");
@@ -3586,6 +6418,46 @@
             } catch (e) {
               console.error("Failed to fetch users for type filtering", e);
             }
+
+            // Default: only show specific allowed transaction type pairs
+            // Allowed pairs:
+            // farmer -> farmer, farmer -> miller, farmer -> pmb,
+            // collecter/collector -> collecter/collector, collecter -> miller, collecter -> pmb
+            transactions = transactions.filter((t) => {
+              const fromId = (t.from || "").toLowerCase();
+              const toId = (t.to || "").toLowerCase();
+              const fromType =
+                usersMap[t.from] || (fromId === "pmb" ? "pmb" : "");
+              const toType = usersMap[t.to] || (toId === "pmb" ? "pmb" : "");
+
+              const isFarmerFarmer =
+                (fromType || "").includes("farmer") &&
+                (toType || "").includes("farmer");
+              const isFarmerMiller =
+                (fromType || "").includes("farmer") &&
+                (toType || "").includes("miller");
+              const isFarmerPmb =
+                (fromType || "").includes("farmer") &&
+                (toType || "").includes("pmb");
+              const isCollectCollect =
+                (fromType || "").includes("collect") &&
+                (toType || "").includes("collect");
+              const isCollectMiller =
+                (fromType || "").includes("collect") &&
+                (toType || "").includes("miller");
+              const isCollectPmb =
+                (fromType || "").includes("collect") &&
+                (toType || "").includes("pmb");
+
+              return (
+                isFarmerFarmer ||
+                isFarmerMiller ||
+                isFarmerPmb ||
+                isCollectCollect ||
+                isCollectMiller ||
+                isCollectPmb
+              );
+            });
 
             // Apply filters
             transactions = transactions.filter((t) => {
@@ -3656,6 +6528,34 @@
                   .includes(searchQuery);
                 if (!matchFrom && !matchTo) return false;
               }
+              // Filter by transaction ID
+              if (transactionIdQuery) {
+                const matchId = (t.id || "")
+                  .toLowerCase()
+                  .includes(transactionIdQuery);
+                if (!matchId) return false;
+              }
+              // Filter by price
+              const priceComparison = document.getElementById(
+                "price-comparison"
+              )
+                ? document.getElementById("price-comparison").value
+                : "";
+              const priceValue = document.getElementById("price-value")
+                ? parseFloat(document.getElementById("price-value").value)
+                : null;
+              if (
+                priceComparison &&
+                priceValue !== null &&
+                !isNaN(priceValue)
+              ) {
+                const txPrice = parseFloat(t.price || 0);
+                if (priceComparison === "upper") {
+                  if (txPrice < priceValue) return false;
+                } else if (priceComparison === "lower") {
+                  if (txPrice > priceValue) return false;
+                }
+              }
               return true;
             });
 
@@ -3663,7 +6563,11 @@
 
             if (transactions.length === 0) {
               transactionTableBody.innerHTML =
-                '<tr><td colspan="6" style="text-align:center;padding:20px;color:#6b7280;">No transactions found</td></tr>';
+                '<tr><td colspan="8" style="text-align:center;padding:20px;color:#6b7280;">No transactions found</td></tr>';
+              const transPagination = document.getElementById(
+                "transaction-table-pagination"
+              );
+              if (transPagination) transPagination.innerHTML = "";
               return;
             }
 
@@ -3680,10 +6584,97 @@
                 <td>${escapeHtml(t.to || "")}</td>
                 <td>${escapeHtml(t.type || "")}</td>
                 <td>${Number(t.quantity || 0).toFixed(3)}</td>
+                <td>${Number(t.price || 0).toFixed(2)}</td>
                 <td>${escapeHtml(dateStr)}</td>
+                <td><button class="btn" style="padding: 4px 12px; font-size: 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">View</button></td>
               `;
+              const viewBtn = tr.querySelector("button");
+              viewBtn.addEventListener("click", async () => {
+                const modal = document.getElementById("transaction-modal");
+                if (modal) {
+                  // Fetch users to get full names for farmers/collectors
+                  let userNameMap = {};
+                  try {
+                    const usersRes = await fetch("/api/users");
+                    if (usersRes.ok) {
+                      const users = await usersRes.json();
+                      users.forEach((u) => {
+                        userNameMap[u.id] = {
+                          name: u.full_name || u.company_name || u.id,
+                          company: u.company_name || "",
+                          type: u.user_type || "",
+                        };
+                      });
+                    }
+                  } catch (e) {
+                    console.warn("Failed to fetch user names", e);
+                  }
+
+                  // Build display names for from/to
+                  let fromDisplay = t.from || "-";
+                  let toDisplay = t.to || "-";
+
+                  const fromUser = userNameMap[t.from];
+                  const toUser = userNameMap[t.to];
+
+                  if (fromUser) {
+                    if (
+                      fromUser.type.includes("armer") ||
+                      fromUser.type.includes("ollect")
+                    ) {
+                      fromDisplay = `${fromUser.name} (${t.from})`;
+                    } else if (fromUser.type.includes("iller")) {
+                      fromDisplay = `${fromUser.company || fromUser.name} (${
+                        t.from
+                      })`;
+                    }
+                  }
+
+                  if (toUser) {
+                    if (
+                      toUser.type.includes("armer") ||
+                      toUser.type.includes("ollect")
+                    ) {
+                      toDisplay = `${toUser.name} (${t.to})`;
+                    } else if (toUser.type.includes("iller")) {
+                      toDisplay = `${toUser.company || toUser.name} (${t.to})`;
+                    }
+                  }
+
+                  document.getElementById("tx-detail-id").textContent =
+                    t.id || "-";
+                  document.getElementById("tx-detail-from").textContent =
+                    fromDisplay;
+                  document.getElementById("tx-detail-to").textContent =
+                    toDisplay;
+                  document.getElementById("tx-detail-type").textContent =
+                    t.type || "-";
+                  document.getElementById("tx-detail-qty").textContent = Number(
+                    t.quantity || 0
+                  ).toFixed(3);
+                  document.getElementById("tx-detail-datetime").textContent =
+                    dateStr;
+                  document.getElementById("tx-detail-tx-hash").textContent =
+                    t.transaction_hash || "-";
+                  document.getElementById("tx-detail-block-hash").textContent =
+                    t.block_hash || "-";
+                  document.getElementById(
+                    "tx-detail-block-number"
+                  ).textContent = t.block_number || "-";
+                  modal.hidden = false;
+                  modal.setAttribute("aria-hidden", "false");
+                }
+              });
               transactionTableBody.appendChild(tr);
             });
+            // initialize frontend-only pagination for transaction table
+            try {
+              if (typeof setupTablePagination === "function") {
+                setupTablePagination("#transaction-table", 10);
+              }
+            } catch (e) {
+              console.warn("Transaction pagination init failed", e);
+            }
           } catch (err) {
             console.error("Failed to load transactions", err);
           }

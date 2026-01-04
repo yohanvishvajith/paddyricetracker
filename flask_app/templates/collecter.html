@@ -8,17 +8,523 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      /* Header Styles */
+      header.site-header {
+        position: relative;
+        background: linear-gradient(135deg, #0b3d91 0%, #1e5a96 100%);
+        color: white;
+        padding: 30px 20px;
+        box-shadow: 0 10px 30px rgba(11, 61, 145, 0.2);
+      }
+
+      .site-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: white;
+      }
+
+      /* Logout button styles */
+      .logout-top {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .logout-top:hover {
+        background: white;
+        color: #0b3d91;
+        border-color: white;
+      }
+
+      .logout-float {
+        /* Floating logout removed — keep class available if needed later */
+      }
+
+      /* Tab Navigation */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tabs ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tab a {
+        display: inline-block;
+        padding: 10px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border: 2px solid transparent;
+      }
+
+      .tab a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .tab.active a {
+        background: white;
+        color: #0b3d91;
+        border-color: white;
+        font-weight: 600;
+      }
+
+      /* Main Content */
+      main.content {
+        padding: 32px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .panel {
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .panel h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0b3d91;
+        margin-bottom: 24px;
+      }
+
+      .panel h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 32px !important;
+        margin-bottom: 16px;
+      }
+
+      /* Card Styles */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 28px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      .card form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        background: white;
+        border-color: #0b3d91;
+        box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #9ca3af;
+      }
+
+      /* Modal Actions */
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .btn:hover {
+        background: #e5e7eb;
+      }
+
+      .btn.primary {
+        background: linear-gradient(135deg, #0b3d91, #1e5a96);
+        color: white;
+        box-shadow: 0 4px 12px rgba(11, 61, 145, 0.3);
+      }
+
+      .btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(11, 61, 145, 0.4);
+      }
+
+      .btn.primary:active {
+        transform: translateY(0);
+      }
+
+      /* Table Styles */
+      .table-wrap {
+        overflow-x: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      .data-table thead {
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        border-bottom: 2px solid #d1d5db;
+      }
+
+      .data-table th {
+        padding: 16px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #0b3d91;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .data-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f3f4f6;
+        color: #4b5563;
+      }
+
+      .data-table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+
+      .data-table tbody tr:hover {
+        background-color: #f9fafb;
+      }
+
+      .data-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Modal Styles */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        animation: slideUp 0.3s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #0b3d91, #1e5a96);
+        color: white;
+        padding: 20px;
+        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid rgba(11, 61, 145, 0.2);
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      /* Success/Error Messages */
+      .error-message {
+        color: #dc3545;
+        font-size: 13px;
+        padding: 10px 12px;
+        background: #fee;
+        border-radius: 6px;
+        margin-top: 8px;
+      }
+
+      .success-message {
+        color: #28a745;
+        font-size: 13px;
+        padding: 10px 12px;
+        background: #efe;
+        border-radius: 6px;
+        margin-top: 8px;
+      }
+
+      /* Searchable Select Styles */
+      .searchable-select-wrapper {
+        position: relative;
+      }
+
+      .searchable-select-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .searchable-select-input:hover {
+        border-color: #d1d5db;
+        background: white;
+      }
+
+      .searchable-select-input:focus,
+      .searchable-select-input.active {
+        outline: none;
+        background: white;
+        border-color: #0b3d91;
+        box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+      }
+
+      .searchable-select-input input {
+        flex: 1;
+        border: none;
+        background: none;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        color: #374151;
+      }
+
+      .searchable-select-input input::placeholder {
+        color: #9ca3af;
+      }
+
+      .searchable-select-arrow {
+        color: #9ca3af;
+        font-size: 12px;
+        transition: transform 0.3s ease;
+        margin-left: 8px;
+      }
+
+      .searchable-select-input.active .searchable-select-arrow {
+        transform: rotate(180deg);
+      }
+
+      .searchable-select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #0b3d91;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 100;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .searchable-select-dropdown.active {
+        display: block;
+      }
+
+      .searchable-select-option {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        color: #4b5563;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      .searchable-select-option:last-child {
+        border-bottom: none;
+      }
+
+      .searchable-select-option:hover {
+        background-color: #f0f6ff;
+        color: #0b3d91;
+      }
+
+      .searchable-select-option.selected {
+        background-color: #e0e7ff;
+        color: #0b3d91;
+        font-weight: 600;
+      }
+
+      .searchable-select-option.hidden {
+        display: none;
+      }
+
+      .searchable-select-no-results {
+        padding: 12px 16px;
+        color: #9ca3af;
+        text-align: center;
+      }
+
+      /* Highlight revert reason rows in damage table */
+      tr.revert-row {
+        background-color: #d38d1b;
+        border-left: 4px solid #eab308;
+      }
+
+      tr.revert-row:hover {
+        background-color: #e2a60e;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .site-title {
+          font-size: 24px;
+        }
+
+        .tabs ul {
+          flex-direction: column;
+        }
+
+        .tab a {
+          width: 100%;
+          text-align: center;
+        }
+
+        .modal-actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .data-table {
+          font-size: 13px;
+        }
+
+        .data-table th,
+        .data-table td {
+          padding: 10px 8px;
+        }
+
+        .searchable-select-dropdown {
+          max-height: 250px;
+        }
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
-      <h1 class="site-title">Collecter Dashboard</h1>
+      <h1 class="site-title">🌾 Collector Dashboard</h1>
       <nav class="tabs" aria-label="Collecter tabs">
         <ul>
-          <li class="tab active"><a href="#" data-index="0">Purchases</a></li>
-          <li class="tab"><a href="#" data-index="1">Damage</a></li>
-          <li class="tab"><a href="#" data-index="2">History</a></li>
+          <li class="tab active">
+            <a href="#" data-index="0">📦 Purchases</a>
+          </li>
+          <li class="tab"><a href="#" data-index="1">⚠️ Damage</a></li>
+          <li class="tab"><a href="#" data-index="2">📋 History</a></li>
+          <li class="tab"><a href="#" data-index="3">📊 Stock</a></li>
         </ul>
       </nav>
+      <a href="/" class="logout-top" aria-label="Logout">Logout</a>
     </header>
 
     <main class="content">
@@ -30,13 +536,25 @@
             <label for="purchaseFromType">Purchase From</label>
             <select id="purchaseFromType" required>
               <option value="Farmer">Farmer</option>
-              <option value="Collecter">Collecter</option>
+              <option value="Collecter">Collector</option>
             </select>
 
             <label for="sourceSelect">Source</label>
-            <select id="sourceSelect" required>
-              <option value="">Loading...</option>
-            </select>
+            <div class="searchable-select-wrapper" id="sourceSelectWrapper">
+              <div class="searchable-select-input" id="sourceSelectInput">
+                <input
+                  type="text"
+                  placeholder="🔍 Search and select source..."
+                  id="sourceSearchInput"
+                />
+                <span class="searchable-select-arrow">▼</span>
+              </div>
+              <div
+                class="searchable-select-dropdown"
+                id="sourceSelectDropdown"
+              ></div>
+              <select id="sourceSelect" style="display: none" required></select>
+            </div>
 
             <label for="paddyType">Paddy Type</label>
             <select id="paddyType" required>
@@ -48,19 +566,31 @@
             </select>
 
             <label for="qty">Quantity (kg)</label>
-            <input id="qty" type="number" min="0" step="0.01" required />
+            <input
+              id="qty"
+              type="number"
+              min="0"
+              step="0.001"
+              placeholder="Enter quantity in kilograms"
+              required
+            />
 
             <label for="price">Price (per kg)</label>
-            <input id="price" type="number" min="0" step="0.01" />
+            <input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Enter price per kilogram"
+            />
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Save Purchase</button>
-              <a href="/" class="btn">Back to home</a>
+              <button type="submit" class="btn primary">✓ Save Purchase</button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <h3>📊 Recent Purchases</h3>
         <div class="table-wrap">
           <table class="data-table" id="purchasesTable">
             <thead>
@@ -90,23 +620,32 @@
             </select>
 
             <label for="damageQty">Damaged Quantity (kg)</label>
-            <input id="damageQty" type="number" min="0" step="0.01" required />
+            <input
+              id="damageQty"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Enter damaged quantity"
+              required
+            />
 
             <label for="damageReason">Reason</label>
             <textarea
               id="damageReason"
               rows="3"
-              placeholder="Describe the reason for damage"
+              placeholder="Describe the reason for damage (e.g., water damage, pest infestation, weather damage)"
               required
             ></textarea>
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Record Damage</button>
+              <button type="submit" class="btn primary">
+                ⚠️ Record Damage
+              </button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Damages</h3>
+        <h3>📊 Recent Damages</h3>
         <div class="table-wrap">
           <table class="data-table" id="damagesTable">
             <thead>
@@ -125,7 +664,7 @@
       </section>
 
       <section class="panel" id="history-panel" hidden>
-        <h2>Purchases History</h2>
+        <h2>📋 Purchases History</h2>
         <div class="table-wrap">
           <table class="data-table" id="historyTable">
             <thead>
@@ -134,12 +673,28 @@
                 <th>Source</th>
                 <th>Paddy Type</th>
                 <th>Qty (kg)</th>
+                <th>Price</th>
                 <th>Block ID</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+      </section>
+
+      <section class="panel" id="stock-panel" hidden>
+        <h2>📊 Stock Management</h2>
+
+        <div class="stock-container" style="grid-template-columns: 1fr">
+          <div class="stock-column">
+            <div class="stock-card">
+              <h3>🌾 Paddy Stock</h3>
+              <div id="paddyStockList" class="stock-list">
+                <p class="loading">Loading paddy stock...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -238,28 +793,112 @@
 
       function populateSourceSelect(fromType) {
         const sel = qs("#sourceSelect");
+        const dropdown = qs("#sourceSelectDropdown");
+        const input = qs("#sourceSearchInput");
+
         sel.innerHTML = "";
+        dropdown.innerHTML = "";
+        input.value = "";
+
         const matches = users.filter(
           (u) => (userTypeOf(u) || "").toLowerCase() === fromType.toLowerCase()
         );
+
         if (matches.length === 0) {
+          dropdown.innerHTML =
+            '<div class="searchable-select-no-results">No ' +
+            fromType +
+            "s found</div>";
           const opt = document.createElement("option");
           opt.value = "";
           opt.textContent = "No " + fromType + "s found";
           sel.appendChild(opt);
           return;
         }
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = "Select " + fromType;
-        sel.appendChild(placeholder);
+
         matches.forEach((u) => {
           const o = document.createElement("option");
           o.value = u.id || u._id || u.user_code || u.code || "";
           o.textContent = userLabel(u);
           o.dataset.full = u.full_name || u.name || "";
+          o.dataset.searchText = (
+            userLabel(u) +
+            " " +
+            (u.user_code || u.code || u.id || "")
+          ).toLowerCase();
           sel.appendChild(o);
+
+          const optDiv = document.createElement("div");
+          optDiv.className = "searchable-select-option";
+          optDiv.textContent = userLabel(u);
+          optDiv.dataset.value = o.value;
+          optDiv.dataset.searchText = o.dataset.searchText;
+          optDiv.addEventListener("click", (e) => {
+            selectSourceOption(o.value, userLabel(u));
+          });
+          dropdown.appendChild(optDiv);
         });
+      }
+
+      function selectSourceOption(value, label) {
+        const input = qs("#sourceSearchInput");
+        const select = qs("#sourceSelect");
+        const dropdown = qs("#sourceSelectDropdown");
+        const wrapper = qs("#sourceSelectWrapper");
+
+        input.value = label;
+        select.value = value;
+
+        // Update selected state
+        const options = dropdown.querySelectorAll(".searchable-select-option");
+        options.forEach((opt) => {
+          opt.classList.remove("selected");
+          if (opt.dataset.value === value) {
+            opt.classList.add("selected");
+          }
+        });
+
+        // Close dropdown
+        dropdown.classList.remove("active");
+        wrapper
+          .querySelector(".searchable-select-input")
+          .classList.remove("active");
+      }
+
+      function filterSourceSelect() {
+        const input = qs("#sourceSearchInput");
+        const dropdown = qs("#sourceSelectDropdown");
+        const searchTerm = (input.value || "").toLowerCase().trim();
+
+        const options = dropdown.querySelectorAll(".searchable-select-option");
+        let visibleCount = 0;
+
+        options.forEach((option) => {
+          const searchText =
+            option.dataset.searchText || option.textContent.toLowerCase();
+          const matches = searchTerm === "" || searchText.includes(searchTerm);
+
+          if (matches) {
+            option.classList.remove("hidden");
+            visibleCount++;
+          } else {
+            option.classList.add("hidden");
+          }
+        });
+
+        if (visibleCount === 0) {
+          if (!dropdown.querySelector(".searchable-select-no-results")) {
+            const noResults = document.createElement("div");
+            noResults.className = "searchable-select-no-results";
+            noResults.textContent = "No results found";
+            dropdown.appendChild(noResults);
+          }
+        } else {
+          const noResults = dropdown.querySelector(
+            ".searchable-select-no-results"
+          );
+          if (noResults) noResults.remove();
+        }
       }
 
       // load transactions for this user from server
@@ -284,6 +923,7 @@
             block_hash: r.block_hash || null,
             block_number: r.block_number || null,
             transaction_hash: r.transaction_hash || null,
+            status: r.status !== undefined ? r.status : 1,
           }));
         } catch (e) {
           console.error("Could not fetch transactions", e);
@@ -333,15 +973,23 @@
           )}" data-txhash="${escapeHtml(
             r.transaction_hash || ""
           )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
-                            <button class="btn revert-purchase-btn" data-id="${escapeHtml(
-                              r.id
-                            )}" data-txid="${escapeHtml(
-            r.tx_id || ""
-          )}" data-qty="${escapeHtml(r.qty)}" data-paddy="${escapeHtml(
-            r.paddyType
-          )}" data-from="${escapeHtml(r.sourceId)}" data-price="${escapeHtml(
-            r.price || 0
-          )}" style="padding:4px 8px; background:#ef4444; color:#fff;">↩️ Revert</button>
+                            ${
+                              r.status !== 0
+                                ? `<button class="btn revert-purchase-btn" data-id="${escapeHtml(
+                                    r.id
+                                  )}" data-txid="${escapeHtml(
+                                    r.tx_id || ""
+                                  )}" data-qty="${escapeHtml(
+                                    r.qty
+                                  )}" data-paddy="${escapeHtml(
+                                    r.paddyType
+                                  )}" data-from="${escapeHtml(
+                                    r.sourceId
+                                  )}" data-price="${escapeHtml(
+                                    r.price || 0
+                                  )}" style="padding:4px 8px; background:#ef4444; color:#fff;">↩️ Revert</button>`
+                                : ""
+                            }
                           </td>`;
           pBody.appendChild(tr);
         });
@@ -394,6 +1042,7 @@
           qs("#purchases-panel"),
           qs("#damage-panel"),
           qs("#history-panel"),
+          qs("#stock-panel"),
         ];
         tabs.forEach((tab, i) => {
           tab.addEventListener("click", (ev) => {
@@ -402,6 +1051,8 @@
             tab.classList.add("active");
             panels.forEach((p) => (p.hidden = true));
             panels[i].hidden = false;
+            // Load stock data when stock tab is shown
+            if (i === 3) renderStockPanel();
           });
         });
       }
@@ -415,6 +1066,7 @@
           return;
         }
         currentUser = me;
+        window.currentUser = me;
         await fetchUsers();
         // populate paddy types select from server
         const types = await fetchPaddyTypes();
@@ -455,6 +1107,36 @@
           populateSourceSelect(e.target.value)
         );
 
+        // Searchable select dropdown functionality
+        const sourceSelectWrapper = qs("#sourceSelectWrapper");
+        const sourceSelectInput = qs(".searchable-select-input");
+        const sourceSelectDropdown = qs("#sourceSelectDropdown");
+        const sourceSearchInput = qs("#sourceSearchInput");
+
+        sourceSelectInput.addEventListener("click", () => {
+          sourceSelectDropdown.classList.toggle("active");
+          sourceSelectInput.classList.toggle("active");
+          if (sourceSelectDropdown.classList.contains("active")) {
+            sourceSearchInput.focus();
+          }
+        });
+
+        sourceSearchInput.addEventListener("input", filterSourceSelect);
+        sourceSearchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            sourceSelectDropdown.classList.remove("active");
+            sourceSelectInput.classList.remove("active");
+          }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (e) => {
+          if (!sourceSelectWrapper.contains(e.target)) {
+            sourceSelectDropdown.classList.remove("active");
+            sourceSelectInput.classList.remove("active");
+          }
+        });
+
         qs("#purchaseForm").addEventListener("submit", (ev) => {
           ev.preventDefault();
           const fromType = qs("#purchaseFromType").value;
@@ -475,18 +1157,22 @@
           let farmerPhone = "";
           // Try multiple ways to find the farmer
           const farmer = users.find(
-            (u) => String(u.id) === String(sourceId) || 
-                   String(u.user_code) === String(sourceId) || 
-                   String(u.code) === String(sourceId)
+            (u) =>
+              String(u.id) === String(sourceId) ||
+              String(u.user_code) === String(sourceId) ||
+              String(u.code) === String(sourceId)
           );
-          
+
           if (farmer) {
-            farmerPhone = farmer.contact_number || farmer.phone || farmer.mobile || "";
+            farmerPhone =
+              farmer.contact_number || farmer.phone || farmer.mobile || "";
           }
 
           // Show OTP verification modal
           const lastDigits =
-            farmerPhone && farmerPhone.length >= 4 ? farmerPhone.slice(-4) : "0000";
+            farmerPhone && farmerPhone.length >= 4
+              ? farmerPhone.slice(-4)
+              : "0000";
 
           // Store purchase data temporarily
           window.pendingPurchaseData = {
@@ -510,41 +1196,85 @@
         // Handle OTP verification form submission
         document
           .getElementById("otp-verification-form")
-          .addEventListener("submit", (ev) => {
+          .addEventListener("submit", async (ev) => {
             ev.preventDefault();
 
             const otpInput = document.getElementById("otp-input-field").value;
             const otpModal = document.getElementById("otp-verification-modal");
+            const otpForm = document.getElementById("otp-verification-form");
+            const action = otpForm.dataset.action || "purchase";
 
             // Verify OTP
             if (otpInput !== "123456") {
-              alert("Invalid OTP. Purchase cancelled.");
+              alert("Invalid OTP. Operation cancelled.");
               otpModal.setAttribute("hidden", "");
               otpModal.setAttribute("aria-hidden", "true");
+              otpForm.dataset.action = "";
               return;
             }
 
-            // OTP verified, close modal and proceed with purchase
+            // OTP verified, close modal
             otpModal.setAttribute("hidden", "");
             otpModal.setAttribute("aria-hidden", "true");
 
-            const data = window.pendingPurchaseData;
-            const rec = {
-              id:
-                Date.now().toString(36) +
-                Math.random().toString(36).slice(2, 6),
-              when: new Date().toISOString(),
-              fromType: data.fromType,
-              sourceId: data.sourceId,
-              sourceName: data.sourceName,
-              paddyType: data.paddyType,
-              qty: Number(data.qty),
-              price: data.price ? Number(data.price) : null,
-              to: currentUser ? currentUser.user_id : null,
-            };
+            if (action === "revert") {
+              // Handle revert action
+              const revertData = window.pendingRevertData;
+              if (!revertData) return;
 
-            // POST the transaction to the server
-            (async () => {
+              try {
+                const to = currentUser ? currentUser.user_id : "";
+                const payload = {
+                  from: revertData.from,
+                  to: to,
+                  type: revertData.paddy,
+                  quantity: revertData.qty,
+                  price: revertData.price,
+                  datetime: new Date().toISOString(),
+                  status: 0, // Mark as revert
+                };
+
+                const res = await fetch("/api/transactions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+
+                const result = await res.json().catch(() => ({}));
+                if (res.ok && result.ok) {
+                  if (typeof loadServerTransactions === "function")
+                    await loadServerTransactions();
+                  if (typeof renderTables === "function") renderTables();
+                  alert("Purchase reverted successfully");
+                  window.pendingRevertData = null;
+                } else {
+                  alert(
+                    "Error: " + (result.error || "Failed to revert purchase")
+                  );
+                }
+              } catch (err) {
+                console.error("Failed to revert purchase:", err);
+                alert("Network error: " + err.message);
+              }
+              otpForm.dataset.action = "";
+            } else {
+              // Handle purchase action (existing logic)
+              const data = window.pendingPurchaseData;
+              const rec = {
+                id:
+                  Date.now().toString(36) +
+                  Math.random().toString(36).slice(2, 6),
+                when: new Date().toISOString(),
+                fromType: data.fromType,
+                sourceId: data.sourceId,
+                sourceName: data.sourceName,
+                paddyType: data.paddyType,
+                qty: Number(data.qty),
+                price: data.price ? Number(data.price) : null,
+                to: currentUser ? currentUser.user_id : null,
+              };
+
+              // POST the transaction to the server
               try {
                 const payload = {
                   from: rec.sourceId,
@@ -581,7 +1311,7 @@
                 console.error("Error saving transaction", err);
                 alert("Error saving transaction");
               }
-            })();
+            }
           });
 
         renderTables();
@@ -651,11 +1381,17 @@
               ? String(d.block_hash).slice(0, 12) + "..."
               : "Not available";
             const kind = d.kind || "paddy";
+
+            // Highlight revert reason rows
+            if (d.reason === "revert") {
+              tr.classList.add("revert-row");
+            }
+
             tr.innerHTML = `<td>${escapeHtml(
               new Date(displayDate).toLocaleString()
             )}</td>
                           <td>${escapeHtml(d.paddy_type)}</td>
-                          <td>${escapeHtml(d.quantity)}</td>
+                          <td>${parseFloat(d.quantity).toFixed(3)}</td>
                           <td>${escapeHtml(d.reason)}</td>
                           <td>${escapeHtml(hashDisplay)}</td>
                           <td>
@@ -664,23 +1400,87 @@
                             )}" data-kind="${escapeHtml(
               kind
             )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
-                            <button class="btn revert-damage-btn" data-id="${escapeHtml(
-                              d.id
-                            )}" data-kind="${escapeHtml(
-              kind
-            )}" data-qty="${escapeHtml(
-              d.quantity
-            )}" data-paddy-type="${escapeHtml(
-              d.paddy_type
-            )}" data-user-id="${escapeHtml(
-              d.user_id
-            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+                            ${
+                              d.reverted !== 1 && d.reason !== "revert"
+                                ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
+                                    d.id
+                                  )}" data-kind="${escapeHtml(
+                                    kind
+                                  )}" data-qty="${escapeHtml(
+                                    d.quantity
+                                  )}" data-paddy-type="${escapeHtml(
+                                    d.paddy_type
+                                  )}" data-user-id="${escapeHtml(
+                                    d.user_id
+                                  )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+                                : ""
+                            }
                           </td>`;
             dBody.appendChild(tr);
           });
         } catch (e) {
           console.error("Could not load damages:", e);
         }
+      }
+
+      async function renderStockPanel() {
+        try {
+          const paddyList = qs("#paddyStockList");
+
+          // Get current user ID
+          const me = await fetchCurrentUser();
+          const userId = me ? me.user_id : null;
+
+          if (!userId) {
+            paddyList.innerHTML = "<p class='error'>User not authenticated</p>";
+            return;
+          }
+
+          // Fetch paddy stock data - filtered by current user from stock table
+          const paddyRes = await fetch(
+            `/api/stock_by_type?kind=paddy&user_id=${encodeURIComponent(
+              userId
+            )}`
+          );
+          const paddyData = paddyRes.ok ? await paddyRes.json() : [];
+
+          // Render Paddy Stock
+          paddyList.innerHTML = "";
+          if (!paddyData || paddyData.length === 0) {
+            paddyList.innerHTML =
+              "<p class='no-data'>No paddy stock available</p>";
+          } else {
+            paddyData.forEach((stock) => {
+              const item = document.createElement("div");
+              item.className = "stock-item";
+              const quantity = parseFloat(
+                stock.quantity || stock.amount || 0
+              ).toFixed(2);
+              item.innerHTML = `
+                <div class="stock-item-header">
+                  <span class="stock-item-name">${escapeHtml(
+                    stock.type || stock.paddy_type || "Unknown"
+                  )}</span>
+                  <span class="stock-quantity">${quantity} kg</span>
+                </div>
+                <div class="stock-item-details">
+                  <p><strong>Available Stock:</strong> ${quantity} kg</p>
+                </div>
+              `;
+              paddyList.appendChild(item);
+            });
+          }
+        } catch (e) {
+          console.error("Failed to load stock data:", e);
+          qs("#paddyStockList").innerHTML =
+            "<p class='error'>Failed to load paddy stock</p>";
+        }
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
       }
 
       // Event delegation for purchase view/update buttons + modal close
@@ -702,40 +1502,13 @@
           const source = e.target.dataset.source || "";
           const paddy = e.target.dataset.paddy || "";
           const qty = e.target.dataset.qty || "";
+          const price = e.target.dataset.price || "-";
           const when = e.target.dataset.when || "";
           const blockhash = e.target.dataset.blockhash || "";
           const blocknumber = e.target.dataset.blocknumber || "";
           const txhash = e.target.dataset.txhash || "";
-          const sourceId = e.target.dataset.sourceid || "";
 
-          // Get farmer's phone number
-          let farmerPhone = "";
-          const farmer = users.find(
-            (u) => (u.id || u.user_code || u.code) === sourceId
-          );
-          if (farmer && farmer.contact_number) {
-            farmerPhone = farmer.contact_number;
-          }
-
-          // Show OTP verification popup
-          const lastDigits =
-            farmerPhone.length >= 4 ? farmerPhone.slice(-4) : "****";
-          const otpInput = prompt(
-            `OTP sent to the farmer's phone ending with ${lastDigits}.\n\nPlease enter the OTP received from the farmer:`
-          );
-
-          // Verify OTP
-          if (otpInput === null) {
-            // User cancelled
-            return;
-          }
-
-          if (otpInput !== "123456") {
-            alert("Invalid OTP. Access denied.");
-            return;
-          }
-
-          // OTP verified, show the purchase details
+          // Show the purchase details modal
           const vmodal = document.getElementById("view-purchase-modal");
           if (vmodal) {
             document.getElementById("view-purchase-when").textContent =
@@ -743,7 +1516,9 @@
             document.getElementById("view-purchase-source").textContent =
               source;
             document.getElementById("view-purchase-paddy").textContent = paddy;
-            document.getElementById("view-purchase-qty").textContent = qty;
+            document.getElementById("view-purchase-qty").textContent =
+              parseFloat(qty).toFixed(3);
+            document.getElementById("view-purchase-price").textContent = price;
             document.getElementById("view-purchase-txid").textContent =
               txid || "N/A";
             document.getElementById("view-purchase-blockhash").textContent =
@@ -757,7 +1532,7 @@
           }
         }
 
-        // Revert purchase: create reversal with status=0
+        // Revert purchase: show confirmation modal and create reversal with status=0 on confirm
         if (e.target && e.target.classList.contains("revert-purchase-btn")) {
           const txid = e.target.dataset.txid;
           const qty = parseFloat(e.target.dataset.qty) || 0;
@@ -765,43 +1540,19 @@
           const from = e.target.dataset.from || "";
           const price = parseFloat(e.target.dataset.price) || 0;
 
-          if (
-            !confirm(
-              `Revert purchase of ${qty} kg ${paddy} from ${from}? This will create a reversal with status=0.`
-            )
-          ) {
-            return;
-          }
-
-          try {
-            const to = currentUser ? currentUser.user_id : "";
-            const payload = {
-              from: from,
-              to: to,
-              type: paddy,
-              quantity: qty,
-              price: price,
-              datetime: new Date().toISOString(),
-              status: 0, // Revert transaction
-            };
-
-            const res = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            const result = await res.json();
-            if (res.ok && result.ok) {
-              alert("Purchase reverted successfully");
-              await loadServerTransactions();
-              renderTables();
-            } else {
-              alert("Error: " + (result.error || "Failed to revert purchase"));
-            }
-          } catch (err) {
-            console.error("Failed to revert purchase:", err);
-            alert("Network error: " + err.message);
+          // populate modal
+          const modal = document.getElementById("confirm-revert-modal");
+          if (modal) {
+            modal.querySelector(
+              "#confirm-revert-text"
+            ).textContent = `Revert purchase of ${qty} kg ${paddy} from ${from}? This will create a reversal`;
+            modal.dataset.txid = txid || "";
+            modal.dataset.qty = String(qty);
+            modal.dataset.paddy = paddy;
+            modal.dataset.from = from;
+            modal.dataset.price = String(price || 0);
+            modal.removeAttribute("hidden");
+            modal.setAttribute("aria-hidden", "false");
           }
           return;
         }
@@ -825,7 +1576,7 @@
               document.getElementById("view-damage-paddy").textContent =
                 d.paddy_type || "";
               document.getElementById("view-damage-qty").textContent =
-                d.quantity || "";
+                d.quantity ? parseFloat(d.quantity).toFixed(3) : "";
               document.getElementById("view-damage-reason").textContent =
                 d.reason || "";
               document.getElementById("view-damage-blockhash").textContent =
@@ -884,6 +1635,7 @@
 
         // Revert damage: create new damage record with reason "revert"
         if (e.target && e.target.classList.contains("revert-damage-btn")) {
+          const damageId = e.target.dataset.id || "";
           const qty = parseFloat(e.target.dataset.qty) || 0;
           const paddyType = e.target.dataset.paddyType || "";
           const userId =
@@ -891,12 +1643,18 @@
           const kind = e.target.dataset.kind || "paddy";
 
           console.log("Revert data:", {
+            damageId,
             qty,
             paddyType,
             userId,
             kind,
             currentUser,
           });
+
+          if (!damageId) {
+            alert("Error: Damage ID not available.");
+            return;
+          }
 
           if (!userId) {
             alert("Error: User ID not available. Please refresh the page.");
@@ -917,23 +1675,14 @@
           }
 
           try {
-            // Create new damage record with reason "revert"
-            const payload = {
-              user_id: userId,
-              paddy_type: paddyType,
-              quantity: qty,
-              reason: "revert",
-              kind: kind,
-              damage_date: new Date().toISOString(),
-            };
-
-            console.log("Sending revert payload:", payload);
-
-            const res = await fetch("/api/damages", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
+            // Call the revert endpoint which will update reverted status and create reversal record
+            const res = await fetch(
+              `/api/damages/${damageId}/revert?kind=${kind}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }
+            );
 
             console.log("Response status:", res.status);
             const result = await res.json();
@@ -1188,38 +1937,46 @@
       aria-hidden="true"
       hidden
     >
-      <div class="modal-content" role="document" style="max-width: 480px">
+      <div class="modal-content" role="document">
         <header class="modal-header">
-          <h3>Purchase Details</h3>
+          <h3>📦 Purchase Details</h3>
         </header>
-        <div style="padding: 16px; display: grid; gap: 8px">
+        <div style="padding: 24px; display: grid; gap: 12px">
           <div
-            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 12px"
           >
-            <strong>When:</strong><span id="view-purchase-when"></span>
-            <strong>Source:</strong><span id="view-purchase-source"></span>
-            <strong>Paddy:</strong><span id="view-purchase-paddy"></span>
-            <strong>Quantity:</strong><span id="view-purchase-qty"></span>
-            <strong>Tx ID:</strong><span id="view-purchase-txid"></span>
-            <strong>Block Hash:</strong
+            <strong style="color: #0b3d91">When:</strong
+            ><span id="view-purchase-when" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Source:</strong
+            ><span id="view-purchase-source" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Paddy:</strong
+            ><span id="view-purchase-paddy" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Quantity:</strong
+            ><span id="view-purchase-qty" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Price (per kg):</strong
+            ><span id="view-purchase-price" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Tx ID:</strong
+            ><span id="view-purchase-txid" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Block Hash:</strong
             ><span
               id="view-purchase-blockhash"
-              style="word-break: break-all"
+              style="word-break: break-all; color: #4b5563"
             ></span>
-            <strong>Block Number:</strong
-            ><span id="view-purchase-blocknumber"></span>
-            <strong>Tx Hash:</strong
+            <strong style="color: #0b3d91">Block Number:</strong
+            ><span id="view-purchase-blocknumber" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Tx Hash:</strong
             ><span
               id="view-purchase-txhash"
-              style="word-break: break-all"
+              style="word-break: break-all; color: #4b5563"
             ></span>
           </div>
-          <div style="text-align: right; margin-top: 8px">
-            <button id="close-view-purchase" class="btn">Close</button>
+          <div style="text-align: right; margin-top: 16px">
+            <button id="close-view-purchase" class="btn primary">Close</button>
           </div>
         </div>
       </div>
     </div>
+
     <!-- Update Purchase Modal -->
     <div
       id="update-purchase-modal"
@@ -1229,28 +1986,47 @@
       aria-hidden="true"
       hidden
     >
-      <div class="modal-content" role="document" style="max-width: 480px">
+      <div class="modal-content" role="document">
         <header class="modal-header">
-          <h3>Update Purchase</h3>
+          <h3>✏️ Update Purchase</h3>
         </header>
         <form
           id="update-purchase-form"
-          style="padding: 16px; display: grid; gap: 8px"
+          style="padding: 24px; display: grid; gap: 16px"
         >
           <input type="hidden" id="update-purchase-id" />
           <input type="hidden" id="update-purchase-txid" />
-          <label
-            style="
-              display: grid;
-              grid-template-columns: 120px 1fr;
-              gap: 8px;
-              align-items: center;
-            "
-          >
-            <span>Paddy:</span><span id="update-purchase-paddy"></span>
+          <label style="display: block">
+            <span
+              style="
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Paddy:</span
+            >
+            <span
+              id="update-purchase-paddy"
+              style="
+                padding: 10px;
+                background: #f9fafb;
+                border-radius: 6px;
+                display: block;
+                color: #4b5563;
+              "
+            ></span>
           </label>
           <label style="display: block">
-            Quantity (kg)
+            <span
+              style="
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Quantity (kg)</span
+            >
             <input
               id="update-purchase-qty"
               type="number"
@@ -1258,22 +2034,24 @@
               min="0"
               required
               style="
+                padding: 12px 16px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
                 width: 100%;
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
               "
             />
           </label>
-          <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <div style="display: flex; justify-content: flex-end; gap: 12px">
             <button type="button" id="close-update-purchase" class="btn">
               Cancel
             </button>
-            <button type="submit" class="btn primary">Save</button>
+            <button type="submit" class="btn primary">Save Changes</button>
           </div>
         </form>
       </div>
     </div>
+
     <!-- View Damage Modal -->
     <div
       id="view-damage-modal"
@@ -1283,29 +2061,37 @@
       aria-hidden="true"
       hidden
     >
-      <div class="modal-content" role="document" style="max-width: 480px">
+      <div class="modal-content" role="document">
         <header class="modal-header">
-          <h3>Damage Details</h3>
+          <h3>⚠️ Damage Details</h3>
         </header>
-        <div style="padding: 16px; display: grid; gap: 8px">
+        <div style="padding: 24px; display: grid; gap: 12px">
           <div
-            style="display: grid; grid-template-columns: 120px 1fr; gap: 8px"
+            style="display: grid; grid-template-columns: 120px 1fr; gap: 12px"
           >
-            <strong>When:</strong><span id="view-damage-when"></span>
-            <strong>Paddy:</strong><span id="view-damage-paddy"></span>
-            <strong>Quantity:</strong><span id="view-damage-qty"></span>
-            <strong>Reason:</strong><span id="view-damage-reason"></span>
-            <strong>Block Hash:</strong
+            <strong style="color: #0b3d91">When:</strong
+            ><span id="view-damage-when" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Paddy:</strong
+            ><span id="view-damage-paddy" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Quantity:</strong
+            ><span id="view-damage-qty" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Reason:</strong
+            ><span id="view-damage-reason" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Block Hash:</strong
             ><span
               id="view-damage-blockhash"
-              style="word-break: break-all"
+              style="word-break: break-all; color: #4b5563"
             ></span>
-            <strong>Block Number:</strong
-            ><span id="view-damage-blocknumber"></span> <strong>Tx Hash:</strong
-            ><span id="view-damage-txhash" style="word-break: break-all"></span>
+            <strong style="color: #0b3d91">Block Number:</strong
+            ><span id="view-damage-blocknumber" style="color: #4b5563"></span>
+            <strong style="color: #0b3d91">Tx Hash:</strong
+            ><span
+              id="view-damage-txhash"
+              style="word-break: break-all; color: #4b5563"
+            ></span>
           </div>
-          <div style="text-align: right; margin-top: 8px">
-            <button id="close-view-damage" class="btn">Close</button>
+          <div style="text-align: right; margin-top: 16px">
+            <button id="close-view-damage" class="btn primary">Close</button>
           </div>
         </div>
       </div>
@@ -1320,28 +2106,47 @@
       aria-hidden="true"
       hidden
     >
-      <div class="modal-content" role="document" style="max-width: 480px">
+      <div class="modal-content" role="document">
         <header class="modal-header">
-          <h3>Update Damage</h3>
+          <h3>✏️ Update Damage</h3>
         </header>
         <form
           id="update-damage-form"
-          style="padding: 16px; display: grid; gap: 8px"
+          style="padding: 24px; display: grid; gap: 16px"
         >
           <input type="hidden" id="update-damage-id" />
           <input type="hidden" id="update-damage-kind" />
-          <label
-            style="
-              display: grid;
-              grid-template-columns: 120px 1fr;
-              gap: 8px;
-              align-items: center;
-            "
-          >
-            <span>Paddy:</span><span id="update-damage-paddy"></span>
+          <label style="display: block">
+            <span
+              style="
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Paddy:</span
+            >
+            <span
+              id="update-damage-paddy"
+              style="
+                padding: 10px;
+                background: #f9fafb;
+                border-radius: 6px;
+                display: block;
+                color: #4b5563;
+              "
+            ></span>
           </label>
-          <label style="display: block"
-            >Quantity (kg)
+          <label style="display: block">
+            <span
+              style="
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Quantity (kg)</span
+            >
             <input
               id="update-damage-qty"
               type="number"
@@ -1349,35 +2154,46 @@
               min="0"
               required
               style="
+                padding: 12px 16px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
                 width: 100%;
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
               "
             />
           </label>
-          <label style="display: block"
-            >Reason
+          <label style="display: block">
+            <span
+              style="
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Reason</span
+            >
             <input
               id="update-damage-reason"
               type="text"
               style="
+                padding: 12px 16px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                font-size: 14px;
                 width: 100%;
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
               "
             />
           </label>
-          <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <div style="display: flex; justify-content: flex-end; gap: 12px">
             <button type="button" id="close-update-damage" class="btn">
               Cancel
             </button>
-            <button type="submit" class="btn primary">Save</button>
+            <button type="submit" class="btn primary">Save Changes</button>
           </div>
         </form>
       </div>
     </div>
+
     <!-- OTP Verification Modal -->
     <div
       id="otp-verification-modal"
@@ -1387,32 +2203,45 @@
       aria-hidden="true"
       hidden
     >
-      <div class="modal-content" role="document" style="max-width: 420px">
+      <div class="modal-content" role="document">
         <header class="modal-header">
-          <h3>OTP Verification</h3>
+          <h3>🔐 OTP Verification</h3>
         </header>
         <form
           id="otp-verification-form"
-          style="padding: 16px; display: grid; gap: 16px"
+          style="padding: 24px; display: grid; gap: 20px"
         >
-          <div style="text-align: center; padding: 8px 0">
+          <div
+            style="
+              text-align: center;
+              padding: 12px 0;
+              background: #f0f6ff;
+              border-radius: 8px;
+            "
+          >
             <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280">
-              OTP sent to the farmer's phone ending with
+              OTP sent to farmer's phone ending with
             </p>
             <p
               style="
                 margin: 0;
-                font-size: 24px;
-                font-weight: bold;
-                color: #1f2937;
+                font-size: 28px;
+                font-weight: 700;
+                color: #0b3d91;
               "
             >
               ****<span id="otp-phone-digits">****</span>
             </p>
           </div>
           <label style="display: block">
-            <span style="display: block; margin-bottom: 6px; font-weight: 500"
-              >Enter OTP received from farmer:</span
+            <span
+              style="
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 600;
+                color: #374151;
+              "
+              >Enter OTP:</span
             >
             <input
               id="otp-input-field"
@@ -1422,24 +2251,142 @@
               required
               style="
                 width: 100%;
-                padding: 12px;
-                border-radius: 6px;
-                border: 2px solid #d1d5db;
+                padding: 14px;
+                border-radius: 8px;
+                border: 2px solid #e5e7eb;
                 font-size: 18px;
                 text-align: center;
                 letter-spacing: 4px;
-                font-weight: bold;
+                font-weight: 700;
               "
             />
           </label>
-          <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <div style="display: flex; justify-content: flex-end; gap: 12px">
             <button type="button" id="close-otp-modal" class="btn">
               Cancel
             </button>
-            <button type="submit" class="btn primary">Verify & Save</button>
+            <button type="submit" class="btn primary">✓ Verify & Save</button>
           </div>
         </form>
       </div>
     </div>
+    <!-- Floating logout button removed -->
+    <!-- Confirm Revert Modal -->
+    <div
+      id="confirm-revert-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      hidden
+    >
+      <div class="modal-content" role="document" style="max-width: 480px">
+        <header class="modal-header">
+          <h3>Confirm Revert</h3>
+        </header>
+        <div style="padding: 16px">
+          <p
+            id="confirm-revert-text"
+            style="color: #374151; margin-bottom: 16px"
+          ></p>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" id="cancel-revert" class="btn">Cancel</button>
+            <button type="button" id="confirm-revert" class="btn primary">
+              Revert Purchase
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        function qs(sel) {
+          return document.querySelector(sel);
+        }
+
+        document.addEventListener("click", async function (e) {
+          if (!e.target) return;
+          // Cancel revert
+          if (e.target.id === "cancel-revert") {
+            const m = qs("#confirm-revert-modal");
+            if (m) {
+              m.setAttribute("hidden", "");
+              m.setAttribute("aria-hidden", "true");
+            }
+            return;
+          }
+
+          // Confirm revert
+          if (e.target.id === "confirm-revert") {
+            const m = qs("#confirm-revert-modal");
+            if (!m) return;
+            const txid = m.dataset.txid || "";
+            const qty = parseFloat(m.dataset.qty) || 0;
+            const paddy = m.dataset.paddy || "";
+            const from = m.dataset.from || "";
+            const price = parseFloat(m.dataset.price) || 0;
+
+            // Store revert data temporarily
+            window.pendingRevertData = {
+              from: from,
+              paddy: paddy,
+              qty: qty,
+              price: price,
+              txid: txid,
+            };
+
+            // Close confirm modal
+            m.setAttribute("hidden", "");
+            m.setAttribute("aria-hidden", "true");
+
+            // Fetch farmer/source details to get phone number
+            (async () => {
+              try {
+                const res = await fetch(
+                  `/api/users/${encodeURIComponent(from)}`
+                );
+                const user = res.ok ? await res.json() : null;
+                let phoneNumber = "****";
+                if (user && user.contact_number) {
+                  const phone = String(user.contact_number).trim();
+                  if (phone.length >= 4) {
+                    phoneNumber = phone.slice(-4);
+                  }
+                }
+
+                // Show OTP modal for revert verification with phone number
+                const otpModal = document.getElementById(
+                  "otp-verification-modal"
+                );
+                document.getElementById("otp-phone-digits").textContent =
+                  phoneNumber;
+                document.getElementById("otp-input-field").value = "";
+                document.getElementById(
+                  "otp-verification-form"
+                ).dataset.action = "revert";
+                otpModal.removeAttribute("hidden");
+                otpModal.setAttribute("aria-hidden", "false");
+                document.getElementById("otp-input-field").focus();
+              } catch (err) {
+                console.error("Failed to fetch user details:", err);
+                // Still show OTP modal even if fetch fails
+                const otpModal = document.getElementById(
+                  "otp-verification-modal"
+                );
+                document.getElementById("otp-phone-digits").textContent =
+                  "****";
+                document.getElementById("otp-input-field").value = "";
+                document.getElementById(
+                  "otp-verification-form"
+                ).dataset.action = "revert";
+                otpModal.removeAttribute("hidden");
+                otpModal.setAttribute("aria-hidden", "false");
+                document.getElementById("otp-input-field").focus();
+              }
+            })();
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

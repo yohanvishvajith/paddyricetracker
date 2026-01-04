@@ -137,6 +137,7 @@
           Purchases
         </button>
         <button onclick="openTab(event, 'history')">History</button>
+        <button onclick="openTab(event, 'stock')">🌾 Stock</button>
       </div>
 
       <!-- Purchases Tab -->
@@ -202,6 +203,20 @@
           <tbody></tbody>
         </table>
       </div>
+
+      <!-- Stock Tab -->
+      <div id="stock" class="tab-content">
+        <h2>🌾 Rice Stock</h2>
+        <table id="stock-table">
+          <thead>
+            <tr>
+              <th>Rice Type</th>
+              <th>Quantity (kg)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal for viewing transaction details -->
@@ -249,6 +264,87 @@
       </div>
     </div>
 
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-modal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <h3>Verify OTP</h3>
+        <p>
+          Enter the OTP sent to
+          <strong>****<span id="otp-phone-digits"></span></strong>
+        </p>
+        <form id="otp-form">
+          <label
+            style="
+              display: flex;
+              flex-direction: column;
+              font-weight: bold;
+              margin: 16px 0;
+            "
+          >
+            OTP
+            <input
+              type="password"
+              id="otp-input"
+              placeholder="Enter OTP"
+              required
+              autofocus
+              style="
+                margin-top: 4px;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+              "
+            />
+          </label>
+          <button
+            type="submit"
+            class="logout"
+            style="
+              background: #4caf50;
+              color: white;
+              width: 100%;
+              margin-bottom: 10px;
+            "
+          >
+            Verify
+          </button>
+          <button
+            type="button"
+            class="logout"
+            onclick="document.getElementById('otp-modal').style.display='none'"
+            style="background: #666; color: white; width: 100%"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
     <script>
       let loggedInUser = null;
       let paddyMap = {}; // id -> name map for paddy types
@@ -287,6 +383,8 @@
           loadPurchases();
         } else if (tabName === "history") {
           loadHistory();
+        } else if (tabName === "stock") {
+          loadStock();
         }
       }
 
@@ -352,7 +450,9 @@
           const riceTypeName = paddyMap[riceTypeId] || riceTypeId;
           const quantity = parseFloat(formData.get("quantity"));
           const price = formData.get("price");
-          const payload = {
+
+          // Store pending purchase data
+          window.pendingPurchaseData = {
             from: supplierId,
             to: loggedInUser.user_code,
             type: riceTypeName,
@@ -361,22 +461,86 @@
             datetime: new Date().toISOString(),
           };
 
+          // Fetch supplier contact to show in OTP modal
           try {
-            const response = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) throw new Error("Failed to record purchase");
-            alert("Purchase recorded successfully!");
-            e.target.reset();
-            document.getElementById("supplier-select").innerHTML =
-              '<option value="">First select source type</option>';
-            loadPurchases();
+            const userRes = await fetch(`/api/users/${supplierId}`);
+            const user = userRes.ok ? await userRes.json() : null;
+            const phoneNumber = user?.contact_number?.slice(-4) || "****";
+            document.getElementById("otp-phone-digits").textContent =
+              phoneNumber;
           } catch (err) {
-            console.error(err);
-            alert("Error recording purchase");
+            console.error("Failed to fetch supplier contact", err);
+            document.getElementById("otp-phone-digits").textContent = "****";
+          }
+
+          // Show OTP modal
+          document.getElementById("otp-input").value = "";
+          document.getElementById("otp-form").dataset.action = "purchase";
+          document.getElementById("otp-modal").style.display = "flex";
+        });
+
+      // OTP Form Submit Handler
+      document
+        .getElementById("otp-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const otpInput = document.getElementById("otp-input").value.trim();
+          const action = e.target.dataset.action || "purchase";
+
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert("Invalid OTP. Please try again.");
+            document.getElementById("otp-input").value = "";
+            return;
+          }
+
+          // Close modal
+          document.getElementById("otp-modal").style.display = "none";
+
+          if (action === "purchase" && window.pendingPurchaseData) {
+            try {
+              const response = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(window.pendingPurchaseData),
+              });
+
+              if (!response.ok) throw new Error("Failed to record purchase");
+              alert("Purchase recorded successfully!");
+              document.getElementById("purchase-form").reset();
+              document.getElementById("supplier-select").innerHTML =
+                '<option value="">First select source type</option>';
+              window.pendingPurchaseData = null;
+              loadHistory();
+            } catch (err) {
+              console.error(err);
+              alert("Error recording purchase");
+              window.pendingPurchaseData = null;
+            }
+          } else if (action === "revert" && window.pendingRevertData) {
+            try {
+              const response = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(window.pendingRevertData),
+              });
+
+              const result = await response.json();
+              if (response.ok && result.ok) {
+                alert("Purchase reverted successfully!");
+                window.pendingRevertData = null;
+                loadHistory();
+              } else {
+                alert(
+                  "Error: " + (result.error || "Failed to revert purchase")
+                );
+                window.pendingRevertData = null;
+              }
+            } catch (err) {
+              console.error("Failed to revert purchase:", err);
+              alert("Network error: " + err.message);
+              window.pendingRevertData = null;
+            }
           }
         });
 
@@ -442,9 +606,16 @@
               : -parseFloat(t.quantity);
             const qtyColor = isPurchase ? "black" : "red";
 
-            // Only show Revert button for purchases, not reverts
-            const actionBtns = isPurchase
-              ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #ff9800;" onclick="viewTransaction(${t.id})">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #f57c00;" onclick="revertTransaction(${t.id})">Revert</button>`
+            // Only show Revert button for purchases, not reverts, and not if already reverted
+            const showRevertBtn = isPurchase && t.is_reverted !== 1;
+            const actionBtns = showRevertBtn
+              ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #ff9800;" onclick="viewTransaction(${
+                  t.id
+                })">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #f57c00;" onclick="showRevertOTP('${
+                  t.from
+                }', '${t.type}', ${t.quantity}, ${
+                  t.price || 0
+                })">Revert</button>`
               : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #ff9800;" onclick="viewTransaction(${t.id})">View</button>`;
 
             row.innerHTML = `
@@ -462,6 +633,44 @@
         } catch (err) {
           console.error(err);
         }
+      }
+
+      // Show OTP modal for revert
+      async function showRevertOTP(from, type, quantity, price) {
+        if (
+          !confirm(
+            `Revert purchase of ${quantity} kg ${type} from ${from}? This will restore stock to the supplier and deduct from yours.`
+          )
+        ) {
+          return;
+        }
+
+        // Store pending revert data
+        window.pendingRevertData = {
+          from: from,
+          to: loggedInUser.user_code,
+          type: type,
+          quantity: quantity,
+          price: price,
+          datetime: new Date().toISOString(),
+          status: 0, // Revert transaction
+        };
+
+        // Fetch supplier contact to show in OTP modal
+        try {
+          const userRes = await fetch(`/api/users/${from}`);
+          const user = userRes.ok ? await userRes.json() : null;
+          const phoneNumber = user?.contact_number?.slice(-4) || "****";
+          document.getElementById("otp-phone-digits").textContent = phoneNumber;
+        } catch (err) {
+          console.error("Failed to fetch supplier contact", err);
+          document.getElementById("otp-phone-digits").textContent = "****";
+        }
+
+        // Show OTP modal
+        document.getElementById("otp-input").value = "";
+        document.getElementById("otp-form").dataset.action = "revert";
+        document.getElementById("otp-modal").style.display = "flex";
       }
 
       // View transaction details function
@@ -573,6 +782,38 @@
           console.error("Error reverting purchase", err);
           alert("Error reverting purchase: " + err.message);
         }
+      }
+
+      async function loadStock() {
+        try {
+          const response = await fetch(
+            `/api/stock_by_type?kind=rice&user_id=${encodeURIComponent(
+              loggedInUser.user_code
+            )}`
+          );
+          if (!response.ok) throw new Error("Failed to load stock");
+          const data = await response.json();
+          renderStockTable(data);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function renderStockTable(stocks) {
+        const tbody = document.querySelector("#stock-table tbody");
+        tbody.innerHTML = "";
+        if (!stocks || stocks.length === 0) {
+          tbody.innerHTML =
+            "<tr><td colspan='2' style='text-align: center; color: #999;'>No rice stock available</td></tr>";
+          return;
+        }
+        stocks.forEach((stock) => {
+          const row = tbody.insertRow();
+          row.innerHTML = `
+            <td>${stock.paddy_type || "Unknown"}</td>
+            <td>${parseFloat(stock.quantity || 0).toFixed(2)}</td>
+          `;
+        });
       }
 
       // Initial load

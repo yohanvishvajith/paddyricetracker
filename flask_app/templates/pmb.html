@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Government Dashboard - PMB</title>
+    <title>Paddy market board</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -11,64 +11,79 @@
   </head>
   <body>
     <header class="site-header">
-      <h1 class="site-title">Government Dashboard (PMB)</h1>
+      <div class="header-left">
+        <h1 class="site-title">📊 Paddy market board</h1>
+      </div>
       <nav class="tabs" aria-label="Government tabs">
         <ul>
-          <li class="tab active"><a href="#" data-index="0">Overview</a></li>
-          <li class="tab"><a href="#" data-index="1">Milling</a></li>
-          <li class="tab"><a href="#" data-index="2">Damage</a></li>
-          <li class="tab"><a href="#" data-index="3">Reports</a></li>
-          <li class="tab"><a href="#" data-index="4">Settings</a></li>
+          <li class="tab active"><a href="#" data-index="0">📦 Overview</a></li>
+          <li class="tab"><a href="#" data-index="1">⚙️ Milling</a></li>
+          <li class="tab"><a href="#" data-index="2">⚠️ Damage</a></li>
+          <li class="tab"><a href="#" data-index="3">📊 Stock</a></li>
         </ul>
       </nav>
+      <div class="header-actions">
+        <a href="/" class="btn logout-btn">🚪 Logout</a>
+      </div>
     </header>
 
     <main class="content">
       <section class="panel" id="purchase-panel">
-        <h2>Record Purchase (PMB)</h2>
+        <h2>🛒 Record Purchase (PMB)</h2>
 
         <div class="card">
           <form id="purchaseForm">
-            <label for="purchaseFromType">Purchase From</label>
-            <select id="purchaseFromType" required>
-              <option value="Farmer">Farmer</option>
-              <option value="Collecter">Collecter</option>
-            </select>
+            <div class="form-group">
+              <label for="purchaseFromType">Purchase From</label>
+              <select id="purchaseFromType" required>
+                <option value="Farmer">Farmer</option>
+                <option value="Collecter">Collecter</option>
+              </select>
+            </div>
 
-            <label for="sourceSelect">Source</label>
-            <select id="sourceSelect" required>
-              <option value="">Loading...</option>
-            </select>
+            <div class="form-group">
+              <label for="sourceSelect">Source</label>
+              <select id="sourceSelect" required>
+                <option value="">Loading...</option>
+              </select>
+            </div>
 
-            <label for="paddyType">Paddy Type</label>
-            <select id="paddyType" required>
-              <option value="">Loading paddy types...</option>
-            </select>
+            <div class="form-group">
+              <label for="paddyType">Paddy Type</label>
+              <select id="paddyType" required>
+                <option value="">Loading paddy types...</option>
+              </select>
+            </div>
 
-            <label for="qty">Quantity (kg)</label>
-            <input id="qty" type="number" min="0" step="0.01" required />
+            <div class="form-group">
+              <label for="qty">Quantity (kg)</label>
+              <input id="qty" type="number" min="0" step="0.01" required />
+            </div>
 
-            <label for="price">Price (per kg)</label>
-            <input id="price" type="number" min="0" step="0.01" />
+            <div class="form-group">
+              <label for="price">Price (per kg)</label>
+              <input id="price" type="number" min="0" step="0.01" />
+            </div>
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Save Purchase</button>
-              <a href="/" class="btn">Back to home</a>
+              <button type="submit" class="btn primary">
+                💾 Save Purchase
+              </button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <h3>📋 Recent Purchases</h3>
         <div class="table-wrap">
           <table class="data-table" id="purchasesTable">
             <thead>
               <tr>
                 <th>When</th>
-                <th>Hash ID</th>
                 <th>Source</th>
                 <th>Paddy Type</th>
                 <th>Qty (kg)</th>
                 <th>Price (per kg)</th>
+                <th>Hash ID</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -78,52 +93,64 @@
       </section>
 
       <section class="panel" id="milling-panel" hidden>
-        <h2>Record Milling (PMB)</h2>
+        <h2>⚙️ Record Milling (PMB)</h2>
 
         <div class="card">
           <form id="pmbMillingForm">
-            <label for="pmbMillingPaddyType">Paddy Type</label>
-            <select id="pmbMillingPaddyType" required>
-              <option value="">Select paddy type</option>
-            </select>
+            <div class="form-group">
+              <label for="pmbMillingPaddyType">Paddy Type</label>
+              <select id="pmbMillingPaddyType" required>
+                <option value="">Select paddy type</option>
+              </select>
+            </div>
 
-            <label for="pmbMillingInputQty">Input Paddy Quantity (kg)</label>
-            <input
-              id="pmbMillingInputQty"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-            />
+            <div class="form-group">
+              <label for="pmbMillingInputQty">Input Paddy Quantity (kg)</label>
+              <input
+                id="pmbMillingInputQty"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
 
-            <label for="pmbMillingOutputQty">Output Rice Quantity (kg)</label>
-            <input
-              id="pmbMillingOutputQty"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-            />
+            <div class="form-group">
+              <label for="pmbMillingOutputQty">Output Rice Quantity (kg)</label>
+              <input
+                id="pmbMillingOutputQty"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
 
-            <label for="pmbMillingDryDuration">Dry Duration (days)</label>
-            <input
-              id="pmbMillingDryDuration"
-              type="number"
-              min="0"
-              step="0.1"
-              placeholder="Number of days for drying"
-            />
+            <div class="form-group">
+              <label for="pmbMillingDryDuration">Dry Duration (days)</label>
+              <input
+                id="pmbMillingDryDuration"
+                type="number"
+                min="0"
+                step="0.1"
+                placeholder="Number of days for drying"
+              />
+            </div>
 
-            <label for="pmbMillingDate">Milling Date</label>
-            <input id="pmbMillingDate" type="date" required />
+            <div class="form-group">
+              <label for="pmbMillingDate">Milling Date</label>
+              <input id="pmbMillingDate" type="date" required />
+            </div>
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Record Milling</button>
+              <button type="submit" class="btn primary">
+                ✅ Record Milling
+              </button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Milling Records</h3>
+        <h3>📋 Recent Milling Records</h3>
         <div class="table-wrap">
           <table class="data-table" id="pmbMillingTable">
             <thead>
@@ -135,6 +162,7 @@
                 <th>Output Rice (kg)</th>
                 <th>Yield (%)</th>
                 <th>Block ID</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -143,38 +171,52 @@
       </section>
 
       <section class="panel" id="damage-panel" hidden>
-        <h2>Record Damage (PMB)</h2>
+        <h2>⚠️ Record Damage (PMB)</h2>
 
         <div class="card">
           <form id="damageForm">
-            <label for="damagePaddyType">Paddy / Rice Type</label>
-            <select id="damagePaddyType" required>
-              <option value="">Select paddy type</option>
-            </select>
+            <div class="form-group">
+              <label for="damagePaddyType">Paddy / Rice Type</label>
+              <select id="damagePaddyType" required>
+                <option value="">Select paddy type</option>
+              </select>
+            </div>
 
-            <label for="damageQty">Damaged Quantity (kg)</label>
-            <input id="damageQty" type="number" min="0" step="0.01" required />
+            <div class="form-group">
+              <label for="damageQty">Damaged Quantity (kg)</label>
+              <input
+                id="damageQty"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
 
-            <label for="damageReason">Reason</label>
-            <textarea
-              id="damageReason"
-              rows="3"
-              placeholder="Describe the reason for damage"
-              required
-            ></textarea>
+            <div class="form-group">
+              <label for="damageReason">Reason</label>
+              <textarea
+                id="damageReason"
+                rows="3"
+                placeholder="Describe the reason for damage"
+                required
+              ></textarea>
+            </div>
 
             <div class="modal-actions">
-              <button type="submit" class="btn primary">Record Damage</button>
+              <button type="submit" class="btn primary">
+                🔴 Record Damage
+              </button>
             </div>
           </form>
         </div>
 
-        <h3 style="margin-top: 18px">Recent Damages</h3>
-        <div class="tabs" style="margin-bottom: 12px">
+        <h3>📋 Recent Damages</h3>
+        <div class="tabs" style="margin-bottom: 16px">
           <ul
             style="
               display: flex;
-              gap: 8px;
+              gap: 10px;
               list-style: none;
               padding: 0;
               margin: 0;
@@ -182,12 +224,12 @@
           >
             <li>
               <button type="button" id="pmbDamagePaddyTab" class="btn primary">
-                Paddy
+                🌾 Paddy
               </button>
             </li>
             <li>
               <button type="button" id="pmbDamageRiceTab" class="btn">
-                Rice
+                🍚 Rice
               </button>
             </li>
           </ul>
@@ -226,16 +268,46 @@
         </div>
       </section>
 
-      <section class="panel" id="reports-panel" hidden>
-        <h2>Reports</h2>
-        <p>Report views will appear here.</p>
-      </section>
+      <section class="panel" id="stock-panel" hidden>
+        <h2>📊 Stock Management</h2>
 
-      <section class="panel" id="settings-panel" hidden>
-        <h2>Settings</h2>
-        <p>Settings will appear here.</p>
+        <div class="stock-container">
+          <div class="stock-column">
+            <div class="stock-card">
+              <h3>🌾 Paddy Types</h3>
+              <div id="paddyStockList" class="stock-list">
+                <p class="loading">Loading paddy types...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stock-column">
+            <div class="stock-card">
+              <h3>🍚 Rice Types</h3>
+              <div id="riceStockList" class="stock-list">
+                <p class="loading">Loading rice types...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
+
+    <style>
+      tr.status-zero {
+        background-color: #fef2f2;
+      }
+
+      /* Highlight revert reason rows in damage table */
+      tr.revert-row {
+        background-color: #d38d1b;
+        border-left: 4px solid #eab308;
+      }
+
+      tr.revert-row:hover {
+        background-color: #e2a60e;
+      }
+    </style>
 
     <script>
       // PMB purchase form - fetches sources and paddy types and posts transactions
@@ -323,13 +395,14 @@
             const fromDisplay = escapeHtml(String(r.from));
             const typeDisplay = escapeHtml(r.type || "");
             const priceDisplay = r.price ? Number(r.price).toFixed(2) : "-";
+            const statusClass = r.status === 0 ? " status-zero" : "";
             tr.innerHTML = `<td>${new Date(
               r.datetime || r.created_at
-            ).toLocaleString()}</td><td title="${
-              r.block_hash || ""
-            }">${hashDisplay}</td><td>${fromDisplay}</td><td>${typeDisplay}</td><td>${
+            ).toLocaleString()}</td><td>${fromDisplay}</td><td>${typeDisplay}</td><td>${
               r.quantity || 0
-            }</td><td>${priceDisplay}</td><td>
+            }</td><td>${priceDisplay}</td><td title="${
+              r.block_hash || ""
+            }">${hashDisplay}</td><td>
               <button class="btn view-purchase-btn" 
                 data-id="${r.id || ""}" 
                 data-from="${escapeHtml(String(r.from))}" 
@@ -340,14 +413,19 @@
                 data-block-hash="${r.block_hash || ""}" 
                 data-block-number="${r.block_number || ""}" 
                 data-tx-hash="${r.transaction_hash || ""}">View</button>
-              <button class="btn revert-purchase-btn" 
+              ${
+                r.status !== 0
+                  ? `<button class="btn revert-purchase-btn" 
                 data-id="${r.id || ""}" 
                 data-from="${escapeHtml(String(r.from))}" 
                 data-type="${escapeHtml(r.type || "")}" 
                 data-quantity="${r.quantity || 0}" 
                 data-price="${escapeHtml(r.price || 0)}"
-                style="background:#ef4444; color:#fff;">↩️ Revert</button>
+                style="background:#ef4444; color:#fff;">↩️ Revert</button>`
+                  : ""
+              }
             </td>`;
+            if (r.status === 0) tr.classList.add("status-zero");
             tbody.appendChild(tr);
           });
       }
@@ -359,6 +437,7 @@
           return;
         }
         currentUser = me;
+        window.currentUser = me;
 
         const fromSel = qs("#purchaseFromType");
         const sourceSel = qs("#sourceSelect");
@@ -370,8 +449,7 @@
             qs("#purchase-panel"),
             qs("#milling-panel"),
             qs("#damage-panel"),
-            qs("#reports-panel"),
-            qs("#settings-panel"),
+            qs("#stock-panel"),
           ];
           tabs.forEach((tab, i) => {
             tab.addEventListener("click", (ev) => {
@@ -383,6 +461,8 @@
                 panels[i].hidden = false;
                 // Load milling data when milling tab is shown
                 if (i === 1) renderPmbMillingTable();
+                // Load stock data when stock tab is shown
+                if (i === 3) renderStockPanel();
               }
             });
           });
@@ -462,34 +542,162 @@
             alert("Please fill all fields");
             return;
           }
+
+          // Store purchase data for OTP verification
+          window.pendingPurchaseData = {
+            fromType: fromType,
+            fromId: fromId,
+            ptype: ptype,
+            qty: qty,
+            price: price,
+          };
+
+          // Fetch farmer/source details to get phone number
           try {
-            const payload = {
-              from: fromId,
-              to: currentUser.user_id,
-              type: ptype,
-              quantity: Number(qty),
-              price: price ? Number(price) : null,
-              datetime: new Date().toISOString(),
-            };
-            const resp = await fetch("/api/transactions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const j = await resp.json().catch(() => ({}));
-            if (!resp.ok) {
-              alert("Failed: " + (j.error || resp.statusText));
+            const res = await fetch(`/api/users/${encodeURIComponent(fromId)}`);
+            const user = res.ok ? await res.json() : null;
+            let phoneNumber = "****";
+            if (user && user.contact_number) {
+              const phone = String(user.contact_number).trim();
+              if (phone.length >= 4) {
+                phoneNumber = phone.slice(-4);
+              }
+            }
+
+            // Show OTP modal with phone number
+            const otpModal = document.getElementById("otp-verification-modal");
+            document.getElementById("otp-phone-digits").textContent =
+              phoneNumber;
+            document.getElementById("otp-input-field").value = "";
+            document.getElementById("otp-verification-form").dataset.action =
+              "purchase";
+            otpModal.hidden = false;
+          } catch (err) {
+            console.error("Failed to fetch user details:", err);
+            // Fallback: show OTP modal anyway
+            const otpModal = document.getElementById("otp-verification-modal");
+            document.getElementById("otp-phone-digits").textContent = "****";
+            document.getElementById("otp-input-field").value = "";
+            document.getElementById("otp-verification-form").dataset.action =
+              "purchase";
+            otpModal.hidden = false;
+          }
+        });
+
+        // OTP verification form handling
+        qs("#otp-verification-form").addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const otpInput = qs("#otp-input-field").value;
+          const otpModal = qs("#otp-verification-modal");
+          const action =
+            qs("#otp-verification-form").dataset.action || "purchase";
+
+          // Verify OTP
+          if (otpInput !== "123456") {
+            alert(
+              "Invalid OTP. " +
+                (action === "revert"
+                  ? "Revert cancelled."
+                  : "Purchase cancelled.")
+            );
+            otpModal.hidden = true;
+            window.pendingPurchaseData = null;
+            window.pendingRevertData = null;
+            return;
+          }
+
+          if (action === "revert") {
+            // Handle revert transaction
+            const data = window.pendingRevertData;
+            if (!data) {
+              alert("No pending revert data");
+              otpModal.hidden = true;
               return;
             }
-            // refresh list
-            purchases = await loadRecent(currentUser.user_id);
-            render();
-            qs("#purchaseForm").reset();
-            await populateSource(fromType);
-          } catch (err) {
-            console.error(err);
-            alert("Error saving transaction");
+
+            otpModal.hidden = true;
+            try {
+              const payload = {
+                from: data.from,
+                to: currentUser.user_id,
+                type: data.type,
+                quantity: data.quantity,
+                price: data.price,
+                datetime: new Date().toISOString(),
+                status: 0, // Revert transaction
+              };
+
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert("Error: " + (j.error || resp.statusText));
+                return;
+              }
+
+              // Reload purchases from server
+              purchases = await loadRecent(currentUser.user_id);
+              render();
+              alert("Purchase reverted successfully");
+              window.pendingRevertData = null;
+            } catch (err) {
+              console.error("Failed to revert purchase:", err);
+              alert("Network error: " + err.message);
+            }
+          } else {
+            // Handle purchase transaction (original logic)
+            const data = window.pendingPurchaseData;
+
+            if (!data) {
+              alert("No pending purchase data");
+              otpModal.hidden = true;
+              return;
+            }
+
+            // OTP verified - proceed with purchase
+            otpModal.hidden = true;
+            try {
+              const payload = {
+                from: data.fromId,
+                to: currentUser.user_id,
+                type: data.ptype,
+                quantity: Number(data.qty),
+                price: data.price ? Number(data.price) : null,
+                datetime: new Date().toISOString(),
+              };
+              const resp = await fetch("/api/transactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              const j = await resp.json().catch(() => ({}));
+              if (!resp.ok) {
+                alert("Failed: " + (j.error || resp.statusText));
+                return;
+              }
+              // refresh list
+              purchases = await loadRecent(currentUser.user_id);
+              render();
+              qs("#purchaseForm").reset();
+              await populateSource(data.fromType);
+              alert("Purchase recorded successfully!");
+              window.pendingPurchaseData = null;
+            } catch (err) {
+              console.error(err);
+              alert("Error saving transaction");
+            }
           }
+        });
+
+        // Close OTP modal button
+        qs("#close-otp-modal").addEventListener("click", () => {
+          qs("#otp-verification-modal").hidden = true;
+          window.pendingPurchaseData = null;
+          window.pendingRevertData = null;
         });
 
         // Damage form handling
@@ -640,6 +848,12 @@
             const hashDisplay = d.block_hash
               ? String(d.block_hash).slice(0, 12) + "..."
               : "Not available";
+
+            // Highlight revert reason rows
+            if (d.reason === "revert") {
+              tr.classList.add("revert-row");
+            }
+
             tr.innerHTML = `<td>${new Date(
               displayDate
             ).toLocaleString()}</td><td>${escapeHtml(
@@ -647,15 +861,32 @@
             )}</td><td>${escapeHtml(d.quantity)}</td><td>${escapeHtml(
               d.reason
             )}</td><td title="${d.block_hash || ""}">${hashDisplay}</td><td>
-              <button class="btn revert-damage-btn" data-id="${escapeHtml(
+              <button class="btn view-damage-btn" data-id="${escapeHtml(
                 d.id
-              )}" data-kind="paddy" data-qty="${escapeHtml(
-              d.quantity
-            )}" data-paddy-type="${escapeHtml(
+              )}" data-kind="paddy" data-type="${escapeHtml(
               d.paddy_type
-            )}" data-user-id="${escapeHtml(
-              d.user_id
-            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+            )}" data-quantity="${escapeHtml(
+              d.quantity
+            )}" data-reason="${escapeHtml(d.reason)}" data-date="${escapeHtml(
+              displayDate
+            )}" data-transaction-hash="${
+              d.transaction_hash || ""
+            }" data-block-number="${d.block_number || ""}" data-block-hash="${
+              d.block_hash || ""
+            }">View</button>
+              ${
+                d.reason !== "revert"
+                  ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
+                      d.id
+                    )}" data-kind="paddy" data-qty="${escapeHtml(
+                      d.quantity
+                    )}" data-paddy-type="${escapeHtml(
+                      d.paddy_type
+                    )}" data-user-id="${escapeHtml(
+                      d.user_id
+                    )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+                  : ""
+              }
             </td>`;
             dBody.appendChild(tr);
           });
@@ -681,6 +912,12 @@
             const hashDisplay = d.block_hash
               ? String(d.block_hash).slice(0, 12) + "..."
               : "Not available";
+
+            // Highlight revert reason rows
+            if (d.reason === "revert") {
+              tr.classList.add("revert-row");
+            }
+
             tr.innerHTML = `<td>${new Date(
               displayDate
             ).toLocaleString()}</td><td>${escapeHtml(
@@ -688,15 +925,32 @@
             )}</td><td>${escapeHtml(d.quantity)}</td><td>${escapeHtml(
               d.reason
             )}</td><td title="${d.block_hash || ""}">${hashDisplay}</td><td>
-              <button class="btn revert-damage-btn" data-id="${escapeHtml(
+              <button class="btn view-damage-btn" data-id="${escapeHtml(
                 d.id
-              )}" data-kind="rice" data-qty="${escapeHtml(
-              d.quantity
-            )}" data-paddy-type="${escapeHtml(
+              )}" data-kind="rice" data-type="${escapeHtml(
               d.paddy_type || d.rice_type
-            )}" data-user-id="${escapeHtml(
-              d.user_id
-            )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>
+            )}" data-quantity="${escapeHtml(
+              d.quantity
+            )}" data-reason="${escapeHtml(d.reason)}" data-date="${escapeHtml(
+              displayDate
+            )}" data-transaction-hash="${
+              d.transaction_hash || ""
+            }" data-block-number="${d.block_number || ""}" data-block-hash="${
+              d.block_hash || ""
+            }">View</button>
+              ${
+                d.reason !== "revert"
+                  ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
+                      d.id
+                    )}" data-kind="rice" data-qty="${escapeHtml(
+                      d.quantity
+                    )}" data-paddy-type="${escapeHtml(
+                      d.paddy_type || d.rice_type
+                    )}" data-user-id="${escapeHtml(
+                      d.user_id
+                    )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+                  : ""
+              }
             </td>`;
             dBody.appendChild(tr);
           });
@@ -732,6 +986,12 @@
             const millerName = userMap[r.miller_id] || r.miller_id;
             const tr = document.createElement("tr");
             const displayDate = r.milling_date || r.created_at;
+
+            // Highlight reverted milling records (status === 0)
+            if (r.status === 0) {
+              tr.classList.add("status-zero");
+            }
+
             tr.innerHTML = `<td>${new Date(
               displayDate
             ).toLocaleDateString()}</td>
@@ -740,9 +1000,39 @@
                           <td>${inputQty.toFixed(2)}</td>
                           <td>${outputQty.toFixed(2)}</td>
                           <td>${yield_percent}%</td>
-                          <td title="${
-                            r.block_hash || ""
-                          }">${hashDisplay}</td>`;
+                          <td title="${r.block_hash || ""}">${hashDisplay}</td>
+                          <td><button class="btn view-milling-btn" data-id="${escapeHtml(
+                            r.id
+                          )}" data-miller="${escapeHtml(
+              millerName
+            )}" data-paddy-type="${escapeHtml(
+              r.paddy_type
+            )}" data-input="${inputQty.toFixed(
+              2
+            )}" data-output="${outputQty.toFixed(
+              2
+            )}" data-yield="${yield_percent}" data-drying-duration="${(
+              r.drying_duration || 0
+            ).toFixed(1)}" data-date="${escapeHtml(
+              displayDate
+            )}" data-block-hash="${
+              r.block_hash || ""
+            }" data-transaction-hash="${
+              r.transaction_hash || ""
+            }" data-block-number="${r.block_number || ""}">View</button>
+                          ${
+                            r.status !== 0
+                              ? `<button class="btn revert-milling-btn" data-id="${
+                                  r.id
+                                }" data-miller="${escapeHtml(
+                                  millerName
+                                )}" data-paddy-type="${escapeHtml(
+                                  r.paddy_type
+                                )}" data-input="${inputQty.toFixed(
+                                  2
+                                )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+                              : ""
+                          }</td>`;
             tbody.appendChild(tr);
           });
         } catch (e) {
@@ -773,6 +1063,100 @@
           pPanel.hidden = true;
           await renderRiceDamageTable();
         });
+      }
+
+      async function renderStockPanel() {
+        try {
+          const paddyList = qs("#paddyStockList");
+          const riceList = qs("#riceStockList");
+
+          // Get current user ID
+          const me = await fetchCurrentUser();
+          const userId = me ? me.user_id : null;
+
+          if (!userId) {
+            paddyList.innerHTML = "<p class='error'>User not authenticated</p>";
+            riceList.innerHTML = "<p class='error'>User not authenticated</p>";
+            return;
+          }
+
+          // Fetch paddy stock data - filtered by current user from stock table
+          const paddyRes = await fetch(
+            `/api/stock_by_type?kind=paddy&user_id=${encodeURIComponent(
+              userId
+            )}`
+          );
+          const paddyData = paddyRes.ok ? await paddyRes.json() : [];
+
+          // Fetch rice stock data - filtered by current user from rice_stock table
+          const riceRes = await fetch(
+            `/api/stock_by_type?kind=rice&user_id=${encodeURIComponent(userId)}`
+          );
+          const riceData = riceRes.ok ? await riceRes.json() : [];
+
+          // Render Paddy Stock
+          paddyList.innerHTML = "";
+          if (!paddyData || paddyData.length === 0) {
+            paddyList.innerHTML =
+              "<p class='no-data'>No paddy stock available</p>";
+          } else {
+            paddyData.forEach((stock) => {
+              const item = document.createElement("div");
+              item.className = "stock-item";
+              const quantity = parseFloat(
+                stock.quantity || stock.amount || 0
+              ).toFixed(2);
+              item.innerHTML = `
+                <div class="stock-item-header">
+                  <span class="stock-item-name">${escapeHtml(
+                    stock.type || stock.paddy_type || "Unknown"
+                  )}</span>
+                  <span class="stock-quantity">${quantity} kg</span>
+                </div>
+                <div class="stock-item-details">
+                  <p><strong>Available Stock:</strong> ${quantity} kg</p>
+                </div>
+              `;
+              paddyList.appendChild(item);
+            });
+          }
+
+          // Render Rice Stock
+          riceList.innerHTML = "";
+          if (!riceData || riceData.length === 0) {
+            riceList.innerHTML =
+              "<p class='no-data'>No rice stock available</p>";
+          } else {
+            riceData.forEach((stock) => {
+              const item = document.createElement("div");
+              item.className = "stock-item";
+              const quantity = parseFloat(
+                stock.quantity || stock.amount || 0
+              ).toFixed(2);
+              item.innerHTML = `
+                <div class="stock-item-header">
+                  <span class="stock-item-name">${escapeHtml(
+                    stock.type ||
+                      stock.paddy_type ||
+                      stock.rice_type ||
+                      "Unknown"
+                  )}</span>
+                  <span class="stock-quantity">${quantity} kg</span>
+                </div>
+                <div class="stock-item-details">
+                  <p><strong>Available Stock:</strong> ${quantity} kg</p>
+                </div>
+              `;
+              riceList.appendChild(item);
+            });
+          }
+        } catch (e) {
+          console.error("Failed to load stock data:", e);
+          qs("#paddyStockList").innerHTML =
+            "<p class='error'>Failed to load paddy stock</p>";
+          qs("#riceStockList").innerHTML =
+            "<p class='error'>Failed to load rice stock</p>";
+        }
       }
 
       // Revert damage handler
@@ -837,6 +1221,52 @@
 
       // Event delegation for view/update purchase buttons
       document.addEventListener("click", async (e) => {
+        // View Damage
+        if (e.target.classList.contains("view-damage-btn")) {
+          const btn = e.target;
+          const modal = qs("#viewDamageModal");
+          qs("#viewDamageType").textContent = btn.dataset.type || "N/A";
+          qs("#viewDamageKind").textContent = (
+            btn.dataset.kind || ""
+          ).toUpperCase();
+          qs("#viewDamageQuantity").textContent = btn.dataset.quantity || "0";
+          qs("#viewDamageReason").textContent = btn.dataset.reason || "N/A";
+          qs("#viewDamageDateTime").textContent = btn.dataset.date
+            ? new Date(btn.dataset.date).toLocaleString()
+            : "";
+          qs("#viewDamageTransactionHash").textContent =
+            btn.dataset.transactionHash || "Not available";
+          qs("#viewDamageBlockNumber").textContent =
+            btn.dataset.blockNumber || "Not available";
+          qs("#viewDamageBlockHash").textContent =
+            btn.dataset.blockHash || "Not available";
+          modal.hidden = false;
+        }
+
+        // View Milling
+        if (e.target.classList.contains("view-milling-btn")) {
+          const btn = e.target;
+          const modal = qs("#viewMillingModal");
+          qs("#viewMillingMiller").textContent = btn.dataset.miller || "N/A";
+          qs("#viewMillingPaddyType").textContent =
+            btn.dataset.paddyType || "N/A";
+          qs("#viewMillingInput").textContent = btn.dataset.input || "0";
+          qs("#viewMillingOutput").textContent = btn.dataset.output || "0";
+          qs("#viewMillingYield").textContent = btn.dataset.yield || "0";
+          qs("#viewMillingDryingDuration").textContent =
+            btn.dataset.dryingDuration || "0";
+          qs("#viewMillingDate").textContent = btn.dataset.date
+            ? new Date(btn.dataset.date).toLocaleString()
+            : "";
+          qs("#viewMillingTransactionHash").textContent =
+            btn.dataset.transactionHash || "Not available";
+          qs("#viewMillingBlockNumber").textContent =
+            btn.dataset.blockNumber || "Not available";
+          qs("#viewMillingBlockHash").textContent =
+            btn.dataset.blockHash || "Not available";
+          modal.hidden = false;
+        }
+
         // View Purchase
         if (e.target.classList.contains("view-purchase-btn")) {
           const btn = e.target;
@@ -865,51 +1295,98 @@
           const quantity = parseFloat(btn.dataset.quantity) || 0;
           const price = parseFloat(btn.dataset.price) || 0;
 
+          // Store revert data for OTP verification
+          window.pendingRevertData = {
+            from: from,
+            type: type,
+            quantity: quantity,
+            price: price,
+          };
+
+          // Fetch farmer/source details to get phone number
+          (async () => {
+            try {
+              const res = await fetch(`/api/users/${encodeURIComponent(from)}`);
+              const user = res.ok ? await res.json() : null;
+              let phoneNumber = "****";
+              if (user && user.contact_number) {
+                const phone = String(user.contact_number).trim();
+                if (phone.length >= 4) {
+                  phoneNumber = phone.slice(-4);
+                }
+              }
+
+              // Show OTP modal for revert verification with phone number
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent =
+                phoneNumber;
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.hidden = false;
+            } catch (err) {
+              console.error("Failed to fetch user details:", err);
+              // Fallback: show OTP modal anyway
+              const otpModal = document.getElementById(
+                "otp-verification-modal"
+              );
+              document.getElementById("otp-phone-digits").textContent = "****";
+              document.getElementById("otp-input-field").value = "";
+              document.getElementById("otp-verification-form").dataset.action =
+                "revert";
+              otpModal.hidden = false;
+            }
+          })();
+          return;
+        }
+
+        // Revert milling record
+        if (e.target.classList.contains("revert-milling-btn")) {
+          const btn = e.target;
+          const id = btn.dataset.id;
+
           if (
             !confirm(
-              `Revert purchase of ${quantity} kg ${type} from ${from}? This will create a reversal with status=0.`
+              `Revert milling record for ${btn.dataset.paddyType} (${btn.dataset.input} kg)?`
             )
           ) {
             return;
           }
 
           try {
-            const to = currentUser ? currentUser.user_id : "";
-            const payload = {
-              from: from,
-              to: to,
-              type: type,
-              quantity: quantity,
-              price: price,
-              datetime: new Date().toISOString(),
-              status: 0, // Revert transaction
-            };
-
-            const res = await fetch("/api/transactions", {
+            const res = await fetch(`/api/milling/${id}/revert`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
             });
 
             const result = await res.json();
             if (res.ok && result.ok) {
-              alert("Purchase reverted successfully");
-              // Reload purchases from server
-              purchases = await loadRecent(currentUser.user_id);
-              render();
+              alert("Milling record reverted successfully");
+              // Reload milling table
+              await renderPmbMillingTable();
             } else {
-              alert("Error: " + (result.error || "Failed to revert purchase"));
+              alert(
+                "Error: " + (result.error || "Failed to revert milling record")
+              );
             }
           } catch (err) {
-            console.error("Failed to revert purchase:", err);
+            console.error("Failed to revert milling record:", err);
             alert("Network error: " + err.message);
           }
           return;
         }
 
         // Close buttons (delegated) - works even if modal elements are after this script
+        if (e.target && e.target.id === "closeViewDamage") {
+          qs("#viewDamageModal").hidden = true;
+        }
         if (e.target && e.target.id === "closeViewPurchase") {
           qs("#viewPurchaseModal").hidden = true;
+        }
+        if (e.target && e.target.id === "closeViewMilling") {
+          qs("#viewMillingModal").hidden = true;
         }
         if (e.target && e.target.id === "closeUpdatePurchase") {
           qs("#updatePurchaseModal").hidden = true;
@@ -917,8 +1394,16 @@
       });
 
       // Close modal handlers
+      qs("#closeViewDamage")?.addEventListener("click", () => {
+        qs("#viewDamageModal").hidden = true;
+      });
+
       qs("#closeViewPurchase")?.addEventListener("click", () => {
         qs("#viewPurchaseModal").hidden = true;
+      });
+
+      qs("#closeViewMilling")?.addEventListener("click", () => {
+        qs("#viewMillingModal").hidden = true;
       });
 
       qs("#closeUpdatePurchase")?.addEventListener("click", () => {
@@ -960,6 +1445,61 @@
       });
     </script>
 
+    <!-- View Damage Modal -->
+    <div id="viewDamageModal" class="modal" hidden>
+      <div class="modal-content">
+        <h3>Damage Details</h3>
+        <p><strong>Kind:</strong> <span id="viewDamageKind"></span></p>
+        <p><strong>Type:</strong> <span id="viewDamageType"></span></p>
+        <p>
+          <strong>Quantity:</strong> <span id="viewDamageQuantity"></span> kg
+        </p>
+        <p><strong>Reason:</strong> <span id="viewDamageReason"></span></p>
+        <p><strong>Date/Time:</strong> <span id="viewDamageDateTime"></span></p>
+        <p>
+          <strong>Transaction Hash:</strong>
+        </p>
+        <div
+          id="viewDamageTransactionHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
+        <p style="margin-top: 12px">
+          <strong>Block Number:</strong>
+          <span id="viewDamageBlockNumber"></span>
+        </p>
+        <p>
+          <strong>Block Hash:</strong>
+        </p>
+        <div
+          id="viewDamageBlockHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
+        <div class="modal-actions">
+          <button id="closeViewDamage" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- View Purchase Modal -->
     <div id="viewPurchaseModal" class="modal" hidden>
       <div class="modal-content">
@@ -995,10 +1535,87 @@
         </p>
         <p>
           <strong>Transaction Hash:</strong>
-          <span id="viewPurchaseTxHash"></span>
         </p>
+        <div
+          id="viewPurchaseTxHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
         <div class="modal-actions">
           <button id="closeViewPurchase" class="btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Milling Modal -->
+    <div id="viewMillingModal" class="modal" hidden>
+      <div class="modal-content">
+        <h3>Milling Details</h3>
+        <p><strong>Miller:</strong> <span id="viewMillingMiller"></span></p>
+        <p>
+          <strong>Paddy Type:</strong> <span id="viewMillingPaddyType"></span>
+        </p>
+        <p>
+          <strong>Input Paddy:</strong> <span id="viewMillingInput"></span> kg
+        </p>
+        <p>
+          <strong>Output Rice:</strong> <span id="viewMillingOutput"></span> kg
+        </p>
+        <p><strong>Yield:</strong> <span id="viewMillingYield"></span>%</p>
+        <p>
+          <strong>Drying Duration:</strong>
+          <span id="viewMillingDryingDuration"></span> days
+        </p>
+        <p><strong>Date:</strong> <span id="viewMillingDate"></span></p>
+        <p>
+          <strong>Transaction Hash:</strong>
+        </p>
+        <div
+          id="viewMillingTransactionHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
+        <p style="margin-top: 12px">
+          <strong>Block Number:</strong>
+          <span id="viewMillingBlockNumber"></span>
+        </p>
+        <p>
+          <strong>Block Hash:</strong>
+        </p>
+        <div
+          id="viewMillingBlockHash"
+          style="
+            white-space: nowrap;
+            overflow: auto;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 100%;
+          "
+        >
+          Not available
+        </div>
+        <div class="modal-actions">
+          <button id="closeViewMilling" class="btn">Close</button>
         </div>
       </div>
     </div>
@@ -1020,6 +1637,38 @@
           <div class="modal-actions">
             <button type="submit" class="btn primary">Update</button>
             <button type="button" id="closeUpdatePurchase" class="btn">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otp-verification-modal" class="modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🔐 OTP Verification</h3>
+        </div>
+        <form id="otp-verification-form">
+          <p style="margin: 16px 0; color: #666">
+            OTP sent to farmer's phone ending with
+            <strong id="otp-phone-digits">****</strong>
+          </p>
+          <div class="form-group">
+            <label for="otp-input-field">Enter OTP</label>
+            <input
+              type="password"
+              id="otp-input-field"
+              placeholder="Enter 6-digit OTP"
+              maxlength="6"
+              required
+              style="font-size: 18px; text-align: center; letter-spacing: 4px"
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">✓ Verify</button>
+            <button type="button" id="close-otp-modal" class="btn">
               Cancel
             </button>
           </div>

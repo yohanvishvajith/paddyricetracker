@@ -1,0 +1,3703 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inspector Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #f3f4f6;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      h1 {
+        color: #1f2937;
+        border-bottom: 3px solid #667eea;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+      }
+      .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .logout-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+      }
+      .logout-btn:hover {
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+        transform: translateY(-2px);
+      }
+      .tab-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        background: white;
+        padding: 8px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+      .tab-btn {
+        padding: 12px 32px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: transparent;
+        color: #6b7280;
+      }
+      .tab-btn:hover {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      .tab-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header-section">
+        <h1>🔍 Inspector Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-container">
+        <button
+          class="tab-btn active"
+          onclick="switchTab('paddy')"
+          id="paddy-tab"
+        >
+          🌾 Paddy
+        </button>
+        <button class="tab-btn" onclick="switchTab('rice')" id="rice-tab">
+          🍚 Rice
+        </button>
+      </div>
+
+      <!-- Paddy Content -->
+      <div id="paddy-content" class="tab-content active">
+        <!-- Farmer Contribution Lookup Section -->
+        <div
+          style="
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 16px;
+              gap: 10px;
+            "
+          >
+            <div style="font-size: 24px">👨‍🌾</div>
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+              "
+            >
+              Farmer Contribution Lookup
+            </h3>
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr auto;
+              gap: 16px;
+              margin-bottom: 20px;
+              align-items: end;
+            "
+          >
+            <div>
+              <label
+                for="farmer-lookup-select"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Select Farmer
+              </label>
+              <select
+                id="farmer-lookup-select"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  font-weight: 500;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              >
+                <option value="">-- Select a farmer --</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="farmer-lookup-date-from"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                From Date
+              </label>
+              <input
+                type="date"
+                id="farmer-lookup-date-from"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              />
+            </div>
+
+            <div>
+              <label
+                for="farmer-lookup-date-to"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                To Date
+              </label>
+              <input
+                type="date"
+                id="farmer-lookup-date-to"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              />
+            </div>
+
+            <button
+              id="farmer-lookup-btn"
+              style="
+                padding: 10px 24px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+                white-space: nowrap;
+              "
+              onmouseover="this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.6)'; this.style.transform='translateY(-2px)';"
+              onmouseout="this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.4)'; this.style.transform='translateY(0)';"
+            >
+              🔍 Lookup
+            </button>
+          </div>
+
+          <!-- Farmer Lookup Results -->
+          <div
+            id="farmer-lookup-results"
+            style="display: none; margin-top: 20px"
+          >
+            <div
+              style="
+                background-color: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
+              <h4
+                style="
+                  margin-top: 0;
+                  margin-bottom: 16px;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Farmer Contribution Summary
+              </h4>
+
+              <!-- Summary Stats -->
+              <div
+                id="farmer-summary-stats"
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                  gap: 16px;
+                  margin-bottom: 24px;
+                "
+              >
+                <!-- Stats will be populated here -->
+              </div>
+
+              <!-- Paddy Type Breakdown Table -->
+              <h4
+                style="
+                  margin-top: 20px;
+                  margin-bottom: 12px;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Paddy Type Breakdown
+              </h4>
+              <div style="overflow-x: auto">
+                <table
+                  id="farmer-paddy-breakdown-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #f3f4f6;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Paddy Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        To Collector (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        To Miller (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        To PMB (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Total (kg)
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="farmer-paddy-tbody">
+                    <!-- Paddy type rows will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- All Transactions -->
+              <h4
+                style="
+                  margin-top: 24px;
+                  margin-bottom: 12px;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                All Related Transactions
+              </h4>
+              <div style="overflow-x: auto">
+                <table
+                  id="farmer-transactions-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #f3f4f6;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Date
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Paddy Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        To Party
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Quantity (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: center;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="farmer-transactions-tbody">
+                    <!-- Transaction rows will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Damage Detection Section -->
+        <div
+          style="
+            margin-top: 32px;
+            background: linear-gradient(135deg, #ffe0e0 0%, #ffb3b3 100%);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 16px;
+              gap: 10px;
+            "
+          >
+            <div style="font-size: 24px">⚠️</div>
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+              "
+            >
+              Damage Detection
+            </h3>
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr 1fr auto;
+              gap: 16px;
+              margin-bottom: 20px;
+              align-items: end;
+            "
+          >
+            <div>
+              <label
+                for="damage-user-type-select"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                User Type
+              </label>
+              <select
+                id="damage-user-type-select"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  font-weight: 500;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              >
+                <option value="">-- All Types --</option>
+                <option value="COLLECTER">Collecter</option>
+                <option value="MILLER">Miller</option>
+                <option value="PMB">PMB</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="damage-paddy-type-select"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Paddy Type
+              </label>
+              <select
+                id="damage-paddy-type-select"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  font-weight: 500;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              >
+                <option value="">-- All Types --</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                for="damage-date-from"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                From Date
+              </label>
+              <input
+                type="date"
+                id="damage-date-from"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              />
+            </div>
+
+            <div>
+              <label
+                for="damage-date-to"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                To Date
+              </label>
+              <input
+                type="date"
+                id="damage-date-to"
+                style="
+                  padding: 10px 14px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  width: 100%;
+                  font-size: 14px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+              />
+            </div>
+
+            <button
+              id="damage-lookup-btn"
+              style="
+                padding: 10px 24px;
+                background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+                white-space: nowrap;
+              "
+              onmouseover="this.style.boxShadow='0 4px 12px rgba(220, 38, 38, 0.6)'; this.style.transform='translateY(-2px)';"
+              onmouseout="this.style.boxShadow='0 2px 8px rgba(220, 38, 38, 0.4)'; this.style.transform='translateY(0)';"
+            >
+              🔍 Search
+            </button>
+          </div>
+
+          <!-- Damage Detection Results -->
+          <div
+            id="damage-lookup-results"
+            style="display: none; margin-top: 20px"
+          >
+            <div
+              style="
+                background-color: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
+              <h4
+                style="
+                  margin-top: 0;
+                  margin-bottom: 16px;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Damage Records (Sorted by Damage Quantity - Ascending)
+              </h4>
+
+              <div style="margin-bottom: 16px">
+                <input
+                  type="text"
+                  id="damage-search-input"
+                  placeholder="🔍 Search by username or name..."
+                  style="
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    width: 100%;
+                    max-width: 400px;
+                    font-size: 14px;
+                    background-color: white;
+                    color: #374151;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                />
+              </div>
+
+              <div style="overflow-x: auto">
+                <table
+                  id="damage-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #f3f4f6;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Date
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        User
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Paddy Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Damage Qty (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Reason
+                      </th>
+                      <th
+                        style="
+                          padding: 12px;
+                          text-align: center;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="damage-tbody">
+                    <!-- Damage records will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div
+                id="damage-no-results"
+                style="
+                  text-align: center;
+                  padding: 40px;
+                  color: #6b7280;
+                  font-size: 16px;
+                "
+              >
+                No damage records found
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Type Stock Distribution by Paddy Type -->
+        <div
+          style="
+            margin-top: 32px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 16px;
+              gap: 10px;
+            "
+          >
+            <div style="font-size: 24px">📊</div>
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+              "
+            >
+              User Type Stock Distribution by Paddy Type
+            </h3>
+          </div>
+
+          <label
+            for="user-type-paddy-filter"
+            style="
+              display: block;
+              margin-bottom: 10px;
+              font-size: 14px;
+              font-weight: 500;
+              color: #4b5563;
+            "
+            >Filter by Paddy Type</label
+          >
+          <select
+            id="user-type-paddy-filter"
+            style="
+              padding: 10px 14px;
+              border-radius: 8px;
+              border: 2px solid #e0e7ff;
+              min-width: 280px;
+              margin-bottom: 16px;
+              font-size: 14px;
+              background-color: white;
+              font-weight: 500;
+              color: #374151;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            "
+            onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+            onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+          >
+            <option value="">All paddy types</option>
+          </select>
+          <div
+            style="
+              height: 400px;
+              width: 90%;
+              margin: 0 auto;
+              position: relative;
+              background-color: white;
+              border-radius: 10px;
+              padding: 16px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            "
+          >
+            <canvas
+              id="user-type-stock-chart"
+              aria-label="User type stock distribution by paddy type"
+            ></canvas>
+          </div>
+        </div>
+
+        <!-- District-based Stock Analysis -->
+        <div
+          style="
+            margin-top: 32px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 16px;
+              gap: 10px;
+            "
+          >
+            <div style="font-size: 24px">🗺️</div>
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+              "
+            >
+              District-based Stock Analysis
+            </h3>
+          </div>
+          <label
+            for="district-paddy-type-select"
+            style="
+              display: block;
+              margin-bottom: 10px;
+              font-size: 14px;
+              font-weight: 500;
+              color: #4b5563;
+            "
+            >Filter by Paddy Type</label
+          >
+          <select
+            id="district-paddy-type-select"
+            style="
+              padding: 10px 14px;
+              border-radius: 8px;
+              border: 2px solid #e0e7ff;
+              min-width: 280px;
+              margin-bottom: 16px;
+              font-size: 14px;
+              background-color: white;
+              font-weight: 500;
+              color: #374151;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            "
+            onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+            onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+          >
+            <option value="">All paddy types</option>
+          </select>
+          <div
+            style="
+              height: 600px;
+              width: 90%;
+              margin: 0 auto;
+              position: relative;
+              background-color: white;
+              border-radius: 10px;
+              padding: 16px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            "
+          >
+            <canvas
+              id="district-chart-analytics"
+              aria-label="Stock by district - Millers and Collectors"
+            ></canvas>
+          </div>
+        </div>
+
+        <!-- User Stock Analysis -->
+        <div
+          style="
+            margin-top: 32px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 20px;
+              gap: 10px;
+            "
+          >
+            <div style="font-size: 24px">👥</div>
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+              "
+            >
+              User Stock Analysis
+            </h3>
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              align-items: flex-end;
+              margin-bottom: 20px;
+              flex-wrap: wrap;
+            "
+          >
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
+              "
+            >
+              User Type
+              <select
+                id="filter-user-type"
+                style="
+                  padding: 8px 12px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  font-size: 13px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  margin-top: 4px;
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+              >
+                <option value="collect">Collectors</option>
+                <option value="miller">Millers</option>
+              </select>
+            </label>
+
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
+              "
+            >
+              Paddy Type
+              <select
+                id="filter-paddy-type"
+                style="
+                  padding: 8px 12px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  font-size: 13px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  margin-top: 4px;
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+              ></select>
+            </label>
+
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
+              "
+            >
+              District (Optional)
+              <select
+                id="filter-district"
+                style="
+                  padding: 8px 12px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  font-size: 13px;
+                  background-color: white;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  margin-top: 4px;
+                "
+                onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+              >
+                <option value="">All Districts</option>
+              </select>
+            </label>
+
+            <label
+              style="
+                display: flex;
+                flex-direction: column;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563;
+              "
+            >
+              Search
+              <input
+                id="filter-search"
+                placeholder="Search by ID or name"
+                style="
+                  padding: 8px 12px;
+                  border-radius: 8px;
+                  border: 2px solid #e0e7ff;
+                  margin-top: 4px;
+                  font-size: 13px;
+                "
+              />
+            </label>
+
+            <button
+              id="filter-refresh"
+              style="
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div
+            style="
+              background-color: white;
+              border-radius: 10px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            "
+          >
+            <table
+              id="user-table"
+              style="width: 100%; border-collapse: collapse; font-size: 14px"
+            >
+              <thead id="user-table-head">
+                <tr
+                  style="
+                    background-color: #f3f4f6;
+                    border-bottom: 2px solid #e5e7eb;
+                  "
+                >
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    User ID
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Name
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    User Type
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    District
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="user-table-body">
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+            <div
+              id="user-table-pagination"
+              style="
+                padding: 12px 16px;
+                background: transparent;
+                display: block;
+                text-align: center;
+              "
+            ></div>
+          </div>
+        </div>
+
+        <!-- Transaction History Section -->
+        <div
+          style="
+            margin-bottom: 32px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <h2
+            style="
+              font-size: 20px;
+              font-weight: 700;
+              margin: 0 0 20px 0;
+              color: #1f2937;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            💱 Transaction History
+          </h2>
+
+          <!-- Filters -->
+          <div
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              gap: 12px;
+              margin-bottom: 20px;
+              align-items: flex-end;
+            "
+          >
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Transaction Type</span
+              >
+              <select
+                id="filter-transaction-type"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  background: white;
+                  min-width: 180px;
+                "
+              >
+                <option value="">All Types</option>
+                <option value="farmer-collector">Farmer → Collector</option>
+                <option value="farmer-miller">Farmer → Miller</option>
+                <option value="collector-miller">Collector → Miller</option>
+                <option value="miller-pmb">Miller → PMB</option>
+                <option value="miller-wholesaler">Miller → Wholesaler</option>
+                <option value="pmb-wholesaler">PMB → Wholesaler</option>
+                <option value="wholesaler-retailer">
+                  Wholesaler → Retailer
+                </option>
+                <option value="retailer-exporter">Retailer → Exporter</option>
+                <option value="retailer-animalfood">
+                  Retailer → Animal Food
+                </option>
+                <option value="retailer-beer">Retailer → Beer</option>
+              </select>
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Paddy Type</span
+              >
+              <select
+                id="filter-tx-paddy-type"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  background: white;
+                  min-width: 150px;
+                "
+              >
+                <option value="">All Paddy Types</option>
+              </select>
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >From Date</span
+              >
+              <input
+                type="date"
+                id="filter-tx-from-date"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                "
+              />
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >To Date</span
+              >
+              <input
+                type="date"
+                id="filter-tx-to-date"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                "
+              />
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Search</span
+              >
+              <input
+                type="text"
+                id="filter-tx-search"
+                placeholder="Search user..."
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  min-width: 150px;
+                "
+              />
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Transaction ID</span
+              >
+              <input
+                type="text"
+                id="filter-tx-id"
+                placeholder="Enter ID..."
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  min-width: 120px;
+                "
+              />
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Price Filter</span
+              >
+              <select
+                id="filter-tx-price"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  background: white;
+                  min-width: 140px;
+                "
+              >
+                <option value="">All Prices</option>
+                <option value="lt-50000">< 50,000</option>
+                <option value="50000-100000">50,000 - 100,000</option>
+                <option value="100000-500000">100,000 - 500,000</option>
+                <option value="gt-500000">> 500,000</option>
+              </select>
+            </label>
+
+            <button
+              id="filter-tx-refresh"
+              style="
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div
+            style="
+              background-color: white;
+              border-radius: 10px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            "
+          >
+            <table
+              id="transaction-table"
+              style="width: 100%; border-collapse: collapse; font-size: 14px"
+            >
+              <thead id="transaction-table-head">
+                <tr
+                  style="
+                    background-color: #f3f4f6;
+                    border-bottom: 2px solid #e5e7eb;
+                  "
+                >
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    ID
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    From
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    To
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Paddy Type
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: right;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Quantity (kg)
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: right;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Price
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Date/Time
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: center;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="transaction-table-body">
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+            <div
+              id="transaction-table-pagination"
+              style="
+                padding: 12px 16px;
+                background: transparent;
+                display: block;
+                text-align: center;
+              "
+            ></div>
+          </div>
+        </div>
+      </div>
+      <!-- End Paddy Content -->
+
+      <!-- Rice Content -->
+      <div id="rice-content" class="tab-content">
+        <div
+          style="
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            text-align: center;
+          "
+        >
+          <div style="font-size: 64px; margin-bottom: 24px">🍚</div>
+          <h2
+            style="
+              font-size: 28px;
+              font-weight: 700;
+              color: #1f2937;
+              margin: 0 0 12px 0;
+            "
+          >
+            Rice Analytics
+          </h2>
+          <p style="font-size: 16px; color: #6b7280; margin: 0">
+            To be implemented
+          </p>
+          <div
+            style="
+              margin-top: 24px;
+              padding: 16px;
+              background: #f3f4f6;
+              border-radius: 8px;
+              display: inline-block;
+            "
+          >
+            <span style="font-size: 14px; color: #9ca3af">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction Detail Modal -->
+      <div
+        id="transaction-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              Transaction Details
+            </h3>
+            <button
+              id="transaction-modal-close"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Transaction ID</label
+              >
+              <p
+                id="tx-detail-id"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >From</label
+              >
+              <p
+                id="tx-detail-from"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >To</label
+              >
+              <p
+                id="tx-detail-to"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Paddy Type</label
+              >
+              <p
+                id="tx-detail-type"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Quantity (kg)</label
+              >
+              <p
+                id="tx-detail-qty"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Price</label
+              >
+              <p
+                id="tx-detail-price"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Date/Time</label
+              >
+              <p
+                id="tx-detail-datetime"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div>
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Block Number</label
+              >
+              <p
+                id="tx-detail-block-number"
+                style="margin: 0; font-size: 14px; color: #374151"
+              ></p>
+            </div>
+            <div style="grid-column: span 2">
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Transaction Hash</label
+              >
+              <p
+                id="tx-detail-tx-hash"
+                style="
+                  margin: 0;
+                  font-size: 12px;
+                  color: #374151;
+                  word-break: break-all;
+                "
+              ></p>
+            </div>
+            <div style="grid-column: span 2">
+              <label
+                style="
+                  display: block;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #6b7280;
+                  margin-bottom: 4px;
+                "
+                >Block Hash</label
+              >
+              <p
+                id="tx-detail-block-hash"
+                style="
+                  margin: 0;
+                  font-size: 12px;
+                  color: #374151;
+                  word-break: break-all;
+                "
+              ></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Detail Modal -->
+      <div
+        id="stock-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              id="stock-modal-title"
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              Stock Details
+            </h3>
+            <button
+              id="stock-modal-close"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+          <table
+            style="width: 100%; border-collapse: collapse; font-size: 14px"
+          >
+            <thead>
+              <tr
+                style="
+                  background-color: #f3f4f6;
+                  border-bottom: 2px solid #e5e7eb;
+                "
+              >
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: left;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  Paddy Type
+                </th>
+                <th
+                  style="
+                    padding: 12px;
+                    text-align: right;
+                    font-weight: 600;
+                    color: #374151;
+                  "
+                >
+                  Amount (kg)
+                </th>
+              </tr>
+            </thead>
+            <tbody id="stock-detail-body">
+              <!-- Stock details will be populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Damage Detail Modal -->
+      <div
+        id="damage-detail-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              Damage Details
+            </h3>
+            <button
+              id="damage-modal-close"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+
+          <div
+            id="damage-detail-content"
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+          >
+            <!-- Details will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Farmer Transaction Detail Modal -->
+      <div
+        id="farmer-transaction-modal"
+        style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        "
+      >
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 12px;
+            "
+          >
+            <h3
+              style="
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #1f2937;
+              "
+            >
+              Transaction Details
+            </h3>
+            <button
+              id="farmer-transaction-modal-close"
+              style="
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #6b7280;
+              "
+            >
+              ✕
+            </button>
+          </div>
+
+          <div
+            id="farmer-transaction-detail-content"
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+          window.location.href = "/";
+        }
+      }
+
+      function switchTab(tab) {
+        // Update tab buttons
+        document
+          .getElementById("paddy-tab")
+          .classList.toggle("active", tab === "paddy");
+        document
+          .getElementById("rice-tab")
+          .classList.toggle("active", tab === "rice");
+
+        // Update content visibility
+        document
+          .getElementById("paddy-content")
+          .classList.toggle("active", tab === "paddy");
+        document
+          .getElementById("rice-content")
+          .classList.toggle("active", tab === "rice");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Populate farmer dropdown
+        async function populateFarmerLookupSelect() {
+          try {
+            const sel = document.getElementById("farmer-lookup-select");
+            if (!sel) return;
+            const res = await fetch("/api/users?user_type=FARMER");
+            if (!res.ok) return;
+            const farmers = await res.json();
+            sel.innerHTML = '<option value="">-- Select a farmer --</option>';
+            farmers.forEach((f) => {
+              const o = document.createElement("option");
+              o.value = f.id || "";
+              o.textContent = (f.full_name || "") + " (" + (f.id || "") + ")";
+              sel.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate farmer lookup select", e);
+          }
+        }
+
+        populateFarmerLookupSelect();
+
+        // Farmer lookup function
+        async function performFarmerLookup() {
+          try {
+            const farmerId = document.getElementById(
+              "farmer-lookup-select"
+            ).value;
+            const dateFrom = document.getElementById(
+              "farmer-lookup-date-from"
+            ).value;
+            const dateTo = document.getElementById(
+              "farmer-lookup-date-to"
+            ).value;
+
+            if (!farmerId) {
+              alert("Please select a farmer");
+              return;
+            }
+
+            // Build API URL
+            let url = `/api/farmer_lookup?farmer_id=${encodeURIComponent(
+              farmerId
+            )}`;
+            if (dateFrom) url += `&date_from=${encodeURIComponent(dateFrom)}`;
+            if (dateTo) url += `&date_to=${encodeURIComponent(dateTo)}`;
+
+            // Fetch data from API
+            const res = await fetch(url);
+
+            if (!res.ok) {
+              const errorText = await res.text();
+              throw new Error(
+                `Failed to fetch farmer data (${res.status}): ${errorText}`
+              );
+            }
+
+            const data = await res.json();
+            displayFarmerLookupResults(data);
+          } catch (e) {
+            console.error("Farmer lookup error:", e);
+            alert("Error fetching farmer data: " + e.message);
+          }
+        }
+
+        // Display farmer lookup results
+        function displayFarmerLookupResults(data) {
+          const resultsDiv = document.getElementById("farmer-lookup-results");
+          const summaryStats = document.getElementById("farmer-summary-stats");
+          const paddyTbody = document.getElementById("farmer-paddy-tbody");
+          const transactionsTbody = document.getElementById(
+            "farmer-transactions-tbody"
+          );
+
+          resultsDiv.style.display = "block";
+
+          // Display summary stats
+          const farmer = data.farmer || {};
+          const summary = data.summary || {};
+
+          summaryStats.innerHTML = `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 16px; border-radius: 10px; color: white;">
+              <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Farmer Name</div>
+              <div style="font-size: 18px; font-weight: 700;">${
+                farmer.full_name || "N/A"
+              }</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 16px; border-radius: 10px; color: white;">
+              <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Total Paddy Sold</div>
+              <div style="font-size: 18px; font-weight: 700;">${(
+                summary.total_paddy || 0
+              ).toFixed(2)} kg</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 16px; border-radius: 10px; color: white;">
+              <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">To Collector</div>
+              <div style="font-size: 18px; font-weight: 700;">${(
+                summary.to_collector || 0
+              ).toFixed(2)} kg</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 16px; border-radius: 10px; color: white;">
+              <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">To Miller</div>
+              <div style="font-size: 18px; font-weight: 700;">${(
+                summary.to_miller || 0
+              ).toFixed(2)} kg</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 16px; border-radius: 10px; color: white;">
+              <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">To PMB</div>
+              <div style="font-size: 18px; font-weight: 700;">${(
+                summary.to_pmb || 0
+              ).toFixed(2)} kg</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 16px; border-radius: 10px; color: #374151;">
+              <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">Field Area</div>
+              <div style="font-size: 18px; font-weight: 700;">${(
+                farmer.field_area || 0
+              ).toFixed(2)} acres</div>
+            </div>
+          `;
+
+          // Display paddy type breakdown
+          const breakdown = data.breakdown || [];
+          paddyTbody.innerHTML = "";
+
+          let totalCollector = 0,
+            totalMiller = 0,
+            totalPmb = 0,
+            totalAll = 0;
+
+          breakdown.forEach((row) => {
+            totalCollector += row.to_collector || 0;
+            totalMiller += row.to_miller || 0;
+            totalPmb += row.to_pmb || 0;
+            totalAll += row.total || 0;
+
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid #e5e7eb";
+            tr.innerHTML = `
+              <td style="padding: 12px; color: #374151;">${
+                row.paddy_type || ""
+              }</td>
+              <td style="padding: 12px; color: #374151; text-align: right;">${(
+                row.to_collector || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; color: #374151; text-align: right;">${(
+                row.to_miller || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; color: #374151; text-align: right;">${(
+                row.to_pmb || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; color: #374151; text-align: right; font-weight: 600;">${(
+                row.total || 0
+              ).toFixed(2)}</td>
+            `;
+            paddyTbody.appendChild(tr);
+          });
+
+          // Add totals row
+          const totalTr = document.createElement("tr");
+          totalTr.style.backgroundColor = "#f3f4f6";
+          totalTr.style.fontWeight = "700";
+          totalTr.innerHTML = `
+            <td style="padding: 12px; color: #1f2937;">TOTAL</td>
+            <td style="padding: 12px; color: #1f2937; text-align: right;">${totalCollector.toFixed(
+              2
+            )}</td>
+            <td style="padding: 12px; color: #1f2937; text-align: right;">${totalMiller.toFixed(
+              2
+            )}</td>
+            <td style="padding: 12px; color: #1f2937; text-align: right;">${totalPmb.toFixed(
+              2
+            )}</td>
+            <td style="padding: 12px; color: #1f2937; text-align: right;">${totalAll.toFixed(
+              2
+            )}</td>
+          `;
+          paddyTbody.appendChild(totalTr);
+
+          // Display transactions
+          const transactions = data.transactions || [];
+          transactionsTbody.innerHTML = "";
+
+          transactions.forEach((tx) => {
+            const txDate = tx.date
+              ? new Date(tx.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "";
+
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid #e5e7eb";
+
+            // Check if reverted
+            if (tx.is_reverted) {
+              tr.style.backgroundColor = "#fee2e2";
+              tr.style.opacity = "0.7";
+            }
+
+            tr.innerHTML = `
+              <td style="padding: 12px; color: #374151;">${txDate}</td>
+              <td style="padding: 12px; color: #374151;">${
+                tx.paddy_type || ""
+              }${
+              tx.is_reverted
+                ? ' <span style="color: #dc2626; font-weight: 600;">(REVERTED)</span>'
+                : ""
+            }</td>
+              <td style="padding: 12px; color: #374151;">${
+                tx.to_party || ""
+              } (${tx.to_party_id || ""})</td>
+              <td style="padding: 12px; color: #374151; text-align: right;">${(
+                tx.quantity || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; text-align: center;">
+                <button
+                  style="
+                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                    color: white;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+                  "
+                  data-tx='${JSON.stringify(tx)}'
+                  onmouseover="this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.5)'; this.style.transform='scale(1.05)';"
+                  onmouseout="this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.3)'; this.style.transform='scale(1)';"
+                >
+                  View
+                </button>
+              </td>
+            `;
+
+            // Add click handler to View button
+            tr.querySelector("button").addEventListener("click", function () {
+              const txData = JSON.parse(this.getAttribute("data-tx"));
+              showFarmerTransactionModal(txData);
+            });
+
+            transactionsTbody.appendChild(tr);
+          });
+        }
+
+        // Show farmer transaction modal
+        function showFarmerTransactionModal(tx) {
+          const contentDiv = document.getElementById(
+            "farmer-transaction-detail-content"
+          );
+          const modal = document.getElementById("farmer-transaction-modal");
+
+          const txDate = tx.date
+            ? new Date(tx.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "";
+
+          const revertedBadge = tx.is_reverted
+            ? '<span style="color: white; background-color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">REVERTED</span>'
+            : '<span style="color: white; background-color: #10b981; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ACTIVE</span>';
+
+          contentDiv.innerHTML = `
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Date</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${txDate}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Status</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${revertedBadge}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Paddy Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.paddy_type || ""
+              }</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Quantity (kg)</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${(
+                tx.quantity || 0
+              ).toFixed(2)}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Price</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${(
+                tx.price || 0
+              ).toFixed(2)}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Number</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                tx.block_number || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">To Party</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.to_party || ""
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Party ID</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                tx.to_party_id || ""
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Party Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                tx.to_party_type === "COLLECTER"
+                  ? "Collector"
+                  : tx.to_party_type === "MILLER"
+                  ? "Miller"
+                  : tx.to_party_type || ""
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Transaction Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                tx.transaction_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                tx.block_hash || "N/A"
+              }</div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+        }
+
+        // Wire up modal close button
+        const txModalCloseBtn = document.getElementById(
+          "farmer-transaction-modal-close"
+        );
+        if (txModalCloseBtn) {
+          txModalCloseBtn.addEventListener("click", function () {
+            document.getElementById("farmer-transaction-modal").style.display =
+              "none";
+          });
+        }
+
+        // Close modal on background click
+        const txModal = document.getElementById("farmer-transaction-modal");
+        if (txModal) {
+          txModal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.style.display = "none";
+            }
+          });
+        }
+
+        // Wire up farmer lookup button
+        const farmerLookupBtn = document.getElementById("farmer-lookup-btn");
+        if (farmerLookupBtn) {
+          farmerLookupBtn.addEventListener("click", performFarmerLookup);
+        }
+
+        // ========== DAMAGE DETECTION FUNCTIONS ==========
+
+        // Populate paddy type select for damage detection
+        async function populateDamagePaddySelect() {
+          try {
+            const sel = document.getElementById("damage-paddy-type-select");
+            if (!sel) return;
+            const res = await fetch("/api/paddy_types");
+            if (!res.ok) return;
+            const types = await res.json();
+            sel.innerHTML = '<option value="">-- All Types --</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || "";
+              o.textContent = t.name || "";
+              sel.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate damage paddy select", e);
+          }
+        }
+
+        populateDamagePaddySelect();
+
+        // Perform damage lookup
+        async function performDamageLookup() {
+          try {
+            const userType = document.getElementById(
+              "damage-user-type-select"
+            ).value;
+            const paddyType = document.getElementById(
+              "damage-paddy-type-select"
+            ).value;
+            const dateFrom = document.getElementById("damage-date-from").value;
+            const dateTo = document.getElementById("damage-date-to").value;
+
+            // Build API URL
+            let url = `/api/damage_lookup?`;
+            const params = [];
+            if (userType)
+              params.push(`user_type=${encodeURIComponent(userType)}`);
+            if (paddyType)
+              params.push(`paddy_type=${encodeURIComponent(paddyType)}`);
+            if (dateFrom)
+              params.push(`date_from=${encodeURIComponent(dateFrom)}`);
+            if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
+            url += params.join("&");
+
+            // Fetch data from API
+            const res = await fetch(url);
+
+            if (!res.ok) {
+              const errorText = await res.text();
+              throw new Error(
+                `Failed to fetch damage data (${res.status}): ${errorText}`
+              );
+            }
+
+            const data = await res.json();
+            displayDamageLookupResults(data);
+          } catch (e) {
+            console.error("Damage lookup error:", e);
+            alert("Error fetching damage data: " + e.message);
+          }
+        }
+
+        // Display damage lookup results
+        function displayDamageLookupResults(data) {
+          const resultsDiv = document.getElementById("damage-lookup-results");
+          const tableBody = document.getElementById("damage-tbody");
+          const noResults = document.getElementById("damage-no-results");
+
+          resultsDiv.style.display = "block";
+
+          if (!data || data.length === 0) {
+            tableBody.innerHTML = "";
+            noResults.style.display = "block";
+            return;
+          }
+
+          noResults.style.display = "none";
+
+          // Sort by quantity ascending
+          data.sort((a, b) => (a.quantity || 0) - (b.quantity || 0));
+
+          tableBody.innerHTML = "";
+          data.forEach((dmg) => {
+            const dateObj = dmg.damage_date ? new Date(dmg.damage_date) : null;
+            const dmgDate = dateObj
+              ? dateObj.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }) +
+                " " +
+                dateObj.toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })
+              : "";
+
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid #e5e7eb";
+            tr.style.transition = "all 0.3s ease";
+            tr.onmouseover = function () {
+              this.style.backgroundColor = "#f9fafb";
+            };
+            tr.onmouseout = function () {
+              this.style.backgroundColor = "transparent";
+            };
+
+            const userDisplay = dmg.user_name
+              ? `${dmg.user_name} (${dmg.user_id})`
+              : dmg.user_id || "N/A";
+
+            const reasonText = dmg.reason || "";
+            const reasonColor =
+              reasonText.toLowerCase() === "revert" ? "#dc2626" : "#374151";
+            const reasonStyle =
+              reasonText.toLowerCase() === "revert" ? "font-weight: 600;" : "";
+
+            tr.innerHTML = `
+              <td style="padding: 12px; color: #374151;">${dmgDate}</td>
+              <td style="padding: 12px; color: #374151;">${userDisplay}</td>
+              <td style="padding: 12px; color: #374151;">${
+                dmg.paddy_type || ""
+              }</td>
+              <td style="padding: 12px; color: #374151; text-align: right; font-weight: 600;">${(
+                dmg.quantity || 0
+              ).toFixed(2)}</td>
+              <td style="padding: 12px; color: ${reasonColor}; ${reasonStyle}">${reasonText}</td>
+              <td style="padding: 12px; text-align: center;">
+                <button
+                  style="
+                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                    color: white;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+                  "
+                  data-dmg='${JSON.stringify(dmg)}'
+                  onmouseover="this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.5)'; this.style.transform='scale(1.05)';"
+                  onmouseout="this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.3)'; this.style.transform='scale(1)';"
+                >
+                  View
+                </button>
+              </td>
+            `;
+
+            // Add click handler to View button
+            tr.querySelector("button").addEventListener("click", function () {
+              const dmgObj = JSON.parse(this.getAttribute("data-dmg"));
+              showDamageModal(dmgObj);
+            });
+
+            tableBody.appendChild(tr);
+          });
+        }
+
+        // Show damage detail modal
+        function showDamageModal(dmg) {
+          const contentDiv = document.getElementById("damage-detail-content");
+          const modal = document.getElementById("damage-detail-modal");
+
+          const dateObj = dmg.damage_date ? new Date(dmg.damage_date) : null;
+          const dmgDate = dateObj
+            ? dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }) +
+              " " +
+              dateObj.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })
+            : "";
+
+          const userDisplay = dmg.user_name
+            ? `${dmg.user_name} (${dmg.user_id})`
+            : dmg.user_id || "N/A";
+
+          contentDiv.innerHTML = `
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Date</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${dmgDate}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">User</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${userDisplay}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Paddy Type</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                dmg.paddy_type || ""
+              }</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Damage Quantity (kg)</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${(
+                dmg.quantity || 0
+              ).toFixed(2)}</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Reason</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600;">${
+                dmg.reason || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Transaction Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                dmg.transaction_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Hash</div>
+              <div style="font-size: 12px; color: #1f2937; font-weight: 500; font-family: monospace; word-break: break-all; background-color: #f3f4f6; padding: 8px; border-radius: 4px;">${
+                dmg.block_hash || "N/A"
+              }</div>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <div style="font-size: 12px; color: #6b7280; font-weight: 500;">Block Number</div>
+              <div style="font-size: 16px; color: #1f2937; font-weight: 600; font-family: monospace;">${
+                dmg.block_number || "N/A"
+              }</div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+        }
+
+        // Wire up damage modal close button
+        const dmgModalCloseBtn = document.getElementById("damage-modal-close");
+        if (dmgModalCloseBtn) {
+          dmgModalCloseBtn.addEventListener("click", function () {
+            document.getElementById("damage-detail-modal").style.display =
+              "none";
+          });
+        }
+
+        // Close damage modal on background click
+        const dmgModal = document.getElementById("damage-detail-modal");
+        if (dmgModal) {
+          dmgModal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.style.display = "none";
+            }
+          });
+        }
+
+        // Damage search filter function
+        function filterDamageTableBySearch() {
+          const searchInput = document.getElementById("damage-search-input");
+          const tableBody = document.getElementById("damage-tbody");
+          const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+
+          if (!tableBody) return;
+
+          const rows = tableBody.querySelectorAll("tr");
+          rows.forEach((row) => {
+            const userCell = row.querySelector("td:nth-child(2)");
+            if (userCell) {
+              const userName = userCell.textContent.toLowerCase();
+              if (searchTerm === "" || userName.includes(searchTerm)) {
+                row.style.display = "";
+              } else {
+                row.style.display = "none";
+              }
+            }
+          });
+        }
+
+        // Wire up damage search input
+        const damageSearchInput = document.getElementById(
+          "damage-search-input"
+        );
+        if (damageSearchInput) {
+          damageSearchInput.addEventListener(
+            "keyup",
+            filterDamageTableBySearch
+          );
+          damageSearchInput.addEventListener(
+            "change",
+            filterDamageTableBySearch
+          );
+        }
+
+        // Wire up damage lookup button
+        const damageBtn = document.getElementById("damage-lookup-btn");
+        if (damageBtn) {
+          damageBtn.addEventListener("click", performDamageLookup);
+        }
+
+        // ========== USER TYPE STOCK DISTRIBUTION CHART ==========
+
+        // Ensure Chart.js is loaded
+        async function ensureChartJs() {
+          if (typeof Chart !== "undefined") return;
+          return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/chart.js";
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        // Fetch paddy types
+        async function fetchPaddyTypes() {
+          const res = await fetch("/api/paddy_types");
+          if (!res.ok) return [];
+          return await res.json();
+        }
+
+        // User type stock distribution chart
+        let userTypeStockChart = null;
+        async function loadUserTypeStockChart() {
+          try {
+            const sel = document.getElementById("user-type-paddy-filter");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_by_user_type";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+
+            const paddyTypes = d.paddy_types || [];
+            const userData = d.data || {};
+
+            const userTypes = ["MILLER", "COLLECTER", "PMB"];
+            const colors = {
+              MILLER: "rgba(245,158,11,0.8)",
+              COLLECTER: "rgba(11,132,255,0.8)",
+              PMB: "rgba(16,185,129,0.8)",
+            };
+            const borderColors = {
+              MILLER: "rgba(245,158,11,1)",
+              COLLECTER: "rgba(11,132,255,1)",
+              PMB: "rgba(16,185,129,1)",
+            };
+
+            let datasets = [];
+            userTypes.forEach((ut) => {
+              const data = paddyTypes.map(
+                (pt) => (userData[ut] && userData[ut][pt]) || 0
+              );
+              datasets.push({
+                label:
+                  ut === "COLLECTER"
+                    ? "Collectors"
+                    : ut === "PMB"
+                    ? "PMB"
+                    : "Millers",
+                data: data,
+                backgroundColor: colors[ut],
+                borderColor: borderColors[ut],
+                borderWidth: 1,
+              });
+            });
+
+            await ensureChartJs();
+            const ctx = document
+              .getElementById("user-type-stock-chart")
+              .getContext("2d");
+
+            if (userTypeStockChart) {
+              userTypeStockChart.data.labels = paddyTypes;
+              userTypeStockChart.data.datasets = datasets;
+              userTypeStockChart.update();
+              return;
+            }
+
+            userTypeStockChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: paddyTypes,
+                datasets: datasets,
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: {
+                    title: { display: true, text: "Paddy Type" },
+                    stacked: false,
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Total Stock (kg)" },
+                    stacked: false,
+                  },
+                },
+                plugins: {
+                  legend: { display: true, position: "bottom" },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          context.parsed.y.toFixed(2) +
+                          " kg"
+                        );
+                      },
+                    },
+                  },
+                },
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
+                barPercentage: 0.8,
+                categoryPercentage: 0.9,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load user type stock chart", e);
+          }
+        }
+
+        // Populate user type paddy filter
+        async function populateUserTypePaddyFilter() {
+          try {
+            const sel = document.getElementById("user-type-paddy-filter");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", loadUserTypeStockChart);
+          } catch (e) {
+            console.error("Failed to populate user type paddy filter", e);
+          }
+        }
+
+        // Initialize user type stock chart
+        populateUserTypePaddyFilter();
+        loadUserTypeStockChart();
+
+        // ========== DISTRICT-BASED STOCK ANALYSIS CHART ==========
+
+        let districtChart = null;
+        async function loadDistrictChart() {
+          try {
+            const sel = document.getElementById("district-paddy-type-select");
+            const ptype = sel ? sel.value : "";
+            let url = "/api/stock_by_district";
+            if (ptype) url += "?paddy_type=" + encodeURIComponent(ptype);
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const d = await res.json();
+            const districts = d.districts || [];
+
+            await ensureChartJs();
+            const ctx = document
+              .getElementById("district-chart-analytics")
+              .getContext("2d");
+
+            let datasets = [];
+
+            // Check if we have a single paddy type or multiple types breakdown
+            if (d.paddy_types && d.data) {
+              // Multiple paddy types - create datasets for each paddy type for both collectors and millers
+              const paddyTypes = d.paddy_types || [];
+              const colors = [
+                { bg: "rgba(11,132,255,0.7)", border: "rgba(11,132,255,1)" },
+                { bg: "rgba(245,158,11,0.7)", border: "rgba(245,158,11,1)" },
+                { bg: "rgba(16,185,129,0.7)", border: "rgba(16,185,129,1)" },
+                { bg: "rgba(239,68,68,0.7)", border: "rgba(239,68,68,1)" },
+                { bg: "rgba(139,92,246,0.7)", border: "rgba(139,92,246,1)" },
+                { bg: "rgba(236,72,153,0.7)", border: "rgba(236,72,153,1)" },
+              ];
+
+              paddyTypes.forEach((pt, idx) => {
+                const colorIdx = idx % colors.length;
+                // Collector dataset for this paddy type
+                datasets.push({
+                  label: `Collectors - ${pt} (kg)`,
+                  data: d.data.collectors[pt] || [],
+                  backgroundColor: colors[colorIdx].bg,
+                  borderColor: colors[colorIdx].border,
+                  borderWidth: 1,
+                });
+                // Miller dataset for this paddy type
+                datasets.push({
+                  label: `Millers - ${pt} (kg)`,
+                  data: d.data.millers[pt] || [],
+                  backgroundColor: colors[colorIdx].bg.replace("0.7", "0.5"),
+                  borderColor: colors[colorIdx].border,
+                  borderWidth: 1,
+                  borderDash: [5, 5],
+                });
+              });
+            } else {
+              // Single paddy type selected
+              const collectorsData = d.collectors || [];
+              const millersData = d.millers || [];
+
+              datasets = [
+                {
+                  label: "Collectors (kg)",
+                  data: collectorsData,
+                  backgroundColor: "rgba(11,132,255,0.7)",
+                  borderColor: "rgba(11,132,255,1)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Millers (kg)",
+                  data: millersData,
+                  backgroundColor: "rgba(245,158,11,0.7)",
+                  borderColor: "rgba(245,158,11,1)",
+                  borderWidth: 1,
+                },
+              ];
+            }
+
+            if (districtChart) {
+              districtChart.data.labels = districts;
+              districtChart.data.datasets = datasets;
+              districtChart.update();
+              return;
+            }
+
+            districtChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: districts,
+                datasets: datasets,
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                  x: {
+                    title: { display: true, text: "District" },
+                    stacked: false,
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Stock (kg)" },
+                    stacked: false,
+                  },
+                },
+                plugins: {
+                  legend: { display: true, position: "bottom" },
+                  tooltip: {
+                    mode: "index",
+                    intersect: false,
+                    callbacks: {
+                      label: function (context) {
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          context.parsed.y.toFixed(2) +
+                          " kg"
+                        );
+                      },
+                    },
+                  },
+                },
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
+                barPercentage: 0.8,
+                categoryPercentage: 0.9,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to load district chart", e);
+          }
+        }
+
+        // Populate district paddy type filter
+        async function populateDistrictPaddyFilter() {
+          try {
+            const sel = document.getElementById("district-paddy-type-select");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            sel.innerHTML = '<option value="">All paddy types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+            sel.addEventListener("change", loadDistrictChart);
+          } catch (e) {
+            console.error("Failed to populate district paddy filter", e);
+          }
+        }
+
+        // Initialize district chart
+        populateDistrictPaddyFilter();
+        loadDistrictChart();
+
+        // ========== USER STOCK ANALYSIS ==========
+
+        // Escape HTML helper
+        function escapeHtml(str) {
+          if (!str) return "";
+          return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        // Populate filter paddy type
+        async function populateFilterPaddyType() {
+          try {
+            const sel = document.getElementById("filter-paddy-type");
+            if (!sel) return;
+            const types = await fetchPaddyTypes();
+            sel.innerHTML = '<option value="">All Paddy Types</option>';
+            types.forEach((t) => {
+              const o = document.createElement("option");
+              o.value = t.name || t.id || "";
+              o.textContent = t.name || String(t.id || "");
+              sel.appendChild(o);
+            });
+          } catch (e) {
+            console.error("Failed to populate filter paddy type", e);
+          }
+        }
+
+        // Populate filter district
+        function populateFilterDistrict() {
+          const filterDistrict = document.getElementById("filter-district");
+          if (!filterDistrict) return;
+
+          const districts = [
+            "Ampara",
+            "Anuradhapura",
+            "Badulla",
+            "Batticaloa",
+            "Colombo",
+            "Galle",
+            "Gampaha",
+            "Hambantota",
+            "Jaffna",
+            "Kalutara",
+            "Kandy",
+            "Kegalle",
+            "Kilinochchi",
+            "Kurunegala",
+            "Mannar",
+            "Matale",
+            "Matara",
+            "Monaragala",
+            "Mullaitivu",
+            "Nuwara Eliya",
+            "Polonnaruwa",
+            "Puttalam",
+            "Ratnapura",
+            "Trincomalee",
+            "Vavuniya",
+          ];
+
+          districts.forEach((d) => {
+            const o = document.createElement("option");
+            o.value = d;
+            o.textContent = d;
+            filterDistrict.appendChild(o);
+          });
+        }
+
+        // Initialize filters
+        populateFilterPaddyType();
+        populateFilterDistrict();
+
+        const filterUserType = document.getElementById("filter-user-type");
+        const filterPaddyType = document.getElementById("filter-paddy-type");
+        const filterDistrict = document.getElementById("filter-district");
+        const filterRefresh = document.getElementById("filter-refresh");
+        const filterSearch = document.getElementById("filter-search");
+
+        if (filterUserType) {
+          filterUserType.addEventListener("change", loadStockUsers);
+        }
+        if (filterPaddyType) {
+          filterPaddyType.addEventListener("change", loadStockUsers);
+        }
+        if (filterDistrict) {
+          filterDistrict.addEventListener("change", loadStockUsers);
+        }
+        if (filterRefresh) {
+          filterRefresh.addEventListener("click", loadStockUsers);
+        }
+        if (filterSearch) {
+          filterSearch.addEventListener("keyup", applyUserSearch);
+          filterSearch.addEventListener("change", applyUserSearch);
+        }
+
+        // Stock modal references
+        const stockModal = document.getElementById("stock-modal");
+        const stockDetailBody = document.getElementById("stock-detail-body");
+        const stockModalClose = document.getElementById("stock-modal-close");
+
+        if (stockModalClose) {
+          stockModalClose.addEventListener("click", function () {
+            stockModal.style.display = "none";
+          });
+        }
+
+        if (stockModal) {
+          stockModal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              this.style.display = "none";
+            }
+          });
+        }
+
+        // Load users - stock view only
+        async function loadStockUsers() {
+          try {
+            const userType = filterUserType ? filterUserType.value : "collect";
+            const ptype = filterPaddyType ? filterPaddyType.value : "";
+            const district = filterDistrict ? filterDistrict.value : "";
+
+            // Update table headers for stock view
+            const tableHead = document.getElementById("user-table-head");
+            tableHead.innerHTML = `<tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+              <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">ID</th>
+              <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">Name</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151;">Quantity (kg)</th>
+              <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151;">District</th>
+            </tr>`;
+
+            let url = `/api/stock_by_user?user_type=${encodeURIComponent(
+              userType
+            )}`;
+            if (ptype) url += `&paddy_type=${encodeURIComponent(ptype)}`;
+            if (district) url += `&district=${encodeURIComponent(district)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Failed to load data");
+            let rows = await res.json();
+
+            // Sort by quantity in descending order
+            rows.sort((a, b) => (b.total || 0) - (a.total || 0));
+
+            const userTableBody = document.getElementById("user-table-body");
+            if (!userTableBody) {
+              console.error("User table tbody not found");
+              return;
+            }
+
+            userTableBody.innerHTML = "";
+            rows.forEach((r) => {
+              const tr = document.createElement("tr");
+              tr.dataset.userId = r.id || "";
+              tr.style.borderBottom = "1px solid #e5e7eb";
+              tr.style.cursor = "pointer";
+              tr.style.transition = "all 0.3s ease";
+              tr.onmouseover = function () {
+                this.style.backgroundColor = "#f9fafb";
+              };
+              tr.onmouseout = function () {
+                this.style.backgroundColor = "transparent";
+              };
+              tr.innerHTML = `
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  r.id || ""
+                )}</td>
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  r.full_name || ""
+                )}</td>
+                <td style="padding: 12px; color: #374151; text-align: right; font-weight: 600;">${Number(
+                  r.total || 0
+                ).toFixed(3)}</td>
+                <td style="padding: 12px; color: #374151;">${escapeHtml(
+                  r.district || ""
+                )}</td>
+              `;
+              tr.addEventListener("click", async () => {
+                try {
+                  const uid = tr.dataset.userId;
+                  const resp = await fetch(
+                    `/api/stock_user_detail?user_id=${encodeURIComponent(uid)}`
+                  );
+                  if (!resp.ok) throw new Error("Failed to load details");
+                  const detail = await resp.json();
+                  stockDetailBody.innerHTML = "";
+                  detail.forEach((d) => {
+                    const row = document.createElement("tr");
+                    row.style.borderBottom = "1px solid #e5e7eb";
+                    row.innerHTML = `
+                      <td style="padding: 12px; color: #374151;">${escapeHtml(
+                        d.type || ""
+                      )}</td>
+                      <td style="padding: 12px; color: #374151; text-align: right; font-weight: 600;">${Number(
+                        d.amount || 0
+                      ).toFixed(3)}</td>
+                    `;
+                    stockDetailBody.appendChild(row);
+                  });
+                  const title = document.getElementById("stock-modal-title");
+                  title.textContent = `Stock details - ${r.full_name || r.id}`;
+                  stockModal.style.display = "flex";
+                } catch (err) {
+                  console.error("Failed to load user stock detail", err);
+                  alert("Failed to load user stock details");
+                }
+              });
+              userTableBody.appendChild(tr);
+            });
+
+            // Initialize pagination
+            setupTablePagination("#user-table", 10);
+          } catch (err) {
+            console.error("Failed loading users", err);
+          }
+        }
+
+        // Client-side pagination helper
+        function setupTablePagination(tableSelector, rowsPerPage = 10) {
+          const table = document.querySelector(tableSelector);
+          if (!table) return;
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          const pagination = document.getElementById("user-table-pagination");
+          if (!pagination) return;
+
+          const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+            (r) => r.style.display !== "none"
+          );
+          const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+          let currentPage = 1;
+
+          function showPage(page) {
+            currentPage = Math.min(Math.max(1, page), totalPages);
+            rows.forEach((r, i) => {
+              r.style.display =
+                i >= (currentPage - 1) * rowsPerPage &&
+                i < currentPage * rowsPerPage
+                  ? ""
+                  : "none";
+            });
+            renderPageNumbers();
+          }
+
+          function renderPageNumbers() {
+            pagination.innerHTML = "";
+            const wrap = document.createElement("div");
+            wrap.style.display = "inline-flex";
+            wrap.style.gap = "8px";
+            wrap.style.alignItems = "center";
+
+            for (let p = 1; p <= totalPages; p++) {
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.textContent = p;
+              btn.style.padding = "6px 10px";
+              btn.style.borderRadius = "6px";
+              btn.style.border = "1px solid #e5e7eb";
+              btn.style.cursor = "pointer";
+              btn.style.background = p === currentPage ? "#4f46e5" : "white";
+              btn.style.color = p === currentPage ? "white" : "#374151";
+              btn.addEventListener("click", () => showPage(p));
+              wrap.appendChild(btn);
+            }
+
+            pagination.appendChild(wrap);
+          }
+
+          showPage(1);
+        }
+
+        // Apply search filtering for user table
+        function applyUserSearch() {
+          const tbl = document.querySelector("#user-table");
+          if (!tbl) return;
+          const qel = document.getElementById("filter-search");
+          const q = qel ? (qel.value || "").trim().toLowerCase() : "";
+          const tbody = tbl.querySelector("tbody");
+          if (!tbody) return;
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          if (!q) {
+            rows.forEach((r) => (r.style.display = ""));
+          } else {
+            rows.forEach((r) => {
+              const cols = r.querySelectorAll("td");
+              const id = ((cols[0] && cols[0].textContent) || "")
+                .trim()
+                .toLowerCase();
+              const name = ((cols[1] && cols[1].textContent) || "")
+                .trim()
+                .toLowerCase();
+              const match = id.includes(q) || name.includes(q);
+              r.style.display = match ? "" : "none";
+            });
+          }
+          setupTablePagination("#user-table", 10);
+        }
+
+        // ==================== TRANSACTION HISTORY ====================
+
+        // Populate transaction paddy type filter
+        async function populateTransactionPaddyFilter() {
+          try {
+            const res = await fetch("/api/paddy_types");
+            if (!res.ok) return;
+            const types = await res.json();
+            const sel = document.getElementById("filter-tx-paddy-type");
+            if (!sel) return;
+            sel.innerHTML = '<option value="">All Paddy Types</option>';
+            types.forEach((t) => {
+              const opt = document.createElement("option");
+              opt.value = t.id;
+              opt.textContent = t.paddy_type;
+              sel.appendChild(opt);
+            });
+          } catch (e) {
+            console.error("Error loading paddy types:", e);
+          }
+        }
+
+        // Transaction modal handlers
+        const transactionModal = document.getElementById("transaction-modal");
+        const transactionModalClose = document.getElementById(
+          "transaction-modal-close"
+        );
+        if (transactionModalClose) {
+          transactionModalClose.addEventListener("click", () => {
+            transactionModal.style.display = "none";
+          });
+        }
+        if (transactionModal) {
+          transactionModal.addEventListener("click", (e) => {
+            if (e.target === transactionModal) {
+              transactionModal.style.display = "none";
+            }
+          });
+        }
+
+        // Load transactions
+        async function loadTransactions() {
+          try {
+            const res = await fetch("/api/transactions");
+            if (!res.ok) return;
+            const transactions = await res.json();
+
+            // Get users for name lookup
+            const usersRes = await fetch("/api/users");
+            const users = usersRes.ok ? await usersRes.json() : [];
+            const userMap = {};
+            users.forEach((u) => {
+              userMap[u.user_id] = u.name;
+            });
+
+            const tbody = document.getElementById("transaction-table-body");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            // Get filter values
+            const txType =
+              document.getElementById("filter-transaction-type")?.value || "";
+            const paddyType =
+              document.getElementById("filter-tx-paddy-type")?.value || "";
+            const fromDate =
+              document.getElementById("filter-tx-from-date")?.value || "";
+            const toDate =
+              document.getElementById("filter-tx-to-date")?.value || "";
+            const search = (
+              document.getElementById("filter-tx-search")?.value || ""
+            )
+              .toLowerCase()
+              .trim();
+            const txIdFilter = (
+              document.getElementById("filter-tx-id")?.value || ""
+            ).trim();
+            const priceFilter =
+              document.getElementById("filter-tx-price")?.value || "";
+
+            // User type mapping for transaction filtering
+            const typeMap = {
+              "farmer-collector": { from: "FARMER", to: "COLLECTER" },
+              "farmer-miller": { from: "FARMER", to: "MILLER" },
+              "collector-miller": { from: "COLLECTER", to: "MILLER" },
+              "miller-pmb": { from: "MILLER", to: "PMB" },
+              "miller-wholesaler": { from: "MILLER", to: "WHOLESALER" },
+              "pmb-wholesaler": { from: "PMB", to: "WHOLESALER" },
+              "wholesaler-retailer": { from: "WHOLESALER", to: "RETAILER" },
+              "retailer-exporter": { from: "RETAILER", to: "EXPORTER" },
+              "retailer-animalfood": { from: "RETAILER", to: "ANIMALFOOD" },
+              "retailer-beer": { from: "RETAILER", to: "BEER" },
+            };
+
+            // Filter transactions
+            let filtered = transactions.filter((tx) => {
+              // Transaction type filter
+              if (txType) {
+                const mapping = typeMap[txType];
+                if (mapping) {
+                  if (
+                    tx.from_type !== mapping.from ||
+                    tx.to_type !== mapping.to
+                  ) {
+                    return false;
+                  }
+                }
+              }
+
+              // Paddy type filter
+              if (paddyType && tx.paddy_type_id != paddyType) return false;
+
+              // Date filters
+              if (fromDate) {
+                const txDate = new Date(tx.datetime)
+                  .toISOString()
+                  .split("T")[0];
+                if (txDate < fromDate) return false;
+              }
+              if (toDate) {
+                const txDate = new Date(tx.datetime)
+                  .toISOString()
+                  .split("T")[0];
+                if (txDate > toDate) return false;
+              }
+
+              // Search filter
+              if (search) {
+                const fromName = (userMap[tx.from_id] || "").toLowerCase();
+                const toName = (userMap[tx.to_id] || "").toLowerCase();
+                const fromId = (tx.from_id || "").toLowerCase();
+                const toId = (tx.to_id || "").toLowerCase();
+                if (
+                  !fromName.includes(search) &&
+                  !toName.includes(search) &&
+                  !fromId.includes(search) &&
+                  !toId.includes(search)
+                ) {
+                  return false;
+                }
+              }
+
+              // Transaction ID filter
+              if (
+                txIdFilter &&
+                !String(tx.transaction_id).includes(txIdFilter)
+              ) {
+                return false;
+              }
+
+              // Price filter
+              if (priceFilter) {
+                const price = Number(tx.price) || 0;
+                if (priceFilter === "lt-50000" && price >= 50000) return false;
+                if (
+                  priceFilter === "50000-100000" &&
+                  (price < 50000 || price > 100000)
+                )
+                  return false;
+                if (
+                  priceFilter === "100000-500000" &&
+                  (price < 100000 || price > 500000)
+                )
+                  return false;
+                if (priceFilter === "gt-500000" && price <= 500000)
+                  return false;
+              }
+
+              return true;
+            });
+
+            // Render table rows
+            filtered.forEach((tx) => {
+              const fromName = userMap[tx.from_id] || tx.from_id;
+              const toName = userMap[tx.to_id] || tx.to_id;
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #e5e7eb";
+              tr.innerHTML = `
+                <td style="padding: 12px; color: #374151;">${
+                  tx.transaction_id
+                }</td>
+                <td style="padding: 12px; color: #374151;">${fromName}</td>
+                <td style="padding: 12px; color: #374151;">${toName}</td>
+                <td style="padding: 12px; color: #374151;">${
+                  tx.paddy_type || "-"
+                }</td>
+                <td style="padding: 12px; color: #374151; text-align: right;">${Number(
+                  tx.quantity
+                ).toLocaleString()}</td>
+                <td style="padding: 12px; color: #374151; text-align: right;">${
+                  tx.price ? Number(tx.price).toLocaleString() : "-"
+                }</td>
+                <td style="padding: 12px; color: #374151;">${new Date(
+                  tx.datetime
+                ).toLocaleString()}</td>
+                <td style="padding: 12px; text-align: center;">
+                  <button class="view-tx-btn" style="
+                    padding: 6px 12px;
+                    font-size: 13px;
+                    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                  ">View</button>
+                </td>
+              `;
+
+              // View button click handler
+              tr.querySelector(".view-tx-btn").addEventListener("click", () => {
+                document.getElementById("tx-detail-id").textContent =
+                  tx.transaction_id;
+                document.getElementById("tx-detail-from").textContent =
+                  fromName;
+                document.getElementById("tx-detail-to").textContent = toName;
+                document.getElementById("tx-detail-type").textContent =
+                  tx.paddy_type || "-";
+                document.getElementById("tx-detail-qty").textContent =
+                  Number(tx.quantity).toLocaleString() + " kg";
+                document.getElementById("tx-detail-price").textContent =
+                  tx.price ? Number(tx.price).toLocaleString() : "-";
+                document.getElementById("tx-detail-datetime").textContent =
+                  new Date(tx.datetime).toLocaleString();
+                document.getElementById("tx-detail-tx-hash").textContent =
+                  tx.transaction_hash || "-";
+                document.getElementById("tx-detail-block-hash").textContent =
+                  tx.block_hash || "-";
+                document.getElementById("tx-detail-block-number").textContent =
+                  tx.block_number || "-";
+                transactionModal.style.display = "flex";
+              });
+
+              tbody.appendChild(tr);
+            });
+
+            setupTransactionPagination("#transaction-table", 10);
+          } catch (e) {
+            console.error("Error loading transactions:", e);
+          }
+        }
+
+        // Setup pagination for transaction table
+        function setupTransactionPagination(tableSelector, rowsPerPage) {
+          const table = document.querySelector(tableSelector);
+          if (!table) return;
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          const pagination = document.getElementById(
+            "transaction-table-pagination"
+          );
+          if (!pagination) return;
+
+          const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+            (r) => r.style.display !== "none"
+          );
+          const totalPages = Math.max(1, Math.ceil(rows.length / rowsPerPage));
+          let currentPage = 1;
+
+          function showPage(page) {
+            currentPage = Math.min(Math.max(1, page), totalPages);
+            rows.forEach((r, i) => {
+              r.style.display =
+                i >= (currentPage - 1) * rowsPerPage &&
+                i < currentPage * rowsPerPage
+                  ? ""
+                  : "none";
+            });
+            renderPageNumbers();
+          }
+
+          function renderPageNumbers() {
+            pagination.innerHTML = "";
+            const wrap = document.createElement("div");
+            wrap.style.display = "inline-flex";
+            wrap.style.gap = "8px";
+            wrap.style.alignItems = "center";
+
+            for (let p = 1; p <= totalPages; p++) {
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.textContent = p;
+              btn.style.padding = "6px 10px";
+              btn.style.borderRadius = "6px";
+              btn.style.border = "1px solid #e5e7eb";
+              btn.style.cursor = "pointer";
+              btn.style.background = p === currentPage ? "#4f46e5" : "white";
+              btn.style.color = p === currentPage ? "white" : "#374151";
+              btn.addEventListener("click", () => showPage(p));
+              wrap.appendChild(btn);
+            }
+
+            pagination.appendChild(wrap);
+          }
+
+          showPage(1);
+        }
+
+        // Transaction filter event listeners
+        document
+          .getElementById("filter-transaction-type")
+          ?.addEventListener("change", loadTransactions);
+        document
+          .getElementById("filter-tx-paddy-type")
+          ?.addEventListener("change", loadTransactions);
+        document
+          .getElementById("filter-tx-from-date")
+          ?.addEventListener("change", loadTransactions);
+        document
+          .getElementById("filter-tx-to-date")
+          ?.addEventListener("change", loadTransactions);
+        document
+          .getElementById("filter-tx-search")
+          ?.addEventListener("input", loadTransactions);
+        document
+          .getElementById("filter-tx-id")
+          ?.addEventListener("input", loadTransactions);
+        document
+          .getElementById("filter-tx-price")
+          ?.addEventListener("change", loadTransactions);
+        document
+          .getElementById("filter-tx-refresh")
+          ?.addEventListener("click", loadTransactions);
+
+        // Initialize transaction history
+        populateTransactionPaddyFilter();
+        loadTransactions();
+
+        // Load initial stock users
+        loadStockUsers();
+      });
+    </script>
+  </body>
+</html>
