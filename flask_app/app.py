@@ -427,17 +427,47 @@ def init_db():
             quantity DECIMAL(14,3),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            block_id INT,
+            block_hash VARCHAR(255),
+            block_number INT,
+            transaction_hash VARCHAR(255),
             INDEX (user_id),
             INDEX (rice_type)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         '''
         try:
             cursor.execute(create_rice)
+            conn.commit()
         except mysql.connector.Error as e:
             print('Could not create rice table:', e)
-        finally:
-            cursor.close()
-            conn.close()
+
+        # Add blockchain columns if they don't exist
+        try:
+            cursor.execute("ALTER TABLE `rice` ADD COLUMN block_id INT AFTER updated_at")
+            conn.commit()
+        except mysql.connector.Error as e:
+            pass  # Column might already exist
+        
+        try:
+            cursor.execute("ALTER TABLE `rice` ADD COLUMN block_hash VARCHAR(255) AFTER block_id")
+            conn.commit()
+        except mysql.connector.Error as e:
+            pass  # Column might already exist
+        
+        try:
+            cursor.execute("ALTER TABLE `rice` ADD COLUMN block_number INT AFTER block_hash")
+            conn.commit()
+        except mysql.connector.Error as e:
+            pass  # Column might already exist
+        
+        try:
+            cursor.execute("ALTER TABLE `rice` ADD COLUMN transaction_hash VARCHAR(255) AFTER block_number")
+            conn.commit()
+        except mysql.connector.Error as e:
+            pass  # Column might already exist
+        
+        cursor.close()
+        conn.close()
 
         print('Database initialized (database/table ensured).')
     except mysql.connector.Error as err:
@@ -868,12 +898,29 @@ def api_get_initial_rice():
             if float(quantity) < 0:
                 return jsonify({'error': 'Quantity must be non-negative'}), 400
             
+            # Record to blockchain first
+            from blockchain import save_initial_rice_record
+            blockchain_result = save_initial_rice_record(user_id, rice_type, quantity)
+            
             conn = get_connection(MYSQL_DATABASE)
             cursor = conn.cursor()
             
-            # Insert the new initial rice record
-            query = 'INSERT INTO rice (user_id, rice_type, quantity) VALUES (%s, %s, %s)'
-            cursor.execute(query, (user_id, rice_type, float(quantity)))
+            # Insert the new initial rice record with blockchain data
+            if blockchain_result:
+                query = 'INSERT INTO rice (user_id, rice_type, quantity, block_id, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+                cursor.execute(query, (
+                    user_id, 
+                    rice_type, 
+                    float(quantity),
+                    blockchain_result.get('block_id'),
+                    blockchain_result.get('block_hash'),
+                    blockchain_result.get('block_number'),
+                    blockchain_result.get('transaction_hash')
+                ))
+            else:
+                # Still insert even if blockchain fails
+                query = 'INSERT INTO rice (user_id, rice_type, quantity) VALUES (%s, %s, %s)'
+                cursor.execute(query, (user_id, rice_type, float(quantity)))
             
             conn.commit()
             
@@ -906,7 +953,11 @@ def api_get_initial_rice():
                        u.district, 
                        r.rice_type, 
                        r.quantity, 
-                       r.created_at
+                       r.created_at,
+                       r.block_id,
+                       r.block_hash,
+                       r.block_number,
+                       r.transaction_hash
                 FROM rice r
                 JOIN users u ON r.user_id = u.id
                 WHERE u.user_type = %s
@@ -922,7 +973,11 @@ def api_get_initial_rice():
                        u.district, 
                        r.rice_type, 
                        r.quantity, 
-                       r.created_at
+                       r.created_at,
+                       r.block_id,
+                       r.block_hash,
+                       r.block_number,
+                       r.transaction_hash
                 FROM rice r
                 JOIN users u ON r.user_id = u.id
                 WHERE u.user_type IN ('Miller', 'Wholesaler')
@@ -2020,12 +2075,24 @@ def api_get_transactions():
 
 @app.route('/api/paddy_types', methods=['GET'])
 def api_get_paddy_types():
-    """Return list of paddy types from paddy_type table."""
+    """Return list of paddy types that have actual data in rice_stock."""
     try:
         conn = get_connection(MYSQL_DATABASE)
         cur = conn.cursor(dictionary=True)
-        cur.execute('SELECT id, name FROM paddy_type ORDER BY id')
+        # Only return paddy types that exist in rice_stock table
+        cur.execute('''
+            SELECT DISTINCT rs.paddy_type as name
+            FROM rice_stock rs
+            WHERE rs.paddy_type IS NOT NULL AND rs.paddy_type != ''
+            ORDER BY rs.paddy_type
+        ''')
         rows = cur.fetchall()
+        
+        # If no data in rice_stock, get from paddy_type table
+        if not rows:
+            cur.execute('SELECT id, name FROM paddy_type ORDER BY id')
+            rows = cur.fetchall()
+        
         cur.close()
         conn.close()
         return jsonify(rows)
@@ -2044,6 +2111,92 @@ def api_get_rice_types():
         cur.close()
         conn.close()
         return jsonify(rows)
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/rice_transactions', methods=['GET'])
+def api_get_rice_transactions():
+    """Return list of rice transactions with optional filters."""
+    transaction_type = request.args.get('transaction_type')
+    rice_type = request.args.get('rice_type')
+    from_date = request.args.get('from_date')
+    to_date = request.args.get('to_date')
+    search = request.args.get('search')
+    transaction_id = request.args.get('transaction_id')
+    
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        
+        sql = '''
+            SELECT 
+                rt.id,
+                rt.`from`,
+                rt.`to`,
+                rt.rice_type,
+                rt.quantity,
+                rt.price,
+                rt.status,
+                rt.is_reverted,
+                rt.datetime,
+                rt.block_hash,
+                rt.block_number,
+                rt.transaction_hash,
+                u_from.user_type as from_user_type,
+                u_from.full_name as from_full_name,
+                u_to.user_type as to_user_type,
+                u_to.full_name as to_full_name
+            FROM rice_transaction rt
+            LEFT JOIN users u_from ON rt.`from` = u_from.id
+            LEFT JOIN users u_to ON rt.`to` = u_to.id
+            WHERE 1=1
+        '''
+        params = []
+        
+        if transaction_type:
+            # Transaction type format: "from_type-to_type" e.g., "miller-wholesaler"
+            types = transaction_type.split('-')
+            if len(types) == 2:
+                from_type, to_type = types
+                sql += ' AND LOWER(u_from.user_type) LIKE %s AND LOWER(u_to.user_type) LIKE %s'
+                params.append('%' + from_type.lower() + '%')
+                params.append('%' + to_type.lower() + '%')
+        
+        if rice_type:
+            sql += ' AND rt.rice_type = %s'
+            params.append(str(rice_type))
+        
+        if from_date:
+            sql += ' AND DATE(rt.datetime) >= %s'
+            params.append(str(from_date))
+        
+        if to_date:
+            sql += ' AND DATE(rt.datetime) <= %s'
+            params.append(str(to_date))
+        
+        if search:
+            sql += ' AND (rt.`from` LIKE %s OR rt.`to` LIKE %s OR u_from.full_name LIKE %s OR u_to.full_name LIKE %s)'
+            search_pattern = '%' + str(search) + '%'
+            params.extend([search_pattern, search_pattern, search_pattern, search_pattern])
+        
+        if transaction_id:
+            sql += ' AND rt.id LIKE %s'
+            params.append('%' + str(transaction_id) + '%')
+        
+        sql += ' ORDER BY rt.datetime DESC, rt.id DESC'
+        
+        if params:
+            cur.execute(sql, params)
+        else:
+            cur.execute(sql)
+        
+        rows = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify(rows if rows else [])
     except mysql.connector.Error as err:
         return jsonify({'error': str(err)}), 500
 
@@ -3918,19 +4071,58 @@ def api_add_milling():
 
 @app.route('/api/milling', methods=['GET'])
 def api_get_milling():
-    """Return milling records. Optional query param `miller_id` to filter by miller.
+    """Return milling records with optional filters for miller_id, paddy_type, from_date, and to_date.
+    Query params: miller_id, paddy_type, from_date (YYYY-MM-DD), to_date (YYYY-MM-DD)
     """
     miller_id_param = request.args.get('miller_id')
+    paddy_type_param = request.args.get('paddy_type')
+    from_date_param = request.args.get('from_date')
+    to_date_param = request.args.get('to_date')
+    
     try:
         conn = get_connection(MYSQL_DATABASE)
         cur = conn.cursor(dictionary=True)
+        
+        # Build dynamic SQL query with filters
+        sql = 'SELECT id, miller_id, paddy_type, input_paddy, output_rice, milling_date, drying_duration, status, block_hash, block_number, transaction_hash, created_at FROM `milling` WHERE 1=1'
+        params = []
+        
+        # Add miller_id filter (check both miller_id and users.full_name for flexibility)
         if miller_id_param:
-            sql = 'SELECT id, miller_id, paddy_type, input_paddy, output_rice, milling_date, drying_duration, status, block_hash, block_number, transaction_hash, created_at FROM `milling` WHERE miller_id = %s ORDER BY id DESC'
-            cur.execute(sql, (str(miller_id_param),))
+            sql += ' AND (miller_id = %s OR miller_id IN (SELECT id FROM users WHERE full_name LIKE %s OR id LIKE %s))'
+            params.extend([str(miller_id_param), f'%{miller_id_param}%', f'%{miller_id_param}%'])
+        
+        # Add paddy_type filter
+        if paddy_type_param:
+            sql += ' AND paddy_type = %s'
+            params.append(str(paddy_type_param))
+        
+        # Add date range filters
+        if from_date_param:
+            sql += ' AND milling_date >= %s'
+            params.append(str(from_date_param))
+        
+        if to_date_param:
+            sql += ' AND milling_date <= %s'
+            params.append(str(to_date_param))
+        
+        sql += ' ORDER BY milling_date DESC, id DESC LIMIT 500'
+        
+        if params:
+            cur.execute(sql, params)
         else:
-            sql = 'SELECT id, miller_id, paddy_type, input_paddy, output_rice, milling_date, drying_duration, status, block_hash, block_number, transaction_hash, created_at FROM `milling` ORDER BY id DESC LIMIT 200'
             cur.execute(sql)
+        
         rows = cur.fetchall()
+        
+        # Enrich rows with miller name from users table
+        if rows:
+            for row in rows:
+                miller_id = row['miller_id']
+                cur.execute('SELECT full_name FROM users WHERE id = %s', (str(miller_id),))
+                user_row = cur.fetchone()
+                row['miller_name'] = user_row['full_name'] if user_row else 'Unknown'
+        
         cur.close()
         conn.close()
         return jsonify(rows)
@@ -4210,6 +4402,190 @@ def api_update_user(user_id):
             conn.close()
             return jsonify({'error': 'User not found'}), 404
             
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/rice_distribution', methods=['GET'])
+def api_rice_distribution():
+    """Return rice distribution by user type (Miller, Wholesaler, PMB).
+    Optional query params: district and paddy_type to filter by district and rice type.
+    """
+    district_param = request.args.get('district')
+    rice_type_param = request.args.get('paddy_type')
+    
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        
+        # Get rice stock data grouped by user type - only Miller, Wholesaler, PMB
+        sql = '''
+            SELECT 
+                u.user_type,
+                SUM(CAST(rs.quantity AS DECIMAL(14,3))) as total_quantity
+            FROM rice_stock rs
+            LEFT JOIN users u ON rs.miller_id = u.id
+            WHERE u.user_type IN ('Miller', 'Wholesaler', 'PMB')
+        '''
+        params = []
+        
+        if district_param:
+            sql += ' AND u.district = %s'
+            params.append(str(district_param))
+        
+        if rice_type_param:
+            sql += ' AND rs.paddy_type = %s'
+            params.append(str(rice_type_param))
+        
+        sql += ' GROUP BY u.user_type ORDER BY u.user_type'
+        
+        if params:
+            cur.execute(sql, params)
+        else:
+            cur.execute(sql)
+        
+        rows = cur.fetchall()
+        
+        # Get list of districts from users that have rice_stock and are Miller, Wholesaler, or PMB
+        cur.execute('''
+            SELECT DISTINCT u.district 
+            FROM rice_stock rs
+            LEFT JOIN users u ON rs.miller_id = u.id
+            WHERE u.user_type IN ('Miller', 'Wholesaler', 'PMB')
+            AND u.district IS NOT NULL AND u.district != ''
+            ORDER BY u.district
+        ''')
+        districts = [row['district'] for row in cur.fetchall()]
+        
+        # Get list of rice types (paddy_type) that actually have data in rice_stock
+        cur.execute('''
+            SELECT DISTINCT rs.paddy_type as name
+            FROM rice_stock rs
+            WHERE rs.paddy_type IS NOT NULL AND rs.paddy_type != ''
+            ORDER BY rs.paddy_type
+        ''')
+        paddy_types = [{'name': row['name']} for row in cur.fetchall()]
+        
+        cur.close()
+        conn.close()
+        
+        # Format response
+        response = {
+            'data': rows if rows else [],
+            'districts': districts if districts else [],
+            'paddy_types': paddy_types if paddy_types else []
+        }
+        
+        return jsonify(response)
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err), 'data': [], 'districts': []}), 500
+
+
+@app.route('/api/debug/rice_stock', methods=['GET'])
+def debug_rice_stock():
+    """Debug endpoint to check rice_stock table data."""
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        
+        # Get rice stock count
+        cur.execute('SELECT COUNT(*) as count FROM rice_stock')
+        count_result = cur.fetchone()
+        rice_stock_count = count_result['count'] if count_result else 0
+        
+        # Get sample rice stock data with user info
+        cur.execute('''
+            SELECT 
+                rs.id,
+                rs.miller_id,
+                rs.paddy_type,
+                rs.quantity,
+                u.id as user_id,
+                u.user_type,
+                u.district,
+                u.full_name
+            FROM rice_stock rs
+            LEFT JOIN users u ON rs.miller_id = u.id
+            LIMIT 10
+        ''')
+        samples = cur.fetchall()
+        
+        # Get user types and districts from rice_stock users
+        cur.execute('''
+            SELECT DISTINCT u.user_type, u.district
+            FROM rice_stock rs
+            LEFT JOIN users u ON rs.miller_id = u.id
+            ORDER BY u.user_type, u.district
+        ''')
+        user_types = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'rice_stock_count': rice_stock_count,
+            'sample_data': samples,
+            'user_types_and_districts': user_types
+        })
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+
+
+@app.route('/api/rice_stock', methods=['GET'])
+def api_rice_stock():
+    """Return rice stock data with optional filtering by district, user_type, and paddy_type."""
+    district_param = request.args.get('district')
+    user_type_param = request.args.get('user_type')
+    paddy_type_param = request.args.get('paddy_type')
+    
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor(dictionary=True)
+        
+        # Get rice stock data with user details
+        sql = '''
+            SELECT 
+                rs.id,
+                rs.miller_id,
+                rs.quantity,
+                rs.paddy_type,
+                u.user_type,
+                u.district,
+                u.full_name
+            FROM rice_stock rs
+            LEFT JOIN users u ON rs.miller_id = u.id
+            WHERE 1=1
+        '''
+        params = []
+        
+        if district_param:
+            sql += ' AND u.district = %s'
+            params.append(str(district_param))
+        
+        if user_type_param:
+            sql += ' AND u.user_type = %s'
+            params.append(str(user_type_param))
+        
+        if paddy_type_param:
+            sql += ' AND rs.paddy_type = %s'
+            params.append(str(paddy_type_param))
+        
+        sql += ' ORDER BY rs.id'
+        
+        if params:
+            cur.execute(sql, params)
+        else:
+            cur.execute(sql)
+        
+        rows = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'data': rows if rows else [],
+            'count': len(rows) if rows else 0
+        })
     except mysql.connector.Error as err:
         return jsonify({'error': str(err)}), 500
 

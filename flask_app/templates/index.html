@@ -2126,29 +2126,1078 @@
         </div>
 
         <div id="analytics-rice-panel" hidden>
-          <div style="text-align: center; padding: 80px 24px; color: #6b7280">
-            <h3
+          <!-- Milling Table Section -->
+          <div
+            style="
+              margin-top: 20px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
               style="
-                font-size: 24px;
-                font-weight: 600;
-                color: #374151;
-                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
               "
             >
-              Rice Analytics
-            </h3>
-            <p style="font-size: 16px; margin-bottom: 24px">
-              To be implemented
-            </p>
-            <svg
-              style="width: 120px; height: 120px; opacity: 0.3"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+              <div style="font-size: 24px">🏭</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Milling Records
+              </h3>
+            </div>
+
+            <!-- Filters Section -->
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 20px;
+                background-color: white;
+                padding: 16px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+              "
             >
-              <path
-                d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-              />
-            </svg>
+              <div>
+                <label
+                  for="milling-paddy-type-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                  >Paddy Type</label
+                >
+                <select
+                  id="milling-paddy-type-filter"
+                  style="
+                    width: 100%;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                  "
+                >
+                  <option value="">All Paddy Types</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="milling-from-date-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                  >From Date</label
+                >
+                <input
+                  type="date"
+                  id="milling-from-date-filter"
+                  style="
+                    width: 100%;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                  "
+                />
+              </div>
+
+              <div>
+                <label
+                  for="milling-to-date-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                  >To Date</label
+                >
+                <input
+                  type="date"
+                  id="milling-to-date-filter"
+                  style="
+                    width: 100%;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                  "
+                />
+              </div>
+
+              <div>
+                <label
+                  for="milling-miller-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                  >Miller (ID or Name)</label
+                >
+                <input
+                  type="text"
+                  id="milling-miller-filter"
+                  placeholder="Search miller ID or name..."
+                  style="
+                    width: 100%;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                  "
+                />
+              </div>
+            </div>
+
+            <!-- Milling Table -->
+            <div
+              style="
+                background-color: white;
+                border-radius: 8px;
+                overflow: auto;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
+              <table
+                id="milling-table"
+                class="data-table"
+                style="width: 100%; border-collapse: collapse; font-size: 13px"
+              >
+                <thead>
+                  <tr
+                    style="
+                      background-color: #f3f4f6;
+                      border-bottom: 2px solid #e5e7eb;
+                    "
+                  >
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Milling ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Miller ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Miller Name
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Paddy Type
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Input Paddy (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Output Rice (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Milling Date
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Drying Duration (days)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                      "
+                    >
+                      Created Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="milling-table-body">
+                  <!-- Rows will be populated by JavaScript -->
+                </tbody>
+              </table>
+              <div
+                id="milling-table-empty"
+                style="text-align: center; padding: 40px; color: #9ca3af"
+              >
+                No milling records found
+              </div>
+            </div>
+          </div>
+
+          <!-- Rice Distribution Chart Section -->
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">📊</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Rice Distribution by User Type
+              </h3>
+            </div>
+
+            <!-- Rice Type and District Filters -->
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 20px;
+              "
+            >
+              <div>
+                <label
+                  for="rice-chart-rice-type-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Filter by Rice Type
+                </label>
+                <select
+                  id="rice-chart-rice-type-filter"
+                  style="
+                    width: 100%;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 14px;
+                    background-color: white;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                >
+                  <option value="">All Rice Types</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  for="rice-chart-district-filter"
+                  style="
+                    display: block;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Filter by District
+                </label>
+                <select
+                  id="rice-chart-district-filter"
+                  style="
+                    width: 100%;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    font-size: 14px;
+                    background-color: white;
+                    font-weight: 500;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                >
+                  <option value="">All Districts</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Chart Container -->
+            <div
+              style="
+                height: 500px;
+                width: 90%;
+                margin: 0 auto;
+                position: relative;
+                background-color: white;
+                border-radius: 10px;
+                padding: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+              "
+            >
+              <canvas
+                id="rice-distribution-chart"
+                aria-label="Rice distribution by user type chart"
+              ></canvas>
+            </div>
+
+            <!-- Stock Lookup Table Section -->
+            <div
+              style="
+                margin-top: 32px;
+                background-color: #f9fafb;
+                border-radius: 10px;
+                padding: 20px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  gap: 10px;
+                "
+              >
+                <div style="font-size: 24px">📦</div>
+                <h3
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Stock Lookup
+                </h3>
+              </div>
+
+              <!-- Stock Lookup Filters -->
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 20px;
+                "
+              >
+                <div>
+                  <label
+                    for="stock-lookup-district"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    District
+                  </label>
+                  <select
+                    id="stock-lookup-district"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  >
+                    <option value="">All Districts</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="stock-lookup-usertype"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    User Type
+                  </label>
+                  <select
+                    id="stock-lookup-usertype"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  >
+                    <option value="">All User Types</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="stock-lookup-ricetype"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    Rice Type
+                  </label>
+                  <select
+                    id="stock-lookup-ricetype"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  >
+                    <option value="">All Rice Types</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="stock-lookup-user"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    User ID or Name
+                  </label>
+                  <input
+                    type="text"
+                    id="stock-lookup-user"
+                    placeholder="Search by ID or name..."
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onfocus="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  />
+                </div>
+              </div>
+
+              <!-- Stock Lookup Table -->
+              <div
+                style="
+                  background-color: white;
+                  border-radius: 8px;
+                  overflow: hidden;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  max-height: 500px;
+                  overflow-y: auto;
+                "
+              >
+                <table
+                  id="stock-lookup-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #f3f4f6;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        ID
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        User ID / Name
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        User Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        District
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Paddy Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Quantity (kg)
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="stock-lookup-tbody">
+                    <tr>
+                      <td
+                        colspan="6"
+                        style="
+                          padding: 16px;
+                          text-align: center;
+                          color: #9ca3af;
+                        "
+                      >
+                        Loading data...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Rice Transaction History Section -->
+            <div
+              style="
+                margin-top: 32px;
+                background-color: #f9fafb;
+                border-radius: 10px;
+                padding: 20px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  gap: 10px;
+                "
+              >
+                <div style="font-size: 24px">💱</div>
+                <h3
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Rice Transaction History
+                </h3>
+              </div>
+
+              <!-- Rice Transaction Filters -->
+              <div
+                class="controls"
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 12px;
+                  align-items: flex-end;
+                  margin-bottom: 20px;
+                "
+              >
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Transaction Type
+                  <select
+                    id="rice-transaction-type-filter"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      background-color: white;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  >
+                    <option value="">All Types</option>
+                    <option value="miller-wholesaler">
+                      Miller → Wholesaler
+                    </option>
+                    <option value="miller-retailer">Miller → Retailer</option>
+                    <option value="miller-pmb">Miller → PMB</option>
+                    <option value="wholesaler-retailer">
+                      Wholesaler → Retailer
+                    </option>
+                    <option value="wholesaler-exporter">
+                      Wholesaler → Exporter
+                    </option>
+                    <option value="retailer-beer">Retailer → Beer</option>
+                    <option value="retailer-animal">
+                      Retailer → Animal Food
+                    </option>
+                  </select>
+                </label>
+
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Rice Type
+                  <select
+                    id="rice-transaction-rice-filter"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      background-color: white;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  >
+                    <option value="">All Rice Types</option>
+                  </select>
+                </label>
+
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  From Date
+                  <input
+                    id="rice-transaction-date-from"
+                    type="date"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  />
+                </label>
+
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  To Date
+                  <input
+                    id="rice-transaction-date-to"
+                    type="date"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  />
+                </label>
+
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Search (From/To)
+                  <input
+                    id="rice-transaction-search"
+                    type="search"
+                    placeholder="Enter user ID or name"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  />
+                </label>
+
+                <label
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #4b5563;
+                  "
+                >
+                  Transaction ID
+                  <input
+                    id="rice-transaction-id-search"
+                    type="search"
+                    placeholder="Search by ID"
+                    style="
+                      padding: 8px 12px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      margin-top: 4px;
+                      font-size: 13px;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                  />
+                </label>
+
+                <button
+                  id="rice-transaction-refresh"
+                  class="btn primary"
+                  style="
+                    padding: 8px 16px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border-radius: 8px;
+                    background: linear-gradient(
+                      135deg,
+                      #4f46e5 0%,
+                      #7c3aed 100%
+                    );
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+                  "
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+                >
+                  Refresh
+                </button>
+              </div>
+
+              <!-- Rice Transaction Table -->
+              <div
+                style="
+                  background-color: white;
+                  border-radius: 8px;
+                  overflow: hidden;
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                  max-height: 500px;
+                  overflow-y: auto;
+                "
+              >
+                <table
+                  id="rice-transaction-table"
+                  style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 14px;
+                  "
+                >
+                  <thead>
+                    <tr
+                      style="
+                        background-color: #f3f4f6;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        ID
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        From
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        To
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Rice Type
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Quantity (kg)
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: right;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Price
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: left;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Date/Time
+                      </th>
+                      <th
+                        style="
+                          padding: 12px 16px;
+                          text-align: center;
+                          font-weight: 600;
+                          color: #374151;
+                        "
+                      >
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="rice-transaction-tbody">
+                    <tr>
+                      <td
+                        colspan="8"
+                        style="
+                          padding: 16px;
+                          text-align: center;
+                          color: #9ca3af;
+                        "
+                      >
+                        Loading data...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2857,7 +3906,33 @@
                 <strong>Rice Type:</strong><span id="view-rice-type"></span>
                 <strong>Quantity (kg):</strong
                 ><span id="view-rice-quantity"></span> <strong>Date:</strong
-                ><span id="view-rice-date"></span>
+                ><span id="view-rice-date"></span> <strong>Block ID:</strong
+                ><span
+                  id="view-rice-block-id"
+                  style="
+                    word-break: break-all;
+                    font-family: monospace;
+                    font-size: 12px;
+                  "
+                ></span>
+                <strong>Block Hash:</strong
+                ><span
+                  id="view-rice-block-hash"
+                  style="
+                    word-break: break-all;
+                    font-family: monospace;
+                    font-size: 11px;
+                  "
+                ></span>
+                <strong>Transaction Hash:</strong
+                ><span
+                  id="view-rice-transaction-hash"
+                  style="
+                    word-break: break-all;
+                    font-family: monospace;
+                    font-size: 11px;
+                  "
+                ></span>
               </div>
             </div>
             <div style="margin-top: 16px; text-align: right">
@@ -3279,7 +4354,11 @@
                 item.district || ""
               }" data-rice-type="${item.rice_type || ""}" data-quantity="${
                 item.quantity || 0
-              }" data-created-at="${dateStr}">
+              }" data-created-at="${dateStr}" data-block-id="${
+                item.block_id || ""
+              }" data-block-hash="${
+                item.block_hash || ""
+              }" data-transaction-hash="${item.transaction_hash || ""}">
                     👁️ View
                   </button>
                   <button class="btn update-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #f59e0b; color: white;" data-id="${
@@ -3480,6 +4559,10 @@
             const riceType = e.target.dataset.riceType || "";
             const quantity = e.target.dataset.quantity || 0;
             const created = e.target.dataset.createdAt || "";
+            const blockId = e.target.dataset.blockId || "Not available";
+            const blockHash = e.target.dataset.blockHash || "Not available";
+            const transactionHash =
+              e.target.dataset.transactionHash || "Not available";
 
             document.getElementById("view-rice-user-id").textContent = userId;
             document.getElementById("view-rice-user-name").textContent =
@@ -3490,6 +4573,11 @@
             document.getElementById("view-rice-quantity").textContent =
               quantity;
             document.getElementById("view-rice-date").textContent = created;
+            document.getElementById("view-rice-block-id").textContent = blockId;
+            document.getElementById("view-rice-block-hash").textContent =
+              blockHash;
+            document.getElementById("view-rice-transaction-hash").textContent =
+              transactionHash;
 
             const modal = document.getElementById("view-initial-rice-modal");
             modal.removeAttribute("hidden");
@@ -4190,6 +5278,10 @@
         // Initialize Analytics filters
         populateFilterPaddyType();
         populateFilterDistrict();
+
+        // Initialize Milling table filters
+        loadMillingPaddyTypes();
+        setupMillingTableListeners();
 
         const filterDistrict = document.getElementById("filter-district");
         if (filterUserType) {
@@ -6690,6 +7782,1008 @@
             }[m];
           });
         }
+
+        // --- Milling Table Functions ---
+        async function loadMillingTable() {
+          try {
+            // Get filter values
+            const paddyTypeFilter = document.getElementById(
+              "milling-paddy-type-filter"
+            ).value;
+            const fromDateFilter = document.getElementById(
+              "milling-from-date-filter"
+            ).value;
+            const toDateFilter = document.getElementById(
+              "milling-to-date-filter"
+            ).value;
+            const millerFilter = document.getElementById(
+              "milling-miller-filter"
+            ).value;
+
+            // Build query string
+            let url = "/api/milling?";
+            const params = new URLSearchParams();
+            if (paddyTypeFilter) {
+              params.append("paddy_type", paddyTypeFilter);
+            }
+            if (fromDateFilter) {
+              params.append("from_date", fromDateFilter);
+            }
+            if (toDateFilter) {
+              params.append("to_date", toDateFilter);
+            }
+            if (millerFilter) {
+              params.append("miller_id", millerFilter);
+            }
+
+            if (params.toString()) {
+              url += params.toString();
+            }
+
+            const res = await fetch(url);
+            if (!res.ok) {
+              console.error("Failed to fetch milling records");
+              return;
+            }
+
+            const records = await res.json();
+            const tbody = document.getElementById("milling-table-body");
+            const emptyMsg = document.getElementById("milling-table-empty");
+            const table = document.getElementById("milling-table");
+
+            tbody.innerHTML = "";
+
+            if (!records || records.length === 0) {
+              if (table) table.style.display = "none";
+              if (emptyMsg) emptyMsg.style.display = "block";
+              return;
+            }
+
+            if (table) table.style.display = "table";
+            if (emptyMsg) emptyMsg.style.display = "none";
+
+            records.forEach((record) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #e5e7eb";
+              tr.style.transition = "background-color 0.2s";
+
+              // Highlight reverted records (status = 0)
+              if (record.status === 0) {
+                tr.style.backgroundColor = "#fee2e2";
+                tr.style.borderLeft = "4px solid #dc2626";
+              }
+
+              tr.addEventListener("mouseenter", function () {
+                if (record.status === 0) {
+                  this.style.backgroundColor = "#fecaca";
+                } else {
+                  this.style.backgroundColor = "#f9fafb";
+                }
+              });
+              tr.addEventListener("mouseleave", function () {
+                if (record.status === 0) {
+                  this.style.backgroundColor = "#fee2e2";
+                } else {
+                  this.style.backgroundColor = "transparent";
+                }
+              });
+
+              const formatDate = (dateStr) => {
+                if (!dateStr) return "-";
+                const date = new Date(dateStr);
+                return date.toLocaleDateString();
+              };
+
+              const formatDateTime = (dateStr) => {
+                if (!dateStr) return "-";
+                const date = new Date(dateStr);
+                return date.toLocaleString();
+              };
+
+              tr.innerHTML = `
+                <td style="padding: 12px; color: #374151; font-weight: 500">${
+                  record.id
+                }</td>
+                <td style="padding: 12px; color: #374151">${escapeHtml(
+                  record.miller_id
+                )}</td>
+                <td style="padding: 12px; color: #374151">${escapeHtml(
+                  record.miller_name || "-"
+                )}</td>
+                <td style="padding: 12px; color: #374151">${escapeHtml(
+                  record.paddy_type
+                )}</td>
+                <td style="padding: 12px; color: #374151; text-align: right">${parseFloat(
+                  record.input_paddy
+                ).toFixed(2)}</td>
+                <td style="padding: 12px; color: #374151; text-align: right">${parseFloat(
+                  record.output_rice
+                ).toFixed(2)}</td>
+                <td style="padding: 12px; color: #374151">${formatDate(
+                  record.milling_date
+                )}</td>
+                <td style="padding: 12px; color: #374151; text-align: center">${
+                  record.drying_duration || "-"
+                }</td>
+                <td style="padding: 12px; color: #6b7280; font-size: 12px">${formatDateTime(
+                  record.created_at
+                )}</td>
+              `;
+
+              tbody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed to load milling table", err);
+          }
+        }
+
+        async function loadMillingPaddyTypes() {
+          try {
+            const res = await fetch("/api/paddy_types");
+            if (!res.ok) return;
+            const paddyTypes = await res.json();
+
+            const select = document.getElementById("milling-paddy-type-filter");
+            if (!select) return;
+
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">All Paddy Types</option>';
+
+            paddyTypes.forEach((type) => {
+              const option = document.createElement("option");
+              option.value = type.name || type.id || "";
+              option.textContent = type.name || String(type.id || "");
+              select.appendChild(option);
+            });
+          } catch (err) {
+            console.error("Failed to load paddy types for milling filter", err);
+          }
+        }
+
+        // Initialize milling table functionality when rice panel is shown
+        function setupMillingTableListeners() {
+          const paddyTypeFilter = document.getElementById(
+            "milling-paddy-type-filter"
+          );
+          const fromDateFilter = document.getElementById(
+            "milling-from-date-filter"
+          );
+          const toDateFilter = document.getElementById(
+            "milling-to-date-filter"
+          );
+          const millerFilter = document.getElementById("milling-miller-filter");
+
+          if (paddyTypeFilter) {
+            paddyTypeFilter.addEventListener("change", loadMillingTable);
+          }
+          if (fromDateFilter) {
+            fromDateFilter.addEventListener("change", loadMillingTable);
+          }
+          if (toDateFilter) {
+            toDateFilter.addEventListener("change", loadMillingTable);
+          }
+          if (millerFilter) {
+            millerFilter.addEventListener("input", function () {
+              // Debounce the filter search
+              clearTimeout(this.debounceTimer);
+              this.debounceTimer = setTimeout(loadMillingTable, 500);
+            });
+          }
+        }
+
+        // --- Rice Distribution Chart Functions ---
+        let riceDistributionChart = null;
+
+        async function loadRiceDistrictFilter() {
+          try {
+            const res = await fetch("/api/rice_distribution");
+            if (!res.ok) {
+              console.error("API returned:", res.status);
+              return;
+            }
+            const data = await res.json();
+            console.log("Rice distribution API response:", data);
+            const districts = data.districts || [];
+
+            const select = document.getElementById(
+              "rice-chart-district-filter"
+            );
+            if (!select) {
+              console.error("rice-chart-district-filter element not found");
+              return;
+            }
+
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">All Districts</option>';
+
+            if (districts.length === 0) {
+              console.warn("No districts found in rice distribution data");
+            }
+
+            districts.forEach((district) => {
+              const option = document.createElement("option");
+              option.value = district;
+              option.textContent = district;
+              select.appendChild(option);
+            });
+            console.log("Loaded", districts.length, "districts");
+          } catch (err) {
+            console.error("Failed to load rice district filter", err);
+          }
+        }
+
+        async function loadRiceTypeFilter() {
+          try {
+            const res = await fetch("/api/rice_distribution");
+            if (!res.ok) {
+              console.error("API returned:", res.status);
+              return;
+            }
+            const data = await res.json();
+            console.log("Rice types from API:", data.paddy_types);
+            const paddyTypes = data.paddy_types || [];
+
+            const select = document.getElementById(
+              "rice-chart-rice-type-filter"
+            );
+            if (!select) {
+              console.error("rice-chart-rice-type-filter element not found");
+              return;
+            }
+
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">All Rice Types</option>';
+
+            if (paddyTypes.length === 0) {
+              console.warn("No rice types found in paddy_type table");
+            }
+
+            paddyTypes.forEach((paddy) => {
+              const option = document.createElement("option");
+              option.value = paddy.name || paddy.id || "";
+              option.textContent = paddy.name || String(paddy.id || "");
+              select.appendChild(option);
+            });
+            console.log("Loaded", paddyTypes.length, "rice types");
+          } catch (err) {
+            console.error("Failed to load rice type filter", err);
+          }
+        }
+
+        async function loadRiceDistributionChart() {
+          try {
+            const districtFilter = document.getElementById(
+              "rice-chart-district-filter"
+            );
+            const riceTypeFilter = document.getElementById(
+              "rice-chart-rice-type-filter"
+            );
+            if (!districtFilter) {
+              console.error("District filter element not found");
+              return;
+            }
+            if (!riceTypeFilter) {
+              console.error("Rice type filter element not found");
+              return;
+            }
+
+            let url = "/api/rice_distribution";
+            const params = new URLSearchParams();
+            if (districtFilter.value) {
+              params.append("district", districtFilter.value);
+            }
+            if (riceTypeFilter.value) {
+              params.append("paddy_type", riceTypeFilter.value);
+            }
+
+            if (params.toString()) {
+              url += "?" + params.toString();
+            }
+
+            console.log("Fetching rice distribution from:", url);
+            const res = await fetch(url);
+            if (!res.ok) {
+              console.error("API returned:", res.status);
+
+              return;
+            }
+            const data = await res.json();
+            const records = data.data || [];
+
+            console.log("Rice distribution data:", records);
+
+            // Aggregate data by user type
+            const aggregated = {};
+            records.forEach((record) => {
+              const userType = record.user_type || "Unknown";
+              const quantity = parseFloat(record.total_quantity) || 0;
+              aggregated[userType] = (aggregated[userType] || 0) + quantity;
+            });
+
+            console.log("Aggregated data:", aggregated);
+
+            // Prepare chart data
+            const labels = Object.keys(aggregated).sort();
+            const chartData = labels.map((label) => aggregated[label]);
+
+            if (labels.length === 0) {
+              console.warn("No data available for chart");
+              // Show empty message
+              const ctx = document.getElementById("rice-distribution-chart");
+              if (ctx) {
+                ctx.style.display = "none";
+              }
+              return;
+            }
+
+            // Color scheme for user types
+            const colorMap = {
+              "Animal Food": "rgba(236, 72, 153, 0.7)",
+              Beer: "rgba(234, 179, 8, 0.7)",
+              Exporter: "rgba(168, 85, 247, 0.7)",
+              Miller: "rgba(245, 158, 11, 0.7)",
+              PMB: "rgba(34, 197, 94, 0.7)",
+              Retailer: "rgba(239, 68, 68, 0.7)",
+              Wholesaler: "rgba(59, 130, 246, 0.7)",
+            };
+
+            const borderColorMap = {
+              "Animal Food": "rgba(236, 72, 153, 1)",
+              Beer: "rgba(234, 179, 8, 1)",
+              Exporter: "rgba(168, 85, 247, 1)",
+              Miller: "rgba(245, 158, 11, 1)",
+              PMB: "rgba(34, 197, 94, 1)",
+              Retailer: "rgba(239, 68, 68, 1)",
+              Wholesaler: "rgba(59, 130, 246, 1)",
+            };
+
+            const colors = labels.map(
+              (label) => colorMap[label] || "rgba(156, 163, 175, 0.7)"
+            );
+            const borderColors = labels.map(
+              (label) => borderColorMap[label] || "rgba(156, 163, 175, 1)"
+            );
+
+            console.log("Loading Chart.js...");
+            await ensureChartJs();
+            const canvas = document.getElementById("rice-distribution-chart");
+            if (!canvas) {
+              console.error("Canvas element not found");
+              return;
+            }
+            const ctx = canvas.getContext("2d");
+
+            if (canvas.style.display === "none") {
+              canvas.style.display = "block";
+            }
+
+            if (riceDistributionChart) {
+              console.log("Updating existing chart");
+              riceDistributionChart.data.labels = labels;
+              riceDistributionChart.data.datasets[0].data = chartData;
+              riceDistributionChart.data.datasets[0].backgroundColor = colors;
+              riceDistributionChart.data.datasets[0].borderColor = borderColors;
+              riceDistributionChart.update();
+              return;
+            }
+
+            console.log("Creating new chart with data:", { labels, chartData });
+            riceDistributionChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Total Rice Stock (kg)",
+                    data: chartData,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "Quantity (kg)",
+                    },
+                  },
+                },
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: "top",
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.parsed.y;
+                        return (
+                          context.dataset.label +
+                          ": " +
+                          value.toFixed(2) +
+                          " kg"
+                        );
+                      },
+                    },
+                  },
+                },
+              },
+            });
+            console.log("Chart created successfully");
+          } catch (err) {
+            console.error("Failed to load rice distribution chart", err);
+          }
+        }
+
+        function setupRiceChartListeners() {
+          const districtFilter = document.getElementById(
+            "rice-chart-district-filter"
+          );
+          const riceTypeFilter = document.getElementById(
+            "rice-chart-rice-type-filter"
+          );
+          if (districtFilter) {
+            districtFilter.addEventListener(
+              "change",
+              loadRiceDistributionChart
+            );
+          }
+          if (riceTypeFilter) {
+            riceTypeFilter.addEventListener(
+              "change",
+              loadRiceDistributionChart
+            );
+          }
+        }
+
+        // Stock Lookup Functions
+        async function loadStockLookupDistricts() {
+          try {
+            console.log("loadStockLookupDistricts called");
+            const response = await fetch("/api/rice_distribution");
+            const data = await response.json();
+            const districts = data.districts || [];
+            console.log("Districts loaded:", districts);
+            const select = document.getElementById("stock-lookup-district");
+            if (select) {
+              districts.forEach((district) => {
+                const option = document.createElement("option");
+                option.value = district;
+                option.textContent = district;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error("Failed to load districts for stock lookup:", err);
+          }
+        }
+
+        async function loadStockLookupUserTypes() {
+          try {
+            console.log("loadStockLookupUserTypes called");
+            const response = await fetch("/api/debug/rice_stock");
+            const data = await response.json();
+            const userTypesSet = new Set();
+            if (data.user_types_and_districts) {
+              data.user_types_and_districts.forEach((item) => {
+                userTypesSet.add(item.user_type);
+              });
+            }
+            const userTypes = Array.from(userTypesSet).sort();
+            console.log("User types loaded:", userTypes);
+            const select = document.getElementById("stock-lookup-usertype");
+            if (select) {
+              userTypes.forEach((userType) => {
+                const option = document.createElement("option");
+                option.value = userType;
+                option.textContent = userType;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error("Failed to load user types for stock lookup:", err);
+          }
+        }
+
+        async function loadStockLookupRiceTypes() {
+          try {
+            console.log("loadStockLookupRiceTypes called");
+            const response = await fetch("/api/paddy_types");
+            const data = await response.json();
+            console.log("Rice types loaded:", data);
+            const select = document.getElementById("stock-lookup-ricetype");
+            if (select) {
+              data.forEach((item) => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error("Failed to load rice types for stock lookup:", err);
+          }
+        }
+
+        async function loadStockLookupTable() {
+          try {
+            console.log("loadStockLookupTable called");
+            const districtFilter =
+              document.getElementById("stock-lookup-district")?.value || "";
+            const userTypeFilter =
+              document.getElementById("stock-lookup-usertype")?.value || "";
+            const riceTypeFilter =
+              document.getElementById("stock-lookup-ricetype")?.value || "";
+            const userSearchFilter = (
+              document.getElementById("stock-lookup-user")?.value || ""
+            ).toLowerCase();
+
+            console.log("Filters:", {
+              districtFilter,
+              userTypeFilter,
+              riceTypeFilter,
+              userSearchFilter,
+            });
+
+            const params = new URLSearchParams();
+            if (districtFilter) params.append("district", districtFilter);
+            if (userTypeFilter) params.append("user_type", userTypeFilter);
+            if (riceTypeFilter) params.append("paddy_type", riceTypeFilter);
+
+            const url = "/api/rice_stock?" + params.toString();
+            console.log("Fetching from:", url);
+
+            const response = await fetch(url);
+            const data = await response.json();
+            console.log("Data received:", data);
+
+            let rows = data.data || [];
+
+            // Apply user search filter
+            if (userSearchFilter) {
+              rows = rows.filter((row) => {
+                const userId = (row.miller_id || "").toLowerCase();
+                const userName = (row.full_name || "").toLowerCase();
+                return (
+                  userId.includes(userSearchFilter) ||
+                  userName.includes(userSearchFilter)
+                );
+              });
+            }
+
+            const tbody = document.getElementById("stock-lookup-tbody");
+            if (!tbody) {
+              console.error("stock-lookup-tbody element not found");
+              return;
+            }
+            tbody.innerHTML = "";
+
+            if (rows.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="6" style="padding: 16px; text-align: center; color: #9ca3af;">
+                    No stock records found
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            rows.forEach((row) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #e5e7eb";
+              tr.style.transition = "background-color 0.2s ease";
+              tr.onmouseover = function () {
+                this.style.backgroundColor = "#f9fafb";
+              };
+              tr.onmouseout = function () {
+                this.style.backgroundColor = "";
+              };
+
+              tr.innerHTML = `
+                <td style="padding: 12px 16px; color: #374151;">${row.id}</td>
+                <td style="padding: 12px 16px; color: #374151;">
+                  <span style="font-weight: 500;">${row.miller_id}</span>
+                  ${
+                    row.full_name
+                      ? `<br/><span style="color: #6b7280; font-size: 13px;">${row.full_name}</span>`
+                      : ""
+                  }
+                </td>
+                <td style="padding: 12px 16px; color: #374151;">${
+                  row.user_type
+                }</td>
+                <td style="padding: 12px 16px; color: #374151;">${
+                  row.district
+                }</td>
+                <td style="padding: 12px 16px; color: #374151;">${
+                  row.paddy_type
+                }</td>
+                <td style="padding: 12px 16px; text-align: right; color: #374151; font-weight: 500;">${parseFloat(
+                  row.quantity
+                ).toFixed(3)}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+            console.log(
+              "Stock lookup table loaded with " + rows.length + " rows"
+            );
+          } catch (err) {
+            console.error("Failed to load stock lookup table:", err);
+            const tbody = document.getElementById("stock-lookup-tbody");
+            if (tbody) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="6" style="padding: 16px; text-align: center; color: #ef4444;">
+                    Error loading data: ${err.message}
+                  </td>
+                </tr>
+              `;
+            }
+          }
+        }
+
+        function setupStockLookupListeners() {
+          console.log("setupStockLookupListeners called");
+          const districtFilter = document.getElementById(
+            "stock-lookup-district"
+          );
+          const userTypeFilter = document.getElementById(
+            "stock-lookup-usertype"
+          );
+          const riceTypeFilter = document.getElementById(
+            "stock-lookup-ricetype"
+          );
+          const userSearch = document.getElementById("stock-lookup-user");
+
+          console.log("Stock lookup elements found:", {
+            districtFilter: !!districtFilter,
+            userTypeFilter: !!userTypeFilter,
+            riceTypeFilter: !!riceTypeFilter,
+            userSearch: !!userSearch,
+          });
+
+          if (districtFilter) {
+            districtFilter.addEventListener("change", loadStockLookupTable);
+          }
+          if (userTypeFilter) {
+            userTypeFilter.addEventListener("change", loadStockLookupTable);
+          }
+          if (riceTypeFilter) {
+            riceTypeFilter.addEventListener("change", loadStockLookupTable);
+          }
+          if (userSearch) {
+            userSearch.addEventListener("input", loadStockLookupTable);
+          }
+        }
+
+        // Rice Transaction History Functions
+        async function loadRiceTransactionRiceTypes() {
+          try {
+            console.log("loadRiceTransactionRiceTypes called");
+            const response = await fetch("/api/paddy_types");
+            const data = await response.json();
+            console.log("Rice transaction rice types loaded:", data);
+            const select = document.getElementById(
+              "rice-transaction-rice-filter"
+            );
+            if (select) {
+              data.forEach((item) => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error(
+              "Failed to load rice types for rice transactions:",
+              err
+            );
+          }
+        }
+
+        async function loadRiceTransactions() {
+          try {
+            console.log("loadRiceTransactions called");
+            const typeFilter =
+              document.getElementById("rice-transaction-type-filter")?.value ||
+              "";
+            const riceFilter =
+              document.getElementById("rice-transaction-rice-filter")?.value ||
+              "";
+            const dateFrom =
+              document.getElementById("rice-transaction-date-from")?.value ||
+              "";
+            const dateTo =
+              document.getElementById("rice-transaction-date-to")?.value || "";
+            const search =
+              document.getElementById("rice-transaction-search")?.value || "";
+            const transactionId =
+              document.getElementById("rice-transaction-id-search")?.value ||
+              "";
+
+            console.log("Rice transaction filters:", {
+              typeFilter,
+              riceFilter,
+              dateFrom,
+              dateTo,
+              search,
+              transactionId,
+            });
+
+            const params = new URLSearchParams();
+            if (typeFilter) params.append("transaction_type", typeFilter);
+            if (riceFilter) params.append("rice_type", riceFilter);
+            if (dateFrom) params.append("from_date", dateFrom);
+            if (dateTo) params.append("to_date", dateTo);
+            if (search) params.append("search", search);
+            if (transactionId) params.append("transaction_id", transactionId);
+
+            const url = "/api/rice_transactions?" + params.toString();
+            console.log("Fetching rice transactions from:", url);
+
+            const response = await fetch(url);
+            const transactions = await response.json();
+            console.log("Rice transactions received:", transactions);
+
+            const tbody = document.getElementById("rice-transaction-tbody");
+            if (!tbody) {
+              console.error("rice-transaction-tbody element not found");
+              return;
+            }
+            tbody.innerHTML = "";
+
+            if (!transactions || transactions.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="8" style="padding: 16px; text-align: center; color: #9ca3af;">
+                    No rice transactions found
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            transactions.forEach((t) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #e5e7eb";
+              tr.style.transition = "background-color 0.2s ease";
+
+              // Highlight reverted transactions
+              if (t.is_reverted === 1) {
+                tr.style.backgroundColor = "#fee2e2";
+                tr.style.borderLeft = "4px solid #ef4444";
+              }
+
+              tr.onmouseover = function () {
+                if (t.is_reverted !== 1) {
+                  this.style.backgroundColor = "#f9fafb";
+                }
+              };
+              tr.onmouseout = function () {
+                if (t.is_reverted !== 1) {
+                  this.style.backgroundColor = "";
+                } else {
+                  this.style.backgroundColor = "#fee2e2";
+                }
+              };
+
+              const dateStr = t.datetime
+                ? new Date(t.datetime).toLocaleString()
+                : "-";
+
+              // Build from/to display with names
+              let fromDisplay = t.from || "-";
+              let toDisplay = t.to || "-";
+              if (t.from_full_name) {
+                fromDisplay = `<span style="font-weight: 500;">${t.from}</span><br/><span style="color: #6b7280; font-size: 12px;">${t.from_full_name}</span>`;
+              }
+              if (t.to_full_name) {
+                toDisplay = `<span style="font-weight: 500;">${t.to}</span><br/><span style="color: #6b7280; font-size: 12px;">${t.to_full_name}</span>`;
+              }
+
+              // Status badge
+              let statusBadge = "";
+              if (t.is_reverted === 1) {
+                statusBadge =
+                  '<span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Reverted</span>';
+              } else if (t.status === 1) {
+                statusBadge =
+                  '<span style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Active</span>';
+              } else {
+                statusBadge =
+                  '<span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Pending</span>';
+              }
+
+              tr.innerHTML = `
+                <td style="padding: 12px 16px; color: #374151;">${
+                  t.id || ""
+                }</td>
+                <td style="padding: 12px 16px; color: #374151;">${fromDisplay}</td>
+                <td style="padding: 12px 16px; color: #374151;">${toDisplay}</td>
+                <td style="padding: 12px 16px; color: #374151;">${
+                  t.rice_type || ""
+                }</td>
+                <td style="padding: 12px 16px; text-align: right; color: #374151; font-weight: 500;">${parseFloat(
+                  t.quantity || 0
+                ).toFixed(3)}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #374151;">${parseFloat(
+                  t.price || 0
+                ).toFixed(2)}</td>
+                <td style="padding: 12px 16px; color: #374151;">${dateStr}</td>
+                <td style="padding: 12px 16px; text-align: center;">${statusBadge}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+            console.log(
+              "Rice transactions table loaded with " +
+                transactions.length +
+                " rows"
+            );
+          } catch (err) {
+            console.error("Failed to load rice transactions:", err);
+            const tbody = document.getElementById("rice-transaction-tbody");
+            if (tbody) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="8" style="padding: 16px; text-align: center; color: #ef4444;">
+                    Error loading data: ${err.message}
+                  </td>
+                </tr>
+              `;
+            }
+          }
+        }
+
+        function setupRiceTransactionListeners() {
+          console.log("setupRiceTransactionListeners called");
+          const typeFilter = document.getElementById(
+            "rice-transaction-type-filter"
+          );
+          const riceFilter = document.getElementById(
+            "rice-transaction-rice-filter"
+          );
+          const dateFrom = document.getElementById(
+            "rice-transaction-date-from"
+          );
+          const dateTo = document.getElementById("rice-transaction-date-to");
+          const search = document.getElementById("rice-transaction-search");
+          const transactionIdSearch = document.getElementById(
+            "rice-transaction-id-search"
+          );
+          const refreshBtn = document.getElementById(
+            "rice-transaction-refresh"
+          );
+
+          console.log("Rice transaction elements found:", {
+            typeFilter: !!typeFilter,
+            riceFilter: !!riceFilter,
+            dateFrom: !!dateFrom,
+            dateTo: !!dateTo,
+            search: !!search,
+            transactionIdSearch: !!transactionIdSearch,
+            refreshBtn: !!refreshBtn,
+          });
+
+          if (typeFilter)
+            typeFilter.addEventListener("change", loadRiceTransactions);
+          if (riceFilter)
+            riceFilter.addEventListener("change", loadRiceTransactions);
+          if (dateFrom)
+            dateFrom.addEventListener("change", loadRiceTransactions);
+          if (dateTo) dateTo.addEventListener("change", loadRiceTransactions);
+          if (search) search.addEventListener("input", loadRiceTransactions);
+          if (transactionIdSearch)
+            transactionIdSearch.addEventListener("input", loadRiceTransactions);
+          if (refreshBtn)
+            refreshBtn.addEventListener("click", loadRiceTransactions);
+        }
+
+        // Test if the functions are loaded - call them on page load for debugging
+        console.log("Testing rice distribution functions...");
+        setTimeout(() => {
+          console.log("Running test calls to rice functions");
+          loadRiceDistrictFilter()
+            .then(() => {
+              console.log("District filter loaded");
+            })
+            .catch((err) => {
+              console.error("District filter failed:", err);
+            });
+          loadRiceTypeFilter()
+            .then(() => {
+              console.log("Rice type filter loaded");
+            })
+            .catch((err) => {
+              console.error("Rice type filter failed:", err);
+            });
+          loadRiceDistributionChart()
+            .then(() => {
+              console.log("Chart loaded");
+            })
+            .catch((err) => {
+              console.error("Chart failed:", err);
+            });
+          // Stock lookup
+          loadStockLookupDistricts()
+            .then(() => {
+              console.log("Stock lookup districts loaded");
+            })
+            .catch((err) => {
+              console.error("Stock lookup districts failed:", err);
+            });
+          loadStockLookupUserTypes()
+            .then(() => {
+              console.log("Stock lookup user types loaded");
+            })
+            .catch((err) => {
+              console.error("Stock lookup user types failed:", err);
+            });
+          loadStockLookupRiceTypes()
+            .then(() => {
+              console.log("Stock lookup rice types loaded");
+            })
+            .catch((err) => {
+              console.error("Stock lookup rice types failed:", err);
+            });
+          loadStockLookupTable()
+            .then(() => {
+              console.log("Stock lookup table loaded");
+            })
+            .catch((err) => {
+              console.error("Stock lookup table failed:", err);
+            });
+          setupStockLookupListeners();
+          // Rice transactions
+          loadRiceTransactionRiceTypes()
+            .then(() => {
+              console.log("Rice transaction rice types loaded");
+            })
+            .catch((err) => {
+              console.error("Rice transaction rice types failed:", err);
+            });
+          loadRiceTransactions()
+            .then(() => {
+              console.log("Rice transactions loaded");
+            })
+            .catch((err) => {
+              console.error("Rice transactions failed:", err);
+            });
+          setupRiceTransactionListeners();
+        }, 1000);
+
+        // Override showRicePanel to include milling table loading
+        const originalShowRicePanel = showRicePanel;
+        showRicePanel = function () {
+          console.log("showRicePanel called - loading rice analytics");
+          originalShowRicePanel();
+          // Load milling data when rice panel is shown
+          setTimeout(() => {
+            console.log("Loading milling and rice data...");
+            loadMillingPaddyTypes();
+            loadMillingTable();
+            setupMillingTableListeners();
+            loadRiceDistrictFilter();
+            loadRiceTypeFilter();
+            loadRiceDistributionChart();
+            setupRiceChartListeners();
+            loadStockLookupDistricts();
+            loadStockLookupUserTypes();
+            loadStockLookupRiceTypes();
+            loadStockLookupTable();
+            setupStockLookupListeners();
+            loadRiceTransactionRiceTypes();
+            loadRiceTransactions();
+            setupRiceTransactionListeners();
+          }, 50);
+        };
       });
     </script>
 

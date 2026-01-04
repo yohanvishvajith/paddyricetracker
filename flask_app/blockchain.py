@@ -1686,6 +1686,90 @@ def save_initial_paddy_record(user_id, paddy_type, quantity):
         return None
 
 
+def save_initial_rice_record(user_id, rice_type, quantity):
+    """Record initial rice to blockchain and return block info.
+    Returns None if blockchain is unavailable (will still save to database).
+    """
+    import time
+    
+    print("\n--- Recording Initial Rice on Blockchain ---")
+    print(f"User ID: {user_id}")
+    print(f"Rice Type: {rice_type}")
+    print(f"Quantity: {quantity}")
+
+    # Check if blockchain is connected
+    if not web3_operations.is_connected():
+        print("⚠️  Operations blockchain is not connected on port 8546")
+        print("   Skipping blockchain recording. Record will be saved to database without blockchain data.")
+        return None
+
+    # Check if contract is deployed
+    try:
+        contract_code = web3_operations.eth.get_code(operations_contract.address)
+        if len(contract_code) == 0:
+            print("⚠️  Operations contract not deployed - skipping blockchain recording")
+            print(f"   Contract address: {operations_contract.address}")
+            print(f"   Please deploy the contract first using deployment scripts")
+            return None
+    except Exception as e:
+        print(f"⚠️  Cannot check contract deployment: {e}")
+        return None
+
+    value = 0  # No ETH value sent
+    current_timestamp = int(time.time())
+
+    try:
+        # Test call to get recordId
+        record_id = operations_contract.functions.saveInitialRiceRecord(
+            user_id, 
+            rice_type, 
+            int(quantity), 
+            current_timestamp,
+            True
+        ).call({'from': WALLET_ADDRESS, 'value': value})
+        print(f"Call simulation succeeded. Record ID from contract: {record_id}")
+    except Exception as e:
+        print(f"⚠️  Call simulation reverted or failed: {e}")
+        print("   This usually means the contract hasn't been redeployed with the saveInitialRiceRecord function.")
+        print("   Please redeploy the contract on the blockchain.")
+        return None
+
+    try:
+        tx = operations_contract.functions.saveInitialRiceRecord(
+            user_id, 
+            rice_type, 
+            int(quantity), 
+            current_timestamp,
+            True
+        ).build_transaction({
+            'from': WALLET_ADDRESS,
+            'nonce': web3_operations.eth.get_transaction_count(WALLET_ADDRESS),
+            'gas': 2000000,
+            'gasPrice': web3_operations.to_wei('20', 'gwei'),
+            'value': value,
+        })
+
+        signed_tx = web3_operations.eth.account.sign_transaction(tx, PRIVATE_KEY)
+        tx_hash = web3_operations.eth.send_raw_transaction(signed_tx.raw_transaction)
+        print("Transaction sent:", tx_hash.hex())
+        receipt = web3_operations.eth.wait_for_transaction_receipt(tx_hash)
+        print("Transaction mined! Block number:", receipt.blockNumber)
+        print("Transaction mined! Block hash:", receipt.blockHash.hex())
+        
+        return {
+            'block_id': receipt.blockNumber,
+            'block_hash': receipt.blockHash.hex(),
+            'block_number': receipt.blockNumber,
+            'transaction_hash': tx_hash.hex(),
+            'record_id': record_id
+        }
+    except Exception as e:
+        print(f"⚠️  Failed to record initial rice on blockchain: {e}")
+        print("   The record will still be saved to the database without blockchain fields.")
+        return None
+
+
+
 # ========================================
 # UTILITY FUNCTIONS
 # ========================================
@@ -1707,3 +1791,24 @@ if __name__ == "__main__":
     print("Rice Supply Chain Blockchain Interface")
     print("=" * 50)
     check_connection()
+    
+    # Test saveInitialRiceRecord function
+    print("\n" + "=" * 50)
+    print("Testing saveInitialRiceRecord function...")
+    print("=" * 50)
+    try:
+        print("Simulating saveInitialRiceRecord call...")
+        result = operations_contract.functions.saveInitialRiceRecord(
+            "farmer001",
+            "Basmati",
+            1000,
+            1704326400,  # Unix timestamp
+            True
+        ).call({
+            'from': WALLET_ADDRESS
+        })
+        print(f"✓ Call simulation succeeded, returned record ID: {result}")
+    except Exception as e:
+        print(f"✗ Call simulation failed: {e}")
+        print("   The contract may not have been redeployed with the saveInitialRiceRecord function.")
+        print("   Please redeploy the smart contract and update operations-abi-address.json")

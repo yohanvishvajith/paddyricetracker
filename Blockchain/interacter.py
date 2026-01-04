@@ -794,6 +794,68 @@ def view_all_rice_transactions():
 
 
 # === Milling Functions ===
+# === Initial Rice Functions ===
+def save_initial_rice_record(user_id: str, rice_type: str, quantity: int, date: int, status: bool = True):
+    """Save initial rice record on-chain."""
+    try:
+        # Get chain ID for reference
+        chain_id = web3_operations.eth.chain_id
+        print(f"Chain ID: {chain_id}")
+        
+        # Simulate the call
+        operations_contract.functions.saveInitialRiceRecord(
+            user_id,
+            rice_type,
+            quantity,
+            date,
+            status
+        ).call({
+            'from': WALLET_ADDRESS
+        })
+        print("Call simulation succeeded (no revert).")
+    except Exception as e:
+        print("Call simulation reverted or failed:", e)
+        return
+
+    try:
+        tx = operations_contract.functions.saveInitialRiceRecord(
+            user_id,
+            rice_type,
+            quantity,
+            date,
+            status
+        ).build_transaction({
+            'from': WALLET_ADDRESS,
+            'nonce': web3_operations.eth.get_transaction_count(WALLET_ADDRESS),
+            'gas': 2000000,
+            'gasPrice': web3_operations.to_wei('20', 'gwei'),
+        })
+        signed_tx = web3_operations.eth.account.sign_transaction(tx, PRIVATE_KEY)
+        tx_hash = web3_operations.eth.send_raw_transaction(signed_tx.raw_transaction)
+        print("Transaction sent:", tx_hash.hex())
+        receipt = web3_operations.eth.wait_for_transaction_receipt(tx_hash)
+        print("Transaction mined! Block number:", receipt.blockNumber)
+    except Exception as e:
+        print("Failed to send transaction:", e)
+
+
+def get_initial_rice_record(record_id: int):
+    """Retrieve initial rice record by ID."""
+    try:
+        record = operations_contract.functions.getInitialRiceRecord(record_id).call()
+        print("\n--- Initial Rice Record ---")
+        print("User ID:", record[0])
+        print("Rice Type:", record[1])
+        print("Quantity:", record[2])
+        print("Date:", record[3])
+        print("Status:", record[4])
+        return record
+    except Exception as e:
+        print("Failed to get initial rice record:", e)
+        return None
+
+
+# === Milling Functions ===
 def record_milling(miller_id: str, paddy_type: str, input_qty: int, output_qty: int, date: int):
     """Record a milling operation on-chain."""
     milling_input = (miller_id, paddy_type, input_qty, output_qty, date)
@@ -915,6 +977,8 @@ def menu_loop():
             print("16) View all milling records")
             print("17) Record paddy damage")
             print("18) Record rice damage")
+            print("19) Save initial rice record")
+            print("20) Get initial rice record by ID")
             print("\n0) Exit")
             choice = input("Choose an option: ").strip()
             if choice == "1":
@@ -1089,6 +1153,35 @@ def menu_loop():
                         record_rice_damage(user_id, rice_type, quantity, damage_date)
                     except Exception as e:
                         print("Failed to record damage:", e)
+            elif choice == "19":
+                print("\nEnter initial rice record details:")
+                user_id = input("User ID: ").strip()
+                rice_type = input("Rice type: ").strip()
+                qty_s = input("Quantity (integer): ").strip()
+                date_s = input("Date (unix timestamp): ").strip()
+                try:
+                    quantity = int(qty_s)
+                    date = int(date_s)
+                except ValueError:
+                    print("Invalid input")
+                    continue
+                confirm = input(f"Save initial rice record for user {user_id} (y/N)? ").strip().lower()
+                if confirm == "y":
+                    try:
+                        save_initial_rice_record(user_id, rice_type, quantity, date)
+                    except Exception as e:
+                        print("Failed to save initial rice record:", e)
+            elif choice == "20":
+                record_id_s = input("Initial Rice Record ID (integer): ").strip()
+                try:
+                    record_id = int(record_id_s)
+                except ValueError:
+                    print("Invalid record ID")
+                    continue
+                try:
+                    get_initial_rice_record(record_id)
+                except Exception as e:
+                    print("Failed to get initial rice record:", e)
             elif choice == "0" or choice.lower() in ("q", "exit"):
                 print("Bye")
                 break

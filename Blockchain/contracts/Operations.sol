@@ -27,6 +27,14 @@ contract Operations{
     mapping(uint256 => uint256) public millingDryingDuration;
     mapping(uint256 => bool) public millingStatus;
 
+    // --- Initial Rice records ---
+    uint256 public nextInitialRiceRecordId;
+    mapping(uint256 => string) public initialRiceRecordUserId;
+    mapping(uint256 => string) public initialRiceRecordRiceType;
+    mapping(uint256 => uint256) public initialRiceRecordQuantity;
+    mapping(uint256 => uint256) public initialRiceRecordDate;
+    mapping(uint256 => bool) public initialRiceRecordStatus;
+
     // --- Rice Damage records ---
     uint256 public nextRiceDamageId;
     mapping(uint256 => string) public riceDamageUserId;
@@ -68,6 +76,15 @@ contract Operations{
         uint256 indexed recordId,
         string userId,
         string paddyType,
+        uint256 quantity,
+        uint256 date,
+        bool status
+    );
+
+    event InitialRiceRecorded(
+        uint256 indexed recordId,
+        string userId,
+        string riceType,
         uint256 quantity,
         uint256 date,
         bool status
@@ -134,6 +151,15 @@ contract Operations{
         bool status
     );
 
+    event InitialRiceUpdated(
+        uint256 indexed recordId,
+        string userId,
+        string riceType,
+        uint256 quantity,
+        uint256 date,
+        bool status
+    );
+
     // --- Save Initial Paddy Record ---
     function saveInitialPaddyRecord(
         string calldata userId,
@@ -160,6 +186,40 @@ contract Operations{
             recordId,
             userId,
             paddyType,
+            quantity,
+            date,
+            status
+        );
+
+        return recordId;
+    }
+
+    // --- Save Initial Rice Record ---
+    function saveInitialRiceRecord(
+        string calldata userId,
+        string calldata riceType,
+        uint256 quantity,
+        uint256 date,
+        bool status
+    ) external returns (uint256) {
+        uint256 recordId = nextInitialRiceRecordId;
+        if (recordId == 0) {
+            recordId = 1;
+            nextInitialRiceRecordId = 2;
+        } else {
+            nextInitialRiceRecordId = recordId + 1;
+        }
+
+        initialRiceRecordUserId[recordId] = userId;
+        initialRiceRecordRiceType[recordId] = riceType;
+        initialRiceRecordQuantity[recordId] = quantity;
+        initialRiceRecordDate[recordId] = date;
+        initialRiceRecordStatus[recordId] = status;
+
+        emit InitialRiceRecorded(
+            recordId,
+            userId,
+            riceType,
             quantity,
             date,
             status
@@ -358,6 +418,23 @@ contract Operations{
             paddyRecordQuantity[recordId],
             paddyRecordDate[recordId],
             paddyRecordStatus[recordId]
+        );
+    }
+
+    function getInitialRiceRecord(uint256 recordId) external view returns (
+        string memory userId,
+        string memory riceType,
+        uint256 quantity,
+        uint256 date,
+        bool status
+    ) {
+        require(recordId > 0 && recordId < nextInitialRiceRecordId, "Invalid record ID");
+        return (
+            initialRiceRecordUserId[recordId],
+            initialRiceRecordRiceType[recordId],
+            initialRiceRecordQuantity[recordId],
+            initialRiceRecordDate[recordId],
+            initialRiceRecordStatus[recordId]
         );
     }
 
