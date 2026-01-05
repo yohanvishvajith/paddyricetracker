@@ -183,12 +183,6 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "nic",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
         "name": "fullName",
         "type": "string"
       },
@@ -209,12 +203,6 @@
         "indexed": false,
         "internalType": "string",
         "name": "id",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "nic",
         "type": "string"
       },
       {
@@ -331,12 +319,6 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "nic",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
         "name": "fullName",
         "type": "string"
       },
@@ -363,12 +345,6 @@
         "indexed": false,
         "internalType": "string",
         "name": "id",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "nic",
         "type": "string"
       },
       {
@@ -777,11 +753,6 @@
       },
       {
         "internalType": "string",
-        "name": "nic",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
         "name": "fullName",
         "type": "string"
       },
@@ -889,11 +860,6 @@
       {
         "internalType": "string",
         "name": "id",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "nic",
         "type": "string"
       },
       {
@@ -1062,11 +1028,6 @@
           },
           {
             "internalType": "string",
-            "name": "nic",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
             "name": "fullName",
             "type": "string"
           },
@@ -1176,11 +1137,6 @@
           {
             "internalType": "string",
             "name": "id",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "nic",
             "type": "string"
           },
           {
@@ -1561,11 +1517,6 @@
           },
           {
             "internalType": "string",
-            "name": "nic",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
             "name": "fullName",
             "type": "string"
           },
@@ -1637,11 +1588,6 @@
           {
             "internalType": "string",
             "name": "id",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "nic",
             "type": "string"
           },
           {
@@ -1939,11 +1885,6 @@
           },
           {
             "internalType": "string",
-            "name": "nic",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
             "name": "fullName",
             "type": "string"
           },
@@ -2015,11 +1956,6 @@
           {
             "internalType": "string",
             "name": "id",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "nic",
             "type": "string"
           },
           {

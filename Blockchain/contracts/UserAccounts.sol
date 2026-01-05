@@ -4,7 +4,6 @@ contract UserAccounts {
     // --- Farmer structure ---
     struct Farmer {
         string id;
-        string nic;
         string fullName;
         string district;
         uint256 totalPaddyFieldArea;
@@ -13,7 +12,6 @@ contract UserAccounts {
     // --- Collector structure ---
     struct Collector {
         string id;
-        string nic;
         string fullName;
         string district;
     }
@@ -78,7 +76,6 @@ contract UserAccounts {
     // --- Input structs ---
     struct FarmerInput {
         string id;
-        string nic;
         string fullName;
         string district;
         uint256 totalPaddyFieldArea;
@@ -86,7 +83,6 @@ contract UserAccounts {
 
     struct CollectorInput {
         string id;
-        string nic;
         string fullName;
         string district;
     }
@@ -165,7 +161,6 @@ contract UserAccounts {
     // --- Events ---
     event FarmerRegistered(
         string id,
-        string nic,
         string fullName,
         string district,
         uint256 totalPaddyFieldArea
@@ -173,7 +168,6 @@ contract UserAccounts {
 
     event CollectorRegistered(
         string id,
-        string nic,
         string fullName,
         string district
     );
@@ -231,7 +225,6 @@ contract UserAccounts {
 
     event FarmerUpdated(
         string id,
-        string nic,
         string fullName,
         string district,
         uint256 totalPaddyFieldArea
@@ -239,7 +232,6 @@ contract UserAccounts {
 
     event CollectorUpdated(
         string id,
-        string nic,
         string fullName,
         string district
     );
@@ -301,7 +293,6 @@ contract UserAccounts {
 
         farmers[input.id] = Farmer({
             id: input.id,
-            nic: input.nic,
             fullName: input.fullName,
             district: input.district,
             totalPaddyFieldArea: input.totalPaddyFieldArea
@@ -311,7 +302,6 @@ contract UserAccounts {
 
         emit FarmerRegistered(
             input.id,
-            input.nic,
             input.fullName,
             input.district,
             input.totalPaddyFieldArea
@@ -324,7 +314,6 @@ contract UserAccounts {
 
         collectors[input.id] = Collector({
             id: input.id,
-            nic: input.nic,
             fullName: input.fullName,
             district: input.district
         });
@@ -333,7 +322,6 @@ contract UserAccounts {
 
         emit CollectorRegistered(
             input.id,
-            input.nic,
             input.fullName,
             input.district
         );
@@ -489,7 +477,6 @@ contract UserAccounts {
 
         farmers[input.id] = Farmer({
             id: input.id,
-            nic: input.nic,
             fullName: input.fullName,
             district: input.district,
             totalPaddyFieldArea: input.totalPaddyFieldArea
@@ -497,7 +484,6 @@ contract UserAccounts {
 
         emit FarmerUpdated(
             input.id,
-            input.nic,
             input.fullName,
             input.district,
             input.totalPaddyFieldArea
@@ -510,14 +496,12 @@ contract UserAccounts {
 
         collectors[input.id] = Collector({
             id: input.id,
-            nic: input.nic,
             fullName: input.fullName,
             district: input.district
         });
 
         emit CollectorUpdated(
             input.id,
-            input.nic,
             input.fullName,
             input.district
         );

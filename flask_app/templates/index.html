@@ -8,6 +8,27 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -170,24 +191,33 @@
         aria-labelledby="tab-manage-user"
         hidden
       >
-        <h2>Manage User</h2>
-
-        <div class="controls" style="margin-bottom: 12px">
-          <button id="add-user-btn" class="btn">Add User</button>
+        <div class="manage-user-header">
+          <div>
+            <h2
+              style="
+                margin: 0 0 8px 0;
+                color: #1f2937;
+                font-size: 28px;
+                font-weight: 700;
+              "
+            >
+              Manage Users
+            </h2>
+            <p style="margin: 0; color: #6b7280; font-size: 14px">
+              View, search, and manage all system users
+            </p>
+          </div>
+          <button id="add-user-btn" class="btn-primary">
+            <span style="font-size: 18px; line-height: 1">+</span>
+            <span>Add New User</span>
+          </button>
         </div>
 
-        <div
-          class="controls"
-          style="
-            margin-bottom: 12px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-          "
-        >
-          <label style="display: flex; flex-direction: column; font-size: 13px">
-            User Type
-            <select id="manage-user-type-filter">
+        <div class="manage-user-filters">
+          <div class="filter-group">
+            <label class="filter-label">📋 User Type</label>
+            <select id="manage-user-type-filter" class="filter-select">
+              <option value="">All Types</option>
               <option value="Farmer">Farmer</option>
               <option value="Collecter">Collecter</option>
               <option value="Miller">Miller</option>
@@ -198,52 +228,57 @@
               <option value="Exporter">Exporter</option>
               <option value="PMB">PMB</option>
             </select>
-          </label>
-          <label
-            style="
-              display: flex;
-              flex-direction: column;
-              flex: 1;
-              font-size: 13px;
-            "
-          >
-            Search (ID / Name)
+          </div>
+          <div class="filter-group" style="flex: 1">
+            <label class="filter-label">🔍 Search</label>
             <input
               id="manage-user-search"
               type="search"
-              placeholder="Enter user ID or name"
-              style="
-                padding: 6px;
-                border-radius: 6px;
-                border: 1px solid #d1d5db;
-              "
+              placeholder="Search by user ID or name..."
+              class="filter-input"
             />
-          </label>
-          <button id="manage-user-refresh" class="btn">Refresh</button>
+          </div>
+          <button
+            id="manage-user-refresh"
+            class="btn-secondary"
+            style="align-self: flex-end"
+          >
+            🔄 Refresh
+          </button>
         </div>
 
-        <div class="table-wrap">
-          <table
-            id="manage-user-table"
-            class="data-table"
-            aria-describedby="manage-user-table-desc"
-          >
-            <caption id="manage-user-table-desc">
-              All Users
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">User ID</th>
-                <th scope="col">Full Name</th>
-                <th scope="col">District</th>
-                <th scope="col">Contact</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- rows will be added here -->
-            </tbody>
-          </table>
+        <div class="manage-user-table-container">
+          <div class="table-wrap">
+            <table
+              id="manage-user-table"
+              class="data-table"
+              aria-describedby="manage-user-table-desc"
+            >
+              <caption id="manage-user-table-desc" style="display: none">
+                All Users
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Full Name</th>
+                  <th scope="col">User Type</th>
+                  <th scope="col">District</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col" style="text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+          </div>
+          <div id="manage-user-empty" class="empty-state" style="display: none">
+            <div class="empty-icon">📭</div>
+            <p class="empty-title">No users found</p>
+            <p class="empty-subtitle">
+              Try adjusting your filters or search terms
+            </p>
+          </div>
         </div>
       </section>
 
@@ -1576,6 +1611,499 @@
                 id="district-chart-analytics"
                 aria-label="Stock by district - Millers and Collectors"
               ></canvas>
+            </div>
+          </div>
+
+          <!-- Price Control Analysis Section -->
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">💰</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Price Control Analysis - Transactions Above Control Price
+              </h3>
+            </div>
+
+            <!-- Price Control Filters -->
+            <div
+              class="controls"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: flex-end;
+                margin-bottom: 20px;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Paddy Type
+                <select
+                  id="price-control-paddy-type"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
+                  <option value="">All Paddy Types</option>
+                </select>
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Control Price (Rs)
+                <input
+                  id="price-control-value"
+                  type="number"
+                  placeholder="Enter control price"
+                  step="0.01"
+                  value="100"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                From Date
+                <input
+                  id="price-control-from-date"
+                  type="date"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                To Date
+                <input
+                  id="price-control-to-date"
+                  type="date"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <button
+                id="price-control-refresh"
+                class="btn primary"
+                style="
+                  padding: 8px 16px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(245, 158, 11, 0.3)';"
+              >
+                Apply Filter
+              </button>
+            </div>
+
+            <!-- Summary Stats -->
+            <div
+              id="price-control-summary"
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 20px;
+              "
+            >
+              <div
+                style="
+                  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="price-control-count"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Transactions Above Control
+                </div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="price-control-total-qty"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Total Quantity (kg)
+                </div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="price-control-avg-price"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Average Price (Rs)
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Control Table -->
+            <div
+              style="
+                background-color: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                max-height: 400px;
+                overflow-y: auto;
+              "
+            >
+              <table
+                id="price-control-table"
+                style="width: 100%; border-collapse: collapse; font-size: 14px"
+              >
+                <thead>
+                  <tr
+                    style="
+                      background-color: #fef3c7;
+                      border-bottom: 2px solid #fcd34d;
+                    "
+                  >
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      From
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      To
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Paddy Type
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Quantity (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Price (Rs)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Over Control
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Date/Time
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: center;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="price-control-tbody">
+                  <tr>
+                    <td
+                      colspan="9"
+                      style="padding: 16px; text-align: center; color: #9ca3af"
+                    >
+                      Set control price and click Apply Filter
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Price Control Details Modal -->
+          <div
+            id="price-control-modal"
+            style="
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 1000;
+              justify-content: center;
+              align-items: center;
+              animation: fadeIn 0.3s ease;
+            "
+          >
+            <div
+              style="
+                background: white;
+                border-radius: 12px;
+                padding: 32px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-height: 80vh;
+                overflow-y: auto;
+                animation: slideUp 0.3s ease;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 24px;
+                  border-bottom: 2px solid #fef3c7;
+                  padding-bottom: 16px;
+                "
+              >
+                <h2
+                  style="
+                    margin: 0;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #1f2937;
+                  "
+                >
+                  Transaction Details
+                </h2>
+                <button
+                  style="
+                    background: none;
+                    border: none;
+                    font-size: 28px;
+                    cursor: pointer;
+                    color: #6b7280;
+                    padding: 0;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                  "
+                  onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.color='#1f2937';"
+                  onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6b7280';"
+                  onclick="closePriceControlModal()"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div id="price-control-modal-content" style="color: #374151">
+                <!-- Content will be populated dynamically -->
+              </div>
+
+              <div
+                style="
+                  margin-top: 24px;
+                  display: flex;
+                  justify-content: flex-end;
+                  gap: 12px;
+                  border-top: 2px solid #f3f4f6;
+                  padding-top: 16px;
+                "
+              >
+                <button
+                  class="btn secondary"
+                  style="
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border-radius: 8px;
+                    background-color: #f3f4f6;
+                    color: #374151;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                  "
+                  onmouseover="this.style.backgroundColor='#e5e7eb'; this.style.transform='translateY(-2px)';"
+                  onmouseout="this.style.backgroundColor='#f3f4f6'; this.style.transform='translateY(0)';"
+                  onclick="closePriceControlModal()"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
 
@@ -3198,6 +3726,762 @@
                 </table>
               </div>
             </div>
+
+            <!-- Rice Transaction Analysis Chart Section -->
+            <div
+              style="
+                margin-top: 32px;
+                background-color: #f9fafb;
+                border-radius: 10px;
+                padding: 20px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  gap: 10px;
+                "
+              >
+                <div style="font-size: 24px">📊</div>
+                <h3
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1f2937;
+                  "
+                >
+                  Rice Transaction Analysis
+                </h3>
+              </div>
+
+              <!-- Chart Filters -->
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr 1fr;
+                  gap: 16px;
+                  margin-bottom: 20px;
+                "
+              >
+                <div>
+                  <label
+                    for="rice-chart-analysis-rice-type"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    Rice Type
+                  </label>
+                  <select
+                    id="rice-chart-analysis-rice-type"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  >
+                    <option value="">All Rice Types</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    for="rice-chart-analysis-from-date"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    From Date
+                  </label>
+                  <input
+                    id="rice-chart-analysis-from-date"
+                    type="date"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="rice-chart-analysis-to-date"
+                    style="
+                      display: block;
+                      margin-bottom: 8px;
+                      font-size: 14px;
+                      font-weight: 500;
+                      color: #4b5563;
+                    "
+                  >
+                    To Date
+                  </label>
+                  <input
+                    id="rice-chart-analysis-to-date"
+                    type="date"
+                    style="
+                      width: 100%;
+                      padding: 10px 14px;
+                      border-radius: 8px;
+                      border: 2px solid #e0e7ff;
+                      font-size: 14px;
+                      background-color: white;
+                      font-weight: 500;
+                      color: #374151;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    "
+                    onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                    onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='0 2px 4px rgba(0, 0, 0, 0.05)';"
+                  />
+                </div>
+              </div>
+
+              <!-- Chart Container -->
+              <div
+                style="
+                  height: 400px;
+                  width: 100%;
+                  position: relative;
+                  background-color: white;
+                  border-radius: 10px;
+                  padding: 16px;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                "
+              >
+                <canvas
+                  id="rice-transaction-analysis-chart"
+                  aria-label="Rice transaction analysis chart"
+                ></canvas>
+              </div>
+
+              <!-- Summary Stats -->
+              <div
+                id="rice-transaction-summary"
+                style="
+                  margin-top: 16px;
+                  display: grid;
+                  grid-template-columns: repeat(4, 1fr);
+                  gap: 16px;
+                "
+              >
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #3b82f6 0%,
+                      #1d4ed8 100%
+                    );
+                    color: white;
+                    padding: 16px;
+                    border-radius: 10px;
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-size: 24px; font-weight: 700"
+                    id="summary-total-quantity"
+                  >
+                    0
+                  </div>
+                  <div style="font-size: 12px; opacity: 0.9">
+                    Total Quantity (kg)
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #22c55e 0%,
+                      #15803d 100%
+                    );
+                    color: white;
+                    padding: 16px;
+                    border-radius: 10px;
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-size: 24px; font-weight: 700"
+                    id="summary-total-transactions"
+                  >
+                    0
+                  </div>
+                  <div style="font-size: 12px; opacity: 0.9">
+                    Total Transactions
+                  </div>
+                </div>
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #f59e0b 0%,
+                      #d97706 100%
+                    );
+                    color: white;
+                    padding: 16px;
+                    border-radius: 10px;
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-size: 24px; font-weight: 700"
+                    id="summary-total-value"
+                  >
+                    0
+                  </div>
+                  <div style="font-size: 12px; opacity: 0.9">Total Value</div>
+                </div>
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #8b5cf6 0%,
+                      #6d28d9 100%
+                    );
+                    color: white;
+                    padding: 16px;
+                    border-radius: 10px;
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-size: 24px; font-weight: 700"
+                    id="summary-avg-price"
+                  >
+                    0
+                  </div>
+                  <div style="font-size: 12px; opacity: 0.9">Avg Price/kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rice Price Control Analysis Section -->
+          <div
+            style="
+              margin-top: 32px;
+              background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+              padding: 24px;
+              border-radius: 12px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                gap: 10px;
+              "
+            >
+              <div style="font-size: 24px">💰</div>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 600;
+                  color: #1f2937;
+                "
+              >
+                Rice Price Control Analysis - Miller to Wholesaler Transactions
+                Above Control Price
+              </h3>
+            </div>
+
+            <!-- Rice Price Control Filters -->
+            <div
+              class="controls"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: flex-end;
+                margin-bottom: 20px;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Rice Type
+                <select
+                  id="rice-price-control-rice-type"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                >
+                  <option value="">All Rice Types</option>
+                </select>
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                Control Price (Rs)
+                <input
+                  id="rice-price-control-value"
+                  type="number"
+                  placeholder="Enter control price"
+                  step="0.01"
+                  value="150"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    transition: all 0.3s ease;
+                    min-width: 150px;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                From Date
+                <input
+                  id="rice-price-control-from-date"
+                  type="date"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #4b5563;
+                "
+              >
+                To Date
+                <input
+                  id="rice-price-control-to-date"
+                  type="date"
+                  style="
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    border: 2px solid #e0e7ff;
+                    margin-top: 4px;
+                    font-size: 13px;
+                    background-color: white;
+                    color: #374151;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.borderColor='#818cf8'; this.style.boxShadow='0 4px 8px rgba(0, 0, 0, 0.1)';"
+                  onmouseout="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none';"
+                />
+              </label>
+
+              <button
+                id="rice-price-control-refresh"
+                class="btn primary"
+                style="
+                  padding: 8px 16px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+                "
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(245, 158, 11, 0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(245, 158, 11, 0.3)';"
+              >
+                Apply Filter
+              </button>
+            </div>
+
+            <!-- Summary Stats -->
+            <div
+              id="rice-price-control-summary"
+              style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 20px;
+              "
+            >
+              <div
+                style="
+                  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="rice-price-control-count"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Transactions Above Control
+                </div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="rice-price-control-total-qty"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Total Quantity (kg)
+                </div>
+              </div>
+              <div
+                style="
+                  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                  color: white;
+                  padding: 16px;
+                  border-radius: 10px;
+                  text-align: center;
+                "
+              >
+                <div
+                  style="font-size: 24px; font-weight: 700"
+                  id="rice-price-control-avg-price"
+                >
+                  0
+                </div>
+                <div style="font-size: 12px; opacity: 0.9">
+                  Average Price (Rs)
+                </div>
+              </div>
+            </div>
+
+            <!-- Rice Price Control Table -->
+            <div
+              style="
+                background-color: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                max-height: 400px;
+                overflow-y: auto;
+              "
+            >
+              <table
+                id="rice-price-control-table"
+                style="width: 100%; border-collapse: collapse; font-size: 14px"
+              >
+                <thead>
+                  <tr
+                    style="
+                      background-color: #fef3c7;
+                      border-bottom: 2px solid #fcd34d;
+                    "
+                  >
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      From (Miller)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      To (Wholesaler)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Rice Type
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Quantity (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Price (Rs)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: right;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Over Control
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Date/Time
+                    </th>
+                    <th
+                      style="
+                        padding: 12px 16px;
+                        text-align: center;
+                        font-weight: 600;
+                        color: #92400e;
+                      "
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="rice-price-control-tbody">
+                  <tr>
+                    <td
+                      colspan="9"
+                      style="padding: 16px; text-align: center; color: #9ca3af"
+                    >
+                      Set control price and click Apply Filter
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Rice Price Control Details Modal -->
+          <div
+            id="rice-price-control-modal"
+            style="
+              display: none;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 1000;
+              justify-content: center;
+              align-items: center;
+              animation: fadeIn 0.3s ease;
+            "
+          >
+            <div
+              style="
+                background: white;
+                border-radius: 12px;
+                padding: 32px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                max-height: 80vh;
+                overflow-y: auto;
+                animation: slideUp 0.3s ease;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 24px;
+                  border-bottom: 2px solid #fef3c7;
+                  padding-bottom: 16px;
+                "
+              >
+                <h2
+                  style="
+                    margin: 0;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #1f2937;
+                  "
+                >
+                  Rice Transaction Details
+                </h2>
+                <button
+                  style="
+                    background: none;
+                    border: none;
+                    font-size: 28px;
+                    cursor: pointer;
+                    color: #6b7280;
+                    padding: 0;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 6px;
+                    transition: all 0.2s ease;
+                  "
+                  onmouseover="this.style.backgroundColor='#f3f4f6'; this.style.color='#1f2937';"
+                  onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6b7280';"
+                  onclick="closeRicePriceControlModal()"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div id="rice-price-control-modal-content" style="color: #374151">
+                <!-- Content will be populated dynamically -->
+              </div>
+
+              <div
+                style="
+                  margin-top: 24px;
+                  display: flex;
+                  justify-content: flex-end;
+                  gap: 12px;
+                  border-top: 2px solid #f3f4f6;
+                  padding-top: 16px;
+                "
+              >
+                <button
+                  class="btn secondary"
+                  style="
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    border-radius: 8px;
+                    background-color: #f3f4f6;
+                    color: #374151;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                  "
+                  onmouseover="this.style.backgroundColor='#e5e7eb'; this.style.transform='translateY(-2px)';"
+                  onmouseout="this.style.backgroundColor='#f3f4f6'; this.style.transform='translateY(0)';"
+                  onclick="closeRicePriceControlModal()"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -3519,6 +4803,19 @@
 
             <label style="display: block; margin-bottom: 12px">
               User Name
+              <input
+                type="text"
+                id="initial-paddy-user-search"
+                placeholder="Search user by ID or name..."
+                style="
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 4px;
+                  border: 1px solid #d1d5db;
+                  margin-top: 4px;
+                  box-sizing: border-box;
+                "
+              />
               <select
                 id="initial-paddy-user-select"
                 style="
@@ -3527,7 +4824,9 @@
                   border-radius: 4px;
                   border: 1px solid #d1d5db;
                   margin-top: 4px;
+                  max-height: 200px;
                 "
+                size="5"
                 required
               >
                 <option value="">Select User</option>
@@ -4083,64 +5382,85 @@
             const users = await resp.json();
 
             manageUserTableBody.innerHTML = "";
-            users
-              .filter((u) => {
-                // Filter by user type
-                if (selectedType && u.user_type !== selectedType) return false;
-                // Filter by search query (ID or name)
-                if (searchQuery) {
-                  const matchId = (u.id || "")
-                    .toLowerCase()
-                    .includes(searchQuery);
-                  const matchName = (u.full_name || "")
-                    .toLowerCase()
-                    .includes(searchQuery);
-                  const matchCompany = (u.company_name || "")
-                    .toLowerCase()
-                    .includes(searchQuery);
-                  if (!matchId && !matchName && !matchCompany) return false;
-                }
-                return true;
-              })
-              .forEach((u) => {
-                const tr = document.createElement("tr");
-                // For millers, wholesalers, retailers and company-type users, show company name instead of full name
-                const displayName =
-                  u.user_type === "Miller" ||
-                  u.user_type === "Wholesaler" ||
-                  u.user_type === "Retailer" ||
-                  u.user_type === "Beer" ||
-                  u.user_type === "Animal Food" ||
-                  u.user_type === "Exporter"
-                    ? u.company_name || ""
-                    : u.full_name || "";
-                tr.innerHTML = `
-                  <td>${escapeHtml(u.id || "")}</td>
-                  <td>${escapeHtml(displayName)}</td>
-                  <td>${escapeHtml(u.district || "")}</td>
-                  <td>${escapeHtml(u.contact_number || "")}</td>
-                  <td>
-                    <button class="btn view-user-btn" style="padding: 4px 8px; font-size: 12px; margin-right: 4px;" title="View Details">
-                      👁️ View
-                    </button>
-                    <button class="btn edit-user-btn" style="padding: 4px 8px; font-size: 12px; background-color: #f59e0b; color: white;" title="Edit User">
-                      ✏️ Edit
-                    </button>
-                  </td>
-                `;
-                tr.dataset.user = JSON.stringify(u);
-                tr.dataset.userId = u.id;
+            const filteredUsers = users.filter((u) => {
+              // Filter by user type
+              if (selectedType && u.user_type !== selectedType) return false;
+              // Filter by search query (ID or name)
+              if (searchQuery) {
+                const matchId = (u.id || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                const matchName = (u.full_name || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                const matchCompany = (u.company_name || "")
+                  .toLowerCase()
+                  .includes(searchQuery);
+                if (!matchId && !matchName && !matchCompany) return false;
+              }
+              return true;
+            });
 
-                // Add click event listener to the view button
-                const viewBtn = tr.querySelector(".view-user-btn");
-                viewBtn.addEventListener("click", () => showUserDetail(u.id));
+            const emptyState = document.getElementById("manage-user-empty");
+            if (filteredUsers.length === 0) {
+              emptyState.style.display = "flex";
+            } else {
+              emptyState.style.display = "none";
+            }
 
-                // Add click event listener to the edit button
-                const editBtn = tr.querySelector(".edit-user-btn");
-                editBtn.addEventListener("click", () => editUser(u));
+            filteredUsers.forEach((u) => {
+              const tr = document.createElement("tr");
+              // For millers, wholesalers, retailers and company-type users, show company name instead of full name
+              const displayName =
+                u.user_type === "Miller" ||
+                u.user_type === "Wholesaler" ||
+                u.user_type === "Retailer" ||
+                u.user_type === "Beer" ||
+                u.user_type === "Animal Food" ||
+                u.user_type === "Exporter"
+                  ? u.company_name || ""
+                  : u.full_name || "";
 
-                manageUserTableBody.appendChild(tr);
-              });
+              const badgeClass = (u.user_type || "")
+                .toLowerCase()
+                .replace(" ", "-");
+
+              tr.innerHTML = `
+                <td style="font-weight: 500; color: #1f2937">${escapeHtml(
+                  u.id || ""
+                )}</td>
+                <td style="color: #374151">${escapeHtml(displayName)}</td>
+                <td><span class="user-type-badge badge-${badgeClass}">${escapeHtml(
+                u.user_type || ""
+              )}</span></td>
+                <td style="color: #6b7280">${escapeHtml(
+                  u.district || "N/A"
+                )}</td>
+                <td style="color: #6b7280; font-size: 13px">${escapeHtml(
+                  u.contact_number || "N/A"
+                )}</td>
+                <td style="text-align: center">
+                  <button class="btn-action btn-view view-user-btn" title="View Details">
+                    👁️ View
+                  </button>
+                  <button class="btn-action btn-edit edit-user-btn" title="Edit User">
+                    ✏️ Edit
+                  </button>
+                </td>
+              `;
+              tr.dataset.user = JSON.stringify(u);
+              tr.dataset.userId = u.id;
+
+              // Add click event listener to the view button
+              const viewBtn = tr.querySelector(".view-user-btn");
+              viewBtn.addEventListener("click", () => showUserDetail(u.id));
+
+              // Add click event listener to the edit button
+              const editBtn = tr.querySelector(".edit-user-btn");
+              editBtn.addEventListener("click", () => editUser(u));
+
+              manageUserTableBody.appendChild(tr);
+            });
           } catch (err) {
             console.error("Failed to load users", err);
           }
@@ -4152,7 +5472,7 @@
           handleUpdateInitialPaddy(e);
           handleRevertInitialPaddy(e);
           handleViewInitialRice(e);
-          handleUpdateInitialRice(e);
+          handleRevertInitialRice(e);
         });
 
         // Add event listeners for modal cancel buttons
@@ -4202,6 +5522,8 @@
             if (!resp.ok) throw new Error("Failed to fetch initial paddy data");
             const data = await resp.json();
 
+            console.log("Initial Paddy Data:", data); // Debug: Check what data we receive
+
             initialPaddyTableBody.innerHTML = "";
 
             if (data.length === 0) {
@@ -4216,7 +5538,29 @@
             }
 
             data.forEach((item) => {
+              console.log("Processing item:", {
+                id: item.id,
+                status: item.status,
+                statusType: typeof item.status,
+                statusValue: item.status,
+              }); // Debug: Check status value and type
+
               const tr = document.createElement("tr");
+
+              // Highlight rows with status = 0 (reverted)
+              // Check for 0, false, "0", and null/undefined
+              const isReverted =
+                item.status === 0 ||
+                item.status === false ||
+                item.status === "0" ||
+                item.status === null;
+
+              if (isReverted) {
+                console.log("Highlighting row for item:", item.id); // Debug: Confirm highlighting
+                tr.style.backgroundColor = "#fee2e2"; // Light red background
+                tr.style.opacity = "0.7";
+              }
+
               // Format the date
               let dateStr = "";
               if (item.created_at) {
@@ -4321,7 +5665,28 @@
             }
 
             data.forEach((item) => {
+              console.log("Processing rice item:", {
+                id: item.id,
+                status: item.status,
+                statusType: typeof item.status,
+                statusValue: item.status,
+              }); // Debug: Check status value and type
+
               const tr = document.createElement("tr");
+
+              // Highlight rows with status = 0 (reverted)
+              const isReverted =
+                item.status === 0 ||
+                item.status === false ||
+                item.status === "0" ||
+                item.status === null;
+
+              if (isReverted) {
+                console.log("Highlighting rice row for item:", item.id); // Debug: Confirm highlighting
+                tr.style.backgroundColor = "#fee2e2"; // Light red background
+                tr.style.opacity = "0.7";
+              }
+
               // Format the date
               let dateStr = "";
               if (item.created_at) {
@@ -4361,12 +5726,12 @@
               }" data-transaction-hash="${item.transaction_hash || ""}">
                     👁️ View
                   </button>
-                  <button class="btn update-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #f59e0b; color: white;" data-id="${
+                  <button class="btn revert-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
                     item.id
                   }" data-user-id="${item.user_id}" data-rice-type="${
                 item.rice_type || ""
               }" data-quantity="${item.quantity || 0}">
-                    ✏️ Update
+                    ↶ Revert
                   </button>
                 </td>
               `;
@@ -4475,22 +5840,46 @@
           }
         }
 
-        // Handle update initial rice button clicks
-        function handleUpdateInitialRice(e) {
-          if (e.target.classList.contains("update-initial-rice-btn")) {
+        // Handle revert initial rice button clicks
+        async function handleRevertInitialRice(e) {
+          if (e.target.classList.contains("revert-initial-rice-btn")) {
             const id = e.target.dataset.id;
             const userId = e.target.dataset.userId;
             const riceType = e.target.dataset.riceType;
-            const quantity = e.target.dataset.quantity;
+            const quantity = parseFloat(e.target.dataset.quantity);
 
-            document.getElementById("update-rice-id").value = id;
-            document.getElementById("update-rice-user-id").value = userId;
-            document.getElementById("update-rice-type").value = riceType;
-            document.getElementById("update-rice-quantity").value = quantity;
+            if (
+              !confirm(
+                `Are you sure you want to revert this rice record? This will set status to inactive and deduct ${quantity} kg from the stock.`
+              )
+            ) {
+              return;
+            }
 
-            const modal = document.getElementById("update-initial-rice-modal");
-            modal.removeAttribute("hidden");
-            modal.setAttribute("aria-hidden", "false");
+            try {
+              const resp = await fetch(`/api/initial_rice/${id}/revert`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  user_id: userId,
+                  rice_type: riceType,
+                  quantity: quantity,
+                }),
+              });
+
+              if (!resp.ok) {
+                const error = await resp.json();
+                throw new Error(
+                  error.message || "Failed to revert initial rice"
+                );
+              }
+
+              alert("Initial rice reverted successfully!");
+              loadInitialRice();
+            } catch (err) {
+              console.error("Error reverting initial rice:", err);
+              alert(`Error: ${err.message}`);
+            }
           }
         }
 
@@ -4957,13 +6346,29 @@
         const initialPaddyTypeSelect = document.getElementById(
           "initial-paddy-type-select"
         );
+        const initialPaddyUserSearch = document.getElementById(
+          "initial-paddy-user-search"
+        );
+
+        // Store all users for filtering
+        let allPaddyUsers = [];
 
         // Fetch paddy types on page load
         async function fetchPaddyTypesForModal() {
           try {
-            const resp = await fetch("/api/paddy_types");
-            if (!resp.ok) throw new Error("Failed to fetch paddy types");
+            console.log("Fetching paddy types for modal..."); // Debug
+            // Fetch from paddy_type table directly, or from stock table to get actual paddy types in use
+            const resp = await fetch("/api/paddy_type_list");
+            if (!resp.ok) {
+              console.error(
+                "Failed to fetch paddy types, status:",
+                resp.status
+              );
+              throw new Error("Failed to fetch paddy types");
+            }
             const types = await resp.json();
+            console.log("Paddy types received:", types); // Debug
+
             initialPaddyTypeSelect.innerHTML =
               '<option value="">Select Paddy Type</option>';
             types.forEach((t) => {
@@ -4972,6 +6377,11 @@
               opt.textContent = t.name || String(t.id || "");
               initialPaddyTypeSelect.appendChild(opt);
             });
+            console.log(
+              "Paddy types dropdown populated with",
+              types.length,
+              "types"
+            ); // Debug
           } catch (err) {
             console.error("Failed to fetch paddy types:", err);
           }
@@ -4982,6 +6392,12 @@
           const userType = initialPaddyUserTypeSelect.value;
           initialPaddyUserSelect.innerHTML =
             '<option value="">Select User</option>';
+          allPaddyUsers = []; // Clear the users array
+
+          // Clear search input
+          if (initialPaddyUserSearch) {
+            initialPaddyUserSearch.value = "";
+          }
 
           if (!userType) return;
 
@@ -4992,27 +6408,67 @@
             if (!resp.ok) throw new Error("Failed to fetch users");
             const users = await resp.json();
 
-            users.forEach((u) => {
-              const opt = document.createElement("option");
-              opt.value = u.id || "";
+            // Store all users for filtering
+            allPaddyUsers = users;
+
+            // Display all users initially
+            displayFilteredPaddyUsers(users);
+          } catch (err) {
+            console.error("Failed to load users:", err);
+          }
+        }
+
+        // Display filtered users in the select dropdown
+        function displayFilteredPaddyUsers(users) {
+          initialPaddyUserSelect.innerHTML =
+            '<option value="">Select User</option>';
+
+          users.forEach((u) => {
+            const opt = document.createElement("option");
+            opt.value = u.id || "";
+            const displayName =
+              u.full_name || u.company_name || u.name || u.user_code || "";
+            const idPart =
+              u.id !== undefined && u.id !== null ? String(u.id) : "";
+            opt.textContent = idPart
+              ? `${idPart} - ${displayName || idPart}`
+              : displayName || idPart;
+            // Store full data for searching
+            opt.dataset.searchText = `${idPart} ${displayName}`.toLowerCase();
+            initialPaddyUserSelect.appendChild(opt);
+          });
+        }
+
+        // Search/filter users
+        if (initialPaddyUserSearch) {
+          initialPaddyUserSearch.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            if (!searchTerm) {
+              // Show all users if search is empty
+              displayFilteredPaddyUsers(allPaddyUsers);
+              return;
+            }
+
+            // Filter users based on search term
+            const filteredUsers = allPaddyUsers.filter((u) => {
               const displayName =
                 u.full_name || u.company_name || u.name || u.user_code || "";
               const idPart =
                 u.id !== undefined && u.id !== null ? String(u.id) : "";
-              opt.textContent = idPart
-                ? `${idPart} - ${displayName || idPart}`
-                : displayName || idPart;
-              initialPaddyUserSelect.appendChild(opt);
+              const searchText = `${idPart} ${displayName}`.toLowerCase();
+              return searchText.includes(searchTerm);
             });
-          } catch (err) {
-            console.error("Failed to load users:", err);
-          }
+
+            displayFilteredPaddyUsers(filteredUsers);
+          });
         }
 
         // Open Add Paddy Modal
         if (addInitialPaddyBtn) {
           addInitialPaddyBtn.addEventListener("click", () => {
             addInitialPaddyModal.hidden = false;
+            addInitialPaddyModal.setAttribute("aria-hidden", "false");
             fetchPaddyTypesForModal();
           });
         }
@@ -5021,6 +6477,7 @@
         if (addPaddyCancelBtn) {
           addPaddyCancelBtn.addEventListener("click", () => {
             addInitialPaddyModal.hidden = true;
+            addInitialPaddyModal.setAttribute("aria-hidden", "true");
             addInitialPaddyForm.reset();
           });
         }
@@ -5661,7 +7118,7 @@
               <label>Address<input type="text" name="address" /></label>
               <label>District<select name="district">${districtOptions}</select></label>
               <label>Contact Number<input type="text" name="contactNumber" /></label>
-              <label>Total Area Of Paddy Land<input type="text" name="totalAreaOfPaddyLand" /></label>
+              <label>Total Area Of Paddy Land(Perch)<input type="text" name="totalAreaOfPaddyLand" /></label>
             `;
           } else if (type === "Collecter") {
             html = `
@@ -5689,8 +7146,8 @@
             `;
           } else if (type === "Retailer") {
             html = `
-              <label>Company Register Number<input type="text" name="companyRegisterNumber" required /></label>
-              <label>Company Name<input type="text" name="companyName" /></label>
+              <label>Shop Registered Number<input type="text" name="companyRegisterNumber" required /></label>
+              <label>Shop Registered Name<input type="text" name="companyName" /></label>
               <label>Address<input type="text" name="address" /></label>
               <label>District<select name="district">${districtOptions}</select></label>
               <label>Contact Number<input type="text" name="contactNumber" /></label>
@@ -6368,6 +7825,7 @@
             loadDistrictChart();
             loadStockUsers();
             loadTransactions();
+            loadPriceControlTable();
           }, 50);
         }
 
@@ -6733,11 +8191,6 @@
               "farmer-lookup-date-to"
             ).value;
 
-            console.log("=== Farmer Lookup Debug ===");
-            console.log("Farmer ID:", farmerId);
-            console.log("Date From:", dateFrom);
-            console.log("Date To:", dateTo);
-
             if (!farmerId) {
               alert("Please select a farmer");
               return;
@@ -6750,12 +8203,8 @@
             if (dateFrom) url += `&date_from=${encodeURIComponent(dateFrom)}`;
             if (dateTo) url += `&date_to=${encodeURIComponent(dateTo)}`;
 
-            console.log("API URL:", url);
-
             // Fetch data from API
             const res = await fetch(url);
-            console.log("Response status:", res.status);
-            console.log("Response ok:", res.ok);
 
             if (!res.ok) {
               const errorText = await res.text();
@@ -6766,7 +8215,6 @@
             }
 
             const data = await res.json();
-            console.log("Received data:", data);
 
             // Display results
             displayFarmerLookupResults(data);
@@ -6778,9 +8226,6 @@
 
         // Display farmer lookup results
         function displayFarmerLookupResults(data) {
-          console.log("=== Display Farmer Lookup Results ===");
-          console.log("Data received:", data);
-
           try {
             const resultsDiv = document.getElementById("farmer-lookup-results");
             const summaryDiv = document.getElementById("farmer-summary-stats");
@@ -6789,24 +8234,10 @@
               "farmer-transactions-tbody"
             );
 
-            console.log("DOM elements found:", {
-              resultsDiv: !!resultsDiv,
-              summaryDiv: !!summaryDiv,
-              paddyTbody: !!paddyTbody,
-              txTbody: !!txTbody,
-            });
-
             const farmer = data.farmer || {};
             const summary = data.summary || {};
             const breakdown = data.breakdown || [];
             const transactions = data.transactions || [];
-
-            console.log("Parsed data:", {
-              farmer,
-              summary,
-              breakdown: breakdown.length,
-              transactions: transactions.length,
-            });
 
             // Build summary stats
             summaryDiv.innerHTML = `
@@ -6847,8 +8278,6 @@
               }</div>
             </div>
           `;
-
-            console.log("Summary stats rendered");
 
             // Build paddy type breakdown table
             paddyTbody.innerHTML = "";
@@ -6897,8 +8326,6 @@
             `;
               paddyTbody.appendChild(totalRow);
             }
-
-            console.log("Breakdown table rendered");
 
             // Build transactions table
             txTbody.innerHTML = "";
@@ -6965,11 +8392,8 @@
               });
             });
 
-            console.log("Transactions table rendered");
-
             // Show results
             resultsDiv.style.display = "block";
-            console.log("Results displayed successfully");
           } catch (error) {
             console.error("Error in displayFarmerLookupResults:", error);
             alert("Error displaying results: " + error.message);
@@ -7130,12 +8554,6 @@
             const dateFrom = document.getElementById("damage-date-from").value;
             const dateTo = document.getElementById("damage-date-to").value;
 
-            console.log("=== Damage Lookup Debug ===");
-            console.log("User Type:", userType);
-            console.log("Paddy Type:", paddyType);
-            console.log("Date From:", dateFrom);
-            console.log("Date To:", dateTo);
-
             // Build API URL
             let url = `/api/damage_lookup?`;
             const params = [];
@@ -7148,11 +8566,8 @@
             if (dateTo) params.push(`date_to=${encodeURIComponent(dateTo)}`);
             url += params.join("&");
 
-            console.log("API URL:", url);
-
             // Fetch data from API
             const res = await fetch(url);
-            console.log("Response status:", res.status);
 
             if (!res.ok) {
               const errorText = await res.text();
@@ -7163,7 +8578,6 @@
             }
 
             const data = await res.json();
-            console.log("Damage data received:", data);
 
             displayDamageLookupResults(data);
           } catch (e) {
@@ -7177,8 +8591,6 @@
           const resultsDiv = document.getElementById("damage-lookup-results");
           const tableBody = document.getElementById("damage-tbody");
           const noResults = document.getElementById("damage-no-results");
-
-          console.log("Displaying damage results, count:", data.length);
 
           resultsDiv.style.display = "block";
 
@@ -7456,6 +8868,416 @@
         if (transactionRefresh) {
           transactionRefresh.addEventListener("click", loadTransactions);
         }
+
+        // Price Control Analysis Functions
+        let priceControlTransactionsData = [];
+
+        async function loadPriceControlPaddyTypes() {
+          try {
+            const response = await fetch("/api/paddy_types");
+            const data = await response.json();
+            const select = document.getElementById("price-control-paddy-type");
+            if (select) {
+              // Clear existing options except the first one
+              while (select.options.length > 1) {
+                select.remove(1);
+              }
+              data.forEach((item) => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error("Failed to load paddy types for price control:", err);
+          }
+        }
+
+        async function loadPriceControlTable() {
+          try {
+            const paddyType =
+              document.getElementById("price-control-paddy-type")?.value || "";
+            const controlPrice =
+              parseFloat(
+                document.getElementById("price-control-value")?.value
+              ) || 0;
+            const fromDate =
+              document.getElementById("price-control-from-date")?.value || "";
+            const toDate =
+              document.getElementById("price-control-to-date")?.value || "";
+
+            // Fetch all transactions
+            const response = await fetch("/api/transactions");
+            const allTransactions = await response.json();
+
+            // Filter transactions above control price
+            let filtered = allTransactions.filter((t) => {
+              const price = parseFloat(t.price || 0);
+              return price > controlPrice;
+            });
+
+            // Apply paddy type filter
+            if (paddyType) {
+              filtered = filtered.filter((t) => t.type === paddyType);
+            }
+
+            // Apply date range filter
+            if (fromDate || toDate) {
+              filtered = filtered.filter((t) => {
+                const txDate = t.datetime
+                  ? new Date(t.datetime)
+                  : t.created_at
+                  ? new Date(t.created_at)
+                  : null;
+                if (!txDate) return false;
+
+                if (fromDate) {
+                  const from = new Date(fromDate);
+                  from.setHours(0, 0, 0, 0);
+                  if (txDate < from) return false;
+                }
+                if (toDate) {
+                  const to = new Date(toDate);
+                  to.setHours(23, 59, 59, 999);
+                  if (txDate > to) return false;
+                }
+                return true;
+              });
+            }
+
+            // Calculate summary stats
+            let totalQty = 0;
+            let totalPrice = 0;
+            filtered.forEach((t) => {
+              totalQty += parseFloat(t.quantity || 0);
+              totalPrice += parseFloat(t.price || 0);
+            });
+            const avgPrice =
+              filtered.length > 0 ? totalPrice / filtered.length : 0;
+
+            // Update summary stats
+            document.getElementById("price-control-count").textContent =
+              filtered.length;
+            document.getElementById("price-control-total-qty").textContent =
+              totalQty.toFixed(3);
+            document.getElementById("price-control-avg-price").textContent =
+              avgPrice.toFixed(2);
+
+            // Update table
+            const tbody = document.getElementById("price-control-tbody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            if (filtered.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="9" style="padding: 16px; text-align: center; color: #9ca3af;">
+                    No transactions found above the control price (Rs ${controlPrice.toFixed(
+                      2
+                    )})
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            // Store filtered transactions for modal access
+            priceControlTransactionsData = filtered;
+
+            filtered.forEach((t, index) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #fcd34d";
+              tr.style.backgroundColor = "#fffbeb";
+              tr.style.transition = "background-color 0.2s ease";
+              tr.onmouseover = function () {
+                this.style.backgroundColor = "#fef3c7";
+              };
+              tr.onmouseout = function () {
+                this.style.backgroundColor = "#fffbeb";
+              };
+
+              const price = parseFloat(t.price || 0);
+              const overControl = price - controlPrice;
+              const dateStr = t.datetime
+                ? new Date(t.datetime).toLocaleString()
+                : t.created_at
+                ? new Date(t.created_at).toLocaleString()
+                : "-";
+
+              tr.innerHTML = `
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.id || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.from || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.to || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.type || ""
+                )}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #92400e; font-weight: 500;">${parseFloat(
+                  t.quantity || 0
+                ).toFixed(3)}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #dc2626; font-weight: 600;">${price.toFixed(
+                  2
+                )}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #dc2626; font-weight: 600;">+${overControl.toFixed(
+                  2
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${dateStr}</td>
+                <td style="padding: 12px 16px; text-align: center;">
+                  <button
+                    class="btn primary"
+                    style="
+                      padding: 6px 12px;
+                      font-size: 12px;
+                      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                      color: white;
+                      border: none;
+                      border-radius: 6px;
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 8px rgba(37, 99, 235, 0.4)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';"
+                    onclick="showPriceControlModal(${index})"
+                  >
+                    View
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          } catch (err) {
+            console.error("Failed to load price control table:", err);
+            const tbody = document.getElementById("price-control-tbody");
+            if (tbody) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="8" style="padding: 16px; text-align: center; color: #ef4444;">
+                    Error loading data: ${err.message}
+                  </td>
+                </tr>
+              `;
+            }
+          }
+        }
+
+        function setupPriceControlListeners() {
+          const paddyType = document.getElementById("price-control-paddy-type");
+          const controlValue = document.getElementById("price-control-value");
+          const fromDate = document.getElementById("price-control-from-date");
+          const toDate = document.getElementById("price-control-to-date");
+          const refreshBtn = document.getElementById("price-control-refresh");
+
+          if (paddyType)
+            paddyType.addEventListener("change", loadPriceControlTable);
+          if (fromDate)
+            fromDate.addEventListener("change", loadPriceControlTable);
+          if (toDate) toDate.addEventListener("change", loadPriceControlTable);
+          if (refreshBtn)
+            refreshBtn.addEventListener("click", loadPriceControlTable);
+        }
+
+        // Make function globally accessible for inline onclick handlers
+        window.showPriceControlModal = function (index) {
+          const modal = document.getElementById("price-control-modal");
+          const content = document.getElementById(
+            "price-control-modal-content"
+          );
+
+          if (!modal || !content) {
+            console.error("Modal or content element not found");
+            return;
+          }
+
+          const transaction = priceControlTransactionsData[index];
+          if (!transaction) {
+            console.error("Transaction not found at index:", index);
+            return;
+          }
+
+          const controlPrice =
+            parseFloat(document.getElementById("price-control-value")?.value) ||
+            0;
+          const price = parseFloat(transaction.price || 0);
+          const overControl = price - controlPrice;
+
+          content.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+              <!-- Transaction Info -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Transaction ID</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                    transaction.id || ""
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Date/Time</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">
+                    ${
+                      transaction.datetime
+                        ? new Date(transaction.datetime).toLocaleString()
+                        : transaction.created_at
+                        ? new Date(transaction.created_at).toLocaleString()
+                        : "-"
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- From Party Details -->
+              <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #92400e; border-bottom: 2px solid #fcd34d; padding-bottom: 8px;">FROM PARTY</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">ID</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from || ""
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Name</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from_name || "-"
+                    )}</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Address</label>
+                    <div style="font-size: 14px; color: #1f2937;">${escapeHtml(
+                      transaction.from_address || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Contact Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from_contact || "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- To Party Details -->
+              <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #1e40af; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">TO PARTY</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">ID</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to || ""
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Name</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to_name || "-"
+                    )}</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Address</label>
+                    <div style="font-size: 14px; color: #1f2937;">${escapeHtml(
+                      transaction.to_address || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Contact Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to_contact || "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transaction Details -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Paddy Type</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                    transaction.type || ""
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Quantity</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${parseFloat(
+                    transaction.quantity || 0
+                  ).toFixed(3)} kg</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Price</label>
+                  <div style="font-size: 18px; font-weight: 700; color: #dc2626;">Rs ${price.toFixed(
+                    2
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Control Price</label>
+                  <div style="font-size: 18px; font-weight: 700; color: #374151;">Rs ${controlPrice.toFixed(
+                    2
+                  )}</div>
+                </div>
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 12px; border-radius: 8px; text-align: center;">
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #991b1b; margin-bottom: 4px;">Over Control Amount</label>
+                  <div style="font-size: 24px; font-weight: 700; color: #dc2626;">+Rs ${overControl.toFixed(
+                    2
+                  )}</div>
+                </div>
+              </div>
+
+              <!-- Blockchain Information -->
+              <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #6b21a8; border-bottom: 2px solid #d8b4fe; padding-bottom: 8px;">⛓️ BLOCKCHAIN INFORMATION</h3>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Transaction Hash</label>
+                    <div style="font-size: 12px; font-family: monospace; color: #1f2937; word-break: break-all; background: white; padding: 8px; border-radius: 4px;">${escapeHtml(
+                      transaction.transaction_hash || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Block Hash</label>
+                    <div style="font-size: 12px; font-family: monospace; color: #1f2937; word-break: break-all; background: white; padding: 8px; border-radius: 4px;">${escapeHtml(
+                      transaction.block_hash || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Block Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.block_number
+                        ? transaction.block_number.toString()
+                        : "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+          document.body.style.overflow = "hidden";
+        };
+
+        window.closePriceControlModal = function () {
+          const modal = document.getElementById("price-control-modal");
+          if (modal) {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+          }
+        };
+
+        // Close modal when clicking outside of it
+        document.addEventListener("click", function (event) {
+          const modal = document.getElementById("price-control-modal");
+          if (modal && event.target === modal) {
+            window.closePriceControlModal();
+          }
+        });
+
+        // Initialize price control on page load
+        loadPriceControlPaddyTypes();
+        setupPriceControlListeners();
 
         // Load transactions
         async function loadTransactions() {
@@ -7982,7 +9804,6 @@
               return;
             }
             const data = await res.json();
-            console.log("Rice distribution API response:", data);
             const districts = data.districts || [];
 
             const select = document.getElementById(
@@ -8006,7 +9827,6 @@
               option.textContent = district;
               select.appendChild(option);
             });
-            console.log("Loaded", districts.length, "districts");
           } catch (err) {
             console.error("Failed to load rice district filter", err);
           }
@@ -8020,7 +9840,6 @@
               return;
             }
             const data = await res.json();
-            console.log("Rice types from API:", data.paddy_types);
             const paddyTypes = data.paddy_types || [];
 
             const select = document.getElementById(
@@ -8044,7 +9863,6 @@
               option.textContent = paddy.name || String(paddy.id || "");
               select.appendChild(option);
             });
-            console.log("Loaded", paddyTypes.length, "rice types");
           } catch (err) {
             console.error("Failed to load rice type filter", err);
           }
@@ -8080,7 +9898,6 @@
               url += "?" + params.toString();
             }
 
-            console.log("Fetching rice distribution from:", url);
             const res = await fetch(url);
             if (!res.ok) {
               console.error("API returned:", res.status);
@@ -8090,8 +9907,6 @@
             const data = await res.json();
             const records = data.data || [];
 
-            console.log("Rice distribution data:", records);
-
             // Aggregate data by user type
             const aggregated = {};
             records.forEach((record) => {
@@ -8099,8 +9914,6 @@
               const quantity = parseFloat(record.total_quantity) || 0;
               aggregated[userType] = (aggregated[userType] || 0) + quantity;
             });
-
-            console.log("Aggregated data:", aggregated);
 
             // Prepare chart data
             const labels = Object.keys(aggregated).sort();
@@ -8144,7 +9957,6 @@
               (label) => borderColorMap[label] || "rgba(156, 163, 175, 1)"
             );
 
-            console.log("Loading Chart.js...");
             await ensureChartJs();
             const canvas = document.getElementById("rice-distribution-chart");
             if (!canvas) {
@@ -8158,7 +9970,6 @@
             }
 
             if (riceDistributionChart) {
-              console.log("Updating existing chart");
               riceDistributionChart.data.labels = labels;
               riceDistributionChart.data.datasets[0].data = chartData;
               riceDistributionChart.data.datasets[0].backgroundColor = colors;
@@ -8167,7 +9978,6 @@
               return;
             }
 
-            console.log("Creating new chart with data:", { labels, chartData });
             riceDistributionChart = new Chart(ctx, {
               type: "bar",
               data: {
@@ -8215,7 +10025,6 @@
                 },
               },
             });
-            console.log("Chart created successfully");
           } catch (err) {
             console.error("Failed to load rice distribution chart", err);
           }
@@ -8245,11 +10054,9 @@
         // Stock Lookup Functions
         async function loadStockLookupDistricts() {
           try {
-            console.log("loadStockLookupDistricts called");
             const response = await fetch("/api/rice_distribution");
             const data = await response.json();
             const districts = data.districts || [];
-            console.log("Districts loaded:", districts);
             const select = document.getElementById("stock-lookup-district");
             if (select) {
               districts.forEach((district) => {
@@ -8266,7 +10073,6 @@
 
         async function loadStockLookupUserTypes() {
           try {
-            console.log("loadStockLookupUserTypes called");
             const response = await fetch("/api/debug/rice_stock");
             const data = await response.json();
             const userTypesSet = new Set();
@@ -8276,7 +10082,6 @@
               });
             }
             const userTypes = Array.from(userTypesSet).sort();
-            console.log("User types loaded:", userTypes);
             const select = document.getElementById("stock-lookup-usertype");
             if (select) {
               userTypes.forEach((userType) => {
@@ -8293,10 +10098,8 @@
 
         async function loadStockLookupRiceTypes() {
           try {
-            console.log("loadStockLookupRiceTypes called");
             const response = await fetch("/api/paddy_types");
             const data = await response.json();
-            console.log("Rice types loaded:", data);
             const select = document.getElementById("stock-lookup-ricetype");
             if (select) {
               data.forEach((item) => {
@@ -8313,7 +10116,6 @@
 
         async function loadStockLookupTable() {
           try {
-            console.log("loadStockLookupTable called");
             const districtFilter =
               document.getElementById("stock-lookup-district")?.value || "";
             const userTypeFilter =
@@ -8324,24 +10126,15 @@
               document.getElementById("stock-lookup-user")?.value || ""
             ).toLowerCase();
 
-            console.log("Filters:", {
-              districtFilter,
-              userTypeFilter,
-              riceTypeFilter,
-              userSearchFilter,
-            });
-
             const params = new URLSearchParams();
             if (districtFilter) params.append("district", districtFilter);
             if (userTypeFilter) params.append("user_type", userTypeFilter);
             if (riceTypeFilter) params.append("paddy_type", riceTypeFilter);
 
             const url = "/api/rice_stock?" + params.toString();
-            console.log("Fetching from:", url);
 
             const response = await fetch(url);
             const data = await response.json();
-            console.log("Data received:", data);
 
             let rows = data.data || [];
 
@@ -8411,9 +10204,6 @@
               `;
               tbody.appendChild(tr);
             });
-            console.log(
-              "Stock lookup table loaded with " + rows.length + " rows"
-            );
           } catch (err) {
             console.error("Failed to load stock lookup table:", err);
             const tbody = document.getElementById("stock-lookup-tbody");
@@ -8430,7 +10220,6 @@
         }
 
         function setupStockLookupListeners() {
-          console.log("setupStockLookupListeners called");
           const districtFilter = document.getElementById(
             "stock-lookup-district"
           );
@@ -8441,13 +10230,6 @@
             "stock-lookup-ricetype"
           );
           const userSearch = document.getElementById("stock-lookup-user");
-
-          console.log("Stock lookup elements found:", {
-            districtFilter: !!districtFilter,
-            userTypeFilter: !!userTypeFilter,
-            riceTypeFilter: !!riceTypeFilter,
-            userSearch: !!userSearch,
-          });
 
           if (districtFilter) {
             districtFilter.addEventListener("change", loadStockLookupTable);
@@ -8466,10 +10248,8 @@
         // Rice Transaction History Functions
         async function loadRiceTransactionRiceTypes() {
           try {
-            console.log("loadRiceTransactionRiceTypes called");
             const response = await fetch("/api/paddy_types");
             const data = await response.json();
-            console.log("Rice transaction rice types loaded:", data);
             const select = document.getElementById(
               "rice-transaction-rice-filter"
             );
@@ -8491,7 +10271,6 @@
 
         async function loadRiceTransactions() {
           try {
-            console.log("loadRiceTransactions called");
             const typeFilter =
               document.getElementById("rice-transaction-type-filter")?.value ||
               "";
@@ -8509,15 +10288,6 @@
               document.getElementById("rice-transaction-id-search")?.value ||
               "";
 
-            console.log("Rice transaction filters:", {
-              typeFilter,
-              riceFilter,
-              dateFrom,
-              dateTo,
-              search,
-              transactionId,
-            });
-
             const params = new URLSearchParams();
             if (typeFilter) params.append("transaction_type", typeFilter);
             if (riceFilter) params.append("rice_type", riceFilter);
@@ -8527,11 +10297,9 @@
             if (transactionId) params.append("transaction_id", transactionId);
 
             const url = "/api/rice_transactions?" + params.toString();
-            console.log("Fetching rice transactions from:", url);
 
             const response = await fetch(url);
             const transactions = await response.json();
-            console.log("Rice transactions received:", transactions);
 
             const tbody = document.getElementById("rice-transaction-tbody");
             if (!tbody) {
@@ -8622,11 +10390,6 @@
               `;
               tbody.appendChild(tr);
             });
-            console.log(
-              "Rice transactions table loaded with " +
-                transactions.length +
-                " rows"
-            );
           } catch (err) {
             console.error("Failed to load rice transactions:", err);
             const tbody = document.getElementById("rice-transaction-tbody");
@@ -8643,7 +10406,6 @@
         }
 
         function setupRiceTransactionListeners() {
-          console.log("setupRiceTransactionListeners called");
           const typeFilter = document.getElementById(
             "rice-transaction-type-filter"
           );
@@ -8662,16 +10424,6 @@
             "rice-transaction-refresh"
           );
 
-          console.log("Rice transaction elements found:", {
-            typeFilter: !!typeFilter,
-            riceFilter: !!riceFilter,
-            dateFrom: !!dateFrom,
-            dateTo: !!dateTo,
-            search: !!search,
-            transactionIdSearch: !!transactionIdSearch,
-            refreshBtn: !!refreshBtn,
-          });
-
           if (typeFilter)
             typeFilter.addEventListener("change", loadRiceTransactions);
           if (riceFilter)
@@ -8686,87 +10438,703 @@
             refreshBtn.addEventListener("click", loadRiceTransactions);
         }
 
-        // Test if the functions are loaded - call them on page load for debugging
-        console.log("Testing rice distribution functions...");
-        setTimeout(() => {
-          console.log("Running test calls to rice functions");
-          loadRiceDistrictFilter()
-            .then(() => {
-              console.log("District filter loaded");
-            })
-            .catch((err) => {
-              console.error("District filter failed:", err);
+        // Rice Transaction Analysis Chart Functions
+        let riceTransactionAnalysisChart = null;
+
+        async function loadRiceTransactionAnalysisRiceTypes() {
+          try {
+            const response = await fetch("/api/paddy_types");
+            const data = await response.json();
+            const select = document.getElementById(
+              "rice-chart-analysis-rice-type"
+            );
+            if (select) {
+              data.forEach((item) => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name;
+                select.appendChild(option);
+              });
+            }
+          } catch (err) {
+            console.error("Failed to load rice types for analysis chart:", err);
+          }
+        }
+
+        async function loadRiceTransactionAnalysisChart() {
+          try {
+            const riceType =
+              document.getElementById("rice-chart-analysis-rice-type")?.value ||
+              "";
+            const fromDate =
+              document.getElementById("rice-chart-analysis-from-date")?.value ||
+              "";
+            const toDate =
+              document.getElementById("rice-chart-analysis-to-date")?.value ||
+              "";
+
+            const params = new URLSearchParams();
+            if (riceType) params.append("rice_type", riceType);
+            if (fromDate) params.append("from_date", fromDate);
+            if (toDate) params.append("to_date", toDate);
+
+            const response = await fetch(
+              "/api/rice_transactions?" + params.toString()
+            );
+            const transactions = await response.json();
+
+            // Filter out reverted transactions for analysis
+            const activeTransactions = transactions.filter(
+              (t) => t.is_reverted !== 1
+            );
+
+            // Group by transaction type (from_user_type -> to_user_type)
+            const groupedData = {};
+            let totalQuantity = 0;
+            let totalValue = 0;
+
+            activeTransactions.forEach((t) => {
+              const fromType = t.from_user_type || "Unknown";
+              const toType = t.to_user_type || "Unknown";
+              const key = `${fromType} → ${toType}`;
+
+              if (!groupedData[key]) {
+                groupedData[key] = { quantity: 0, count: 0, value: 0 };
+              }
+
+              const qty = parseFloat(t.quantity || 0);
+              const price = parseFloat(t.price || 0);
+
+              groupedData[key].quantity += qty;
+              groupedData[key].count += 1;
+              groupedData[key].value += price;
+
+              totalQuantity += qty;
+              totalValue += price;
             });
-          loadRiceTypeFilter()
-            .then(() => {
-              console.log("Rice type filter loaded");
-            })
-            .catch((err) => {
-              console.error("Rice type filter failed:", err);
+
+            // Prepare chart data
+            const labels = Object.keys(groupedData);
+            const quantities = labels.map((k) => groupedData[k].quantity);
+            const counts = labels.map((k) => groupedData[k].count);
+
+            // Update summary stats
+            document.getElementById("summary-total-quantity").textContent =
+              totalQuantity.toFixed(3);
+            document.getElementById("summary-total-transactions").textContent =
+              activeTransactions.length;
+            document.getElementById("summary-total-value").textContent =
+              totalValue.toFixed(2);
+            document.getElementById("summary-avg-price").textContent =
+              totalQuantity > 0
+                ? (totalValue / totalQuantity).toFixed(2)
+                : "0.00";
+
+            // Create/Update chart
+            await ensureChartJs();
+
+            const ctx = document.getElementById(
+              "rice-transaction-analysis-chart"
+            );
+            if (!ctx) {
+              console.error("rice-transaction-analysis-chart canvas not found");
+              return;
+            }
+
+            if (riceTransactionAnalysisChart) {
+              riceTransactionAnalysisChart.destroy();
+            }
+
+            // Generate colors for bars
+            const colors = [
+              "rgba(59, 130, 246, 0.8)", // blue
+              "rgba(34, 197, 94, 0.8)", // green
+              "rgba(245, 158, 11, 0.8)", // amber
+              "rgba(139, 92, 246, 0.8)", // purple
+              "rgba(236, 72, 153, 0.8)", // pink
+              "rgba(20, 184, 166, 0.8)", // teal
+              "rgba(249, 115, 22, 0.8)", // orange
+              "rgba(99, 102, 241, 0.8)", // indigo
+            ];
+
+            const borderColors = colors.map((c) => c.replace("0.8", "1"));
+
+            riceTransactionAnalysisChart = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Quantity (kg)",
+                    data: quantities,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderColor: borderColors.slice(0, labels.length),
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    yAxisID: "y",
+                  },
+                  {
+                    label: "Transaction Count",
+                    data: counts,
+                    backgroundColor: "rgba(156, 163, 175, 0.6)",
+                    borderColor: "rgba(107, 114, 128, 1)",
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    yAxisID: "y1",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                  mode: "index",
+                  intersect: false,
+                },
+                plugins: {
+                  legend: {
+                    position: "top",
+                    labels: {
+                      font: { size: 12, weight: "500" },
+                      padding: 15,
+                    },
+                  },
+                  title: {
+                    display: true,
+                    text: riceType
+                      ? `Rice Transactions - ${riceType}`
+                      : "Rice Transactions by Type",
+                    font: { size: 16, weight: "600" },
+                    padding: { bottom: 20 },
+                  },
+                  tooltip: {
+                    backgroundColor: "rgba(17, 24, 39, 0.95)",
+                    titleFont: { size: 13, weight: "600" },
+                    bodyFont: { size: 12 },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                      afterBody: function (context) {
+                        const idx = context[0].dataIndex;
+                        const label = labels[idx];
+                        const data = groupedData[label];
+                        return [
+                          `Value: Rs ${data.value.toFixed(2)}`,
+                          `Avg/kg: Rs ${(data.value / data.quantity).toFixed(
+                            2
+                          )}`,
+                        ];
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: { display: false },
+                    ticks: {
+                      font: { size: 11 },
+                      maxRotation: 45,
+                      minRotation: 0,
+                    },
+                  },
+                  y: {
+                    type: "linear",
+                    display: true,
+                    position: "left",
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "Quantity (kg)",
+                      font: { size: 12, weight: "500" },
+                    },
+                    grid: { color: "rgba(229, 231, 235, 0.5)" },
+                  },
+                  y1: {
+                    type: "linear",
+                    display: true,
+                    position: "right",
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "Count",
+                      font: { size: 12, weight: "500" },
+                    },
+                    grid: { drawOnChartArea: false },
+                  },
+                },
+              },
             });
-          loadRiceDistributionChart()
-            .then(() => {
-              console.log("Chart loaded");
-            })
-            .catch((err) => {
-              console.error("Chart failed:", err);
+          } catch (err) {
+            console.error(
+              "Failed to load rice transaction analysis chart:",
+              err
+            );
+          }
+        }
+
+        function setupRiceTransactionAnalysisListeners() {
+          const riceType = document.getElementById(
+            "rice-chart-analysis-rice-type"
+          );
+          const fromDate = document.getElementById(
+            "rice-chart-analysis-from-date"
+          );
+          const toDate = document.getElementById("rice-chart-analysis-to-date");
+
+          if (riceType)
+            riceType.addEventListener(
+              "change",
+              loadRiceTransactionAnalysisChart
+            );
+          if (fromDate)
+            fromDate.addEventListener(
+              "change",
+              loadRiceTransactionAnalysisChart
+            );
+          if (toDate)
+            toDate.addEventListener("change", loadRiceTransactionAnalysisChart);
+        }
+
+        // Rice Price Control Analysis Functions
+        let ricePriceControlTransactionsData = [];
+
+        async function loadRicePriceControlRiceTypes() {
+          try {
+            // Wait a bit to ensure element is rendered
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            const select = document.getElementById(
+              "rice-price-control-rice-type"
+            );
+
+            if (!select) {
+              console.error("Rice price control rice type select not found!");
+              return;
+            }
+
+            const response = await fetch("/api/rice_types");
+            const data = await response.json();
+
+            if (!data || data.length === 0) {
+              console.warn("No rice types returned from API");
+              return;
+            }
+
+            // Clear existing options except the first one
+            while (select.options.length > 1) {
+              select.remove(1);
+            }
+
+            // Add new options
+            data.forEach((item) => {
+              const option = document.createElement("option");
+              option.value = item.name;
+              option.textContent = item.name;
+              select.appendChild(option);
             });
-          // Stock lookup
-          loadStockLookupDistricts()
-            .then(() => {
-              console.log("Stock lookup districts loaded");
-            })
-            .catch((err) => {
-              console.error("Stock lookup districts failed:", err);
+          } catch (err) {
+            console.error("Failed to load rice types for price control:", err);
+          }
+        }
+
+        async function loadRicePriceControlTable() {
+          try {
+            const riceType =
+              document.getElementById("rice-price-control-rice-type")?.value ||
+              "";
+            const controlPrice =
+              parseFloat(
+                document.getElementById("rice-price-control-value")?.value
+              ) || 0;
+            const fromDate =
+              document.getElementById("rice-price-control-from-date")?.value ||
+              "";
+            const toDate =
+              document.getElementById("rice-price-control-to-date")?.value ||
+              "";
+
+            // Fetch rice transactions with user details
+            const response = await fetch("/api/rice_transactions");
+            const allTransactions = await response.json();
+
+            // Filter for miller to wholesaler transactions only
+            let filtered = allTransactions.filter((t) => {
+              const fromType = (t.from_user_type || "").toLowerCase();
+              const toType = (t.to_user_type || "").toLowerCase();
+              const price = parseFloat(t.price || 0);
+
+              return (
+                fromType.includes("miller") &&
+                toType.includes("wholesaler") &&
+                price > controlPrice
+              );
             });
-          loadStockLookupUserTypes()
-            .then(() => {
-              console.log("Stock lookup user types loaded");
-            })
-            .catch((err) => {
-              console.error("Stock lookup user types failed:", err);
+
+            // Apply rice type filter
+            if (riceType) {
+              filtered = filtered.filter((t) => t.rice_type === riceType);
+            }
+
+            // Apply date range filter
+            if (fromDate || toDate) {
+              filtered = filtered.filter((t) => {
+                const txDate = t.datetime ? new Date(t.datetime) : null;
+                if (!txDate) return false;
+
+                if (fromDate) {
+                  const from = new Date(fromDate);
+                  from.setHours(0, 0, 0, 0);
+                  if (txDate < from) return false;
+                }
+                if (toDate) {
+                  const to = new Date(toDate);
+                  to.setHours(23, 59, 59, 999);
+                  if (txDate > to) return false;
+                }
+                return true;
+              });
+            }
+
+            // Calculate summary stats
+            let totalQty = 0;
+            let totalPrice = 0;
+            filtered.forEach((t) => {
+              totalQty += parseFloat(t.quantity || 0);
+              totalPrice += parseFloat(t.price || 0);
             });
-          loadStockLookupRiceTypes()
-            .then(() => {
-              console.log("Stock lookup rice types loaded");
-            })
-            .catch((err) => {
-              console.error("Stock lookup rice types failed:", err);
+            const avgPrice =
+              filtered.length > 0 ? totalPrice / filtered.length : 0;
+
+            // Update summary stats
+            document.getElementById("rice-price-control-count").textContent =
+              filtered.length;
+            document.getElementById(
+              "rice-price-control-total-qty"
+            ).textContent = totalQty.toFixed(3);
+            document.getElementById(
+              "rice-price-control-avg-price"
+            ).textContent = avgPrice.toFixed(2);
+
+            // Update table
+            const tbody = document.getElementById("rice-price-control-tbody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+
+            if (filtered.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="9" style="padding: 16px; text-align: center; color: #9ca3af;">
+                    No miller to wholesaler transactions found above the control price (Rs ${controlPrice.toFixed(
+                      2
+                    )})
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            // Store filtered transactions for modal access
+            ricePriceControlTransactionsData = filtered;
+
+            filtered.forEach((t, index) => {
+              const tr = document.createElement("tr");
+              tr.style.borderBottom = "1px solid #fcd34d";
+              tr.style.backgroundColor = "#fffbeb";
+              tr.style.transition = "background-color 0.2s ease";
+              tr.onmouseover = function () {
+                this.style.backgroundColor = "#fef3c7";
+              };
+              tr.onmouseout = function () {
+                this.style.backgroundColor = "#fffbeb";
+              };
+
+              const price = parseFloat(t.price || 0);
+              const overControl = price - controlPrice;
+              const dateStr = t.datetime
+                ? new Date(t.datetime).toLocaleString()
+                : "-";
+
+              tr.innerHTML = `
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.id || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.from || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.to || ""
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${escapeHtml(
+                  t.rice_type || ""
+                )}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #92400e; font-weight: 500;">${parseFloat(
+                  t.quantity || 0
+                ).toFixed(3)}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #dc2626; font-weight: 600;">${price.toFixed(
+                  2
+                )}</td>
+                <td style="padding: 12px 16px; text-align: right; color: #dc2626; font-weight: 600;">+${overControl.toFixed(
+                  2
+                )}</td>
+                <td style="padding: 12px 16px; color: #92400e;">${dateStr}</td>
+                <td style="padding: 12px 16px; text-align: center;">
+                  <button
+                    class="btn primary"
+                    style="
+                      padding: 6px 12px;
+                      font-size: 12px;
+                      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                      color: white;
+                      border: none;
+                      border-radius: 6px;
+                      cursor: pointer;
+                      transition: all 0.2s ease;
+                    "
+                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 8px rgba(37, 99, 235, 0.4)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';"
+                    onclick="showRicePriceControlModal(${index})"
+                  >
+                    View
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
             });
-          loadStockLookupTable()
-            .then(() => {
-              console.log("Stock lookup table loaded");
-            })
-            .catch((err) => {
-              console.error("Stock lookup table failed:", err);
-            });
-          setupStockLookupListeners();
-          // Rice transactions
-          loadRiceTransactionRiceTypes()
-            .then(() => {
-              console.log("Rice transaction rice types loaded");
-            })
-            .catch((err) => {
-              console.error("Rice transaction rice types failed:", err);
-            });
-          loadRiceTransactions()
-            .then(() => {
-              console.log("Rice transactions loaded");
-            })
-            .catch((err) => {
-              console.error("Rice transactions failed:", err);
-            });
-          setupRiceTransactionListeners();
-        }, 1000);
+          } catch (err) {
+            console.error("Failed to load rice price control table:", err);
+            const tbody = document.getElementById("rice-price-control-tbody");
+            if (tbody) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="9" style="padding: 16px; text-align: center; color: #ef4444;">
+                    Error loading data: ${err.message}
+                  </td>
+                </tr>
+              `;
+            }
+          }
+        }
+
+        function setupRicePriceControlListeners() {
+          const riceType = document.getElementById(
+            "rice-price-control-rice-type"
+          );
+          const fromDate = document.getElementById(
+            "rice-price-control-from-date"
+          );
+          const toDate = document.getElementById("rice-price-control-to-date");
+          const refreshBtn = document.getElementById(
+            "rice-price-control-refresh"
+          );
+
+          if (riceType)
+            riceType.addEventListener("change", loadRicePriceControlTable);
+          if (fromDate)
+            fromDate.addEventListener("change", loadRicePriceControlTable);
+          if (toDate)
+            toDate.addEventListener("change", loadRicePriceControlTable);
+          if (refreshBtn)
+            refreshBtn.addEventListener("click", loadRicePriceControlTable);
+        }
+
+        // Make function globally accessible for inline onclick handlers
+        window.showRicePriceControlModal = function (index) {
+          const modal = document.getElementById("rice-price-control-modal");
+          const content = document.getElementById(
+            "rice-price-control-modal-content"
+          );
+
+          if (!modal || !content) {
+            console.error("Rice modal or content element not found");
+            return;
+          }
+
+          const transaction = ricePriceControlTransactionsData[index];
+          if (!transaction) {
+            console.error("Rice transaction not found at index:", index);
+            return;
+          }
+
+          const controlPrice =
+            parseFloat(
+              document.getElementById("rice-price-control-value")?.value
+            ) || 0;
+          const price = parseFloat(transaction.price || 0);
+          const overControl = price - controlPrice;
+
+          content.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+              <!-- Transaction Info -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Transaction ID</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                    transaction.id || ""
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Date/Time</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">
+                    ${
+                      transaction.datetime
+                        ? new Date(transaction.datetime).toLocaleString()
+                        : "-"
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- From Party (Miller) Details -->
+              <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #92400e; border-bottom: 2px solid #fcd34d; padding-bottom: 8px;">FROM PARTY (Miller)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">ID</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from || ""
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Name</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from_full_name || "-"
+                    )}</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Address</label>
+                    <div style="font-size: 14px; color: #1f2937;">${escapeHtml(
+                      transaction.from_address || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Contact Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.from_contact || "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- To Party (Wholesaler) Details -->
+              <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #1e40af; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">TO PARTY (Wholesaler)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">ID</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to || ""
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Name</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to_full_name || "-"
+                    )}</div>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Address</label>
+                    <div style="font-size: 14px; color: #1f2937;">${escapeHtml(
+                      transaction.to_address || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #1e40af; margin-bottom: 4px;">Contact Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.to_contact || "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transaction Details -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Rice Type</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                    transaction.rice_type || ""
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Quantity</label>
+                  <div style="font-size: 16px; font-weight: 600; color: #1f2937;">${parseFloat(
+                    transaction.quantity || 0
+                  ).toFixed(3)} kg</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Price</label>
+                  <div style="font-size: 18px; font-weight: 700; color: #dc2626;">Rs ${price.toFixed(
+                    2
+                  )}</div>
+                </div>
+                <div>
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">Control Price</label>
+                  <div style="font-size: 18px; font-weight: 700; color: #374151;">Rs ${controlPrice.toFixed(
+                    2
+                  )}</div>
+                </div>
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 12px; border-radius: 8px; text-align: center;">
+                  <label style="display: block; font-size: 12px; font-weight: 600; color: #991b1b; margin-bottom: 4px;">Over Control Amount</label>
+                  <div style="font-size: 24px; font-weight: 700; color: #dc2626;">+Rs ${overControl.toFixed(
+                    2
+                  )}</div>
+                </div>
+              </div>
+
+              <!-- Blockchain Information -->
+              <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); padding: 16px; border-radius: 8px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: #6b21a8; border-bottom: 2px solid #d8b4fe; padding-bottom: 8px;">⛓️ BLOCKCHAIN INFORMATION</h3>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Transaction Hash</label>
+                    <div style="font-size: 12px; font-family: monospace; color: #1f2937; word-break: break-all; background: white; padding: 8px; border-radius: 4px;">${escapeHtml(
+                      transaction.transaction_hash || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Block Hash</label>
+                    <div style="font-size: 12px; font-family: monospace; color: #1f2937; word-break: break-all; background: white; padding: 8px; border-radius: 4px;">${escapeHtml(
+                      transaction.block_hash || "-"
+                    )}</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 11px; font-weight: 600; color: #6b21a8; margin-bottom: 4px;">Block Number</label>
+                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;">${escapeHtml(
+                      transaction.block_number
+                        ? transaction.block_number.toString()
+                        : "-"
+                    )}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          modal.style.display = "flex";
+          document.body.style.overflow = "hidden";
+        };
+
+        window.closeRicePriceControlModal = function () {
+          const modal = document.getElementById("rice-price-control-modal");
+          if (modal) {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+          }
+        };
+
+        // Close modal when clicking outside of it
+        document.addEventListener("click", function (event) {
+          const modal = document.getElementById("rice-price-control-modal");
+          if (modal && event.target === modal) {
+            window.closeRicePriceControlModal();
+          }
+        });
 
         // Override showRicePanel to include milling table loading
         const originalShowRicePanel = showRicePanel;
         showRicePanel = function () {
-          console.log("showRicePanel called - loading rice analytics");
           originalShowRicePanel();
           // Load milling data when rice panel is shown
           setTimeout(() => {
-            console.log("Loading milling and rice data...");
             loadMillingPaddyTypes();
             loadMillingTable();
             setupMillingTableListeners();
@@ -8782,6 +11150,12 @@
             loadRiceTransactionRiceTypes();
             loadRiceTransactions();
             setupRiceTransactionListeners();
+            loadRiceTransactionAnalysisRiceTypes();
+            loadRiceTransactionAnalysisChart();
+            setupRiceTransactionAnalysisListeners();
+            loadRicePriceControlRiceTypes();
+            loadRicePriceControlTable();
+            setupRicePriceControlListeners();
           }, 50);
         };
       });
