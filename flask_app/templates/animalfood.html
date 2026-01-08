@@ -123,6 +123,9 @@
       table tbody tr:hover {
         background: #f1f1f1;
       }
+      .reverted-field {
+        color: #888 !important;
+      }
     </style>
   </head>
   <body>
@@ -180,7 +183,20 @@
           <button type="submit">Purchase Rice</button>
         </form>
 
-        <!-- Purchase history removed from UI -->
+        <h2 style="margin-top: 40px">Recent Transactions</h2>
+        <table id="recent-purchases-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Party</th>
+              <th>Rice Type</th>
+              <th>Quantity (kg)</th>
+              <th>Price (per kg)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
       <!-- Damage feature removed -->
@@ -424,10 +440,13 @@
               '<option value="">Select Supplier</option>';
             suppliers.forEach((s) => {
               const option = document.createElement("option");
-              option.value = s.id || s.user_code || "";
-              option.textContent = s.user_code
-                ? `${s.user_code} - ${s.full_name}`
-                : s.full_name || s.id || "Unknown";
+              option.value = s.user_code || s.id || "";
+              const userName =
+                s.company_name || s.full_name || s.fullName || s.name || "";
+              const userCode = s.user_code || s.id || "";
+              option.textContent = userName
+                ? `${userCode} - ${userName}`
+                : userCode;
               supplierSelect.appendChild(option);
             });
           } catch (err) {
@@ -511,6 +530,7 @@
               document.getElementById("supplier-select").innerHTML =
                 '<option value="">First select source type</option>';
               window.pendingPurchaseData = null;
+              loadPurchases();
               loadHistory();
             } catch (err) {
               console.error(err);
@@ -519,16 +539,20 @@
             }
           } else if (action === "revert" && window.pendingRevertData) {
             try {
-              const response = await fetch("/api/transactions", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(window.pendingRevertData),
-              });
+              // Use the specialized revert endpoint which handles marking the original as reverted
+              const response = await fetch(
+                `/api/rice_transactions/${window.pendingRevertData.id}/revert`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                }
+              );
 
               const result = await response.json();
               if (response.ok && result.ok) {
                 alert("Purchase reverted successfully!");
                 window.pendingRevertData = null;
+                loadPurchases();
                 loadHistory();
               } else {
                 alert(
@@ -549,13 +573,73 @@
       async function loadPurchases() {
         try {
           const response = await fetch(
-            `/api/transactions?user=${loggedInUser.user_code}&type=Purchase`
+            `/api/transactions?user=${loggedInUser.user_code}`
           );
-          if (!response.ok) throw new Error("Failed to load purchases");
+          if (!response.ok) throw new Error("Failed to load transactions");
           const data = await response.json();
 
-          // Purchase history removed from UI; nothing to render here
-          return;
+          // Update allTransactions for the View modal
+          data.forEach((t) => {
+            if (!allTransactions.find((at) => at.id === t.id)) {
+              allTransactions.push(t);
+            }
+          });
+
+          const tbody = document.querySelector("#recent-purchases-table tbody");
+          tbody.innerHTML = "";
+
+          // Show last 5 transactions (Purchases and Reverts)
+          data.slice(0, 5).forEach((t) => {
+            const row = tbody.insertRow();
+            const dateValue = t.datetime || t.created_at;
+
+            // Determine if this is a purchase (user is recipient) or revert (user is sender)
+            const isPurchase = t.to === loggedInUser.user_code;
+            const isReverted = t.reverted === 1;
+
+            if (isReverted) {
+              row.style.backgroundColor = "#fff5f5";
+            }
+
+            // Show appropriate party name
+            let displayName = isPurchase
+              ? t.from_name || t.from || "Unknown"
+              : t.to_name || t.to || "Unknown";
+
+            let displayQty = isPurchase
+              ? parseFloat(t.quantity)
+              : -parseFloat(t.quantity);
+            const qtyColor = isPurchase ? "black" : "red";
+
+            // Only show Revert button for purchases, not if already reverted
+            const showRevertBtn = isPurchase && !isReverted;
+            const actionBtns = showRevertBtn
+              ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #ff9800; border: none; color: white; border-radius: 4px;" onclick="viewTransaction(${
+                  t.id
+                })">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #f57c00; border: none; color: white; border-radius: 4px;" onclick="showRevertOTP(${
+                  t.id
+                }, '${t.from}', '${t.type}', ${t.quantity}, ${
+                  t.price || 0
+                })">Revert</button>`
+              : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #ff9800; border: none; color: white; border-radius: 4px;" onclick="viewTransaction(${t.id})">View</button>`;
+
+            const revertedClass = isReverted ? "reverted-field" : "";
+
+            row.innerHTML = `
+              <td class="${revertedClass}">${
+              dateValue ? new Date(dateValue).toLocaleString() : "N/A"
+            }</td>
+              <td class="${revertedClass}">${displayName}</td>
+              <td class="${revertedClass}">${t.type}</td>
+              <td class="${revertedClass}" style="color: ${
+              isReverted ? "#888" : qtyColor
+            };">${displayQty}</td>
+              <td class="${revertedClass}">${
+              t.price ? Number(t.price).toFixed(2) : "-"
+            }</td>
+              <td>${actionBtns}</td>
+            `;
+          });
         } catch (err) {
           console.error(err);
         }
@@ -593,40 +677,50 @@
 
             // Determine if this is a purchase (user is recipient) or revert (user is sender)
             const isPurchase = t.to === loggedInUser.user_code;
-            const isRevert =
-              t.from === loggedInUser.user_code && t.status === 0;
+            const isReverted = t.reverted === 1;
+
+            if (isReverted) {
+              row.style.backgroundColor = "#fff5f5";
+            }
 
             // Show appropriate party name
             let displayName = isPurchase
               ? t.from_name || t.from || "Unknown"
               : t.to_name || t.to || "Unknown";
-            let displayLabel = isPurchase ? "Purchase" : "Revert";
             let displayQty = isPurchase
               ? parseFloat(t.quantity)
               : -parseFloat(t.quantity);
             const qtyColor = isPurchase ? "black" : "red";
 
             // Only show Revert button for purchases, not reverts, and not if already reverted
-            const showRevertBtn = isPurchase && t.is_reverted !== 1;
+            const showRevertBtn = isPurchase && !isReverted;
             const actionBtns = showRevertBtn
               ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #ff9800;" onclick="viewTransaction(${
                   t.id
-                })">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #f57c00;" onclick="showRevertOTP('${
-                  t.from
-                }', '${t.type}', ${t.quantity}, ${
+                })">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #f57c00;" onclick="showRevertOTP(${
+                  t.id
+                }, '${t.from}', '${t.type}', ${t.quantity}, ${
                   t.price || 0
                 })">Revert</button>`
               : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #ff9800;" onclick="viewTransaction(${t.id})">View</button>`;
 
+            const revertedClass = isReverted ? "reverted-field" : "";
+
             row.innerHTML = `
-              <td>${
-                dateValue ? new Date(dateValue).toLocaleString() : "N/A"
-              }</td>
-              <td>${displayName} <span style="font-size: 11px; color: #666;">(${displayLabel})</span></td>
-              <td>${t.type}</td>
-              <td style="color: ${qtyColor};">${displayQty}</td>
-              <td>${t.price ? Number(t.price).toFixed(2) : "-"}</td>
-              <td title="${t.block_hash || ""}">${blockIdDisplay}</td>
+              <td class="${revertedClass}">${
+              dateValue ? new Date(dateValue).toLocaleString() : "N/A"
+            }</td>
+              <td class="${revertedClass}">${displayName}</td>
+              <td class="${revertedClass}">${t.type}</td>
+              <td class="${revertedClass}" style="color: ${
+              isReverted ? "#888" : qtyColor
+            };">${displayQty}</td>
+              <td class="${revertedClass}">${
+              t.price ? Number(t.price).toFixed(2) : "-"
+            }</td>
+              <td class="${revertedClass}" title="${
+              t.block_hash || ""
+            }">${blockIdDisplay}</td>
               <td>${actionBtns}</td>
             `;
           });
@@ -636,7 +730,7 @@
       }
 
       // Show OTP modal for revert
-      async function showRevertOTP(from, type, quantity, price) {
+      async function showRevertOTP(id, from, type, quantity, price) {
         if (
           !confirm(
             `Revert purchase of ${quantity} kg ${type} from ${from}? This will restore stock to the supplier and deduct from yours.`
@@ -647,6 +741,7 @@
 
         // Store pending revert data
         window.pendingRevertData = {
+          id: id,
           from: from,
           to: loggedInUser.user_code,
           type: type,

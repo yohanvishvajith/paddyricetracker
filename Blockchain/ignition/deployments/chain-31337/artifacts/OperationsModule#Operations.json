@@ -1,0 +1,1964 @@
+{
+  "_format": "hh3-artifact-1",
+  "contractName": "Operations",
+  "sourceName": "contracts/Operations.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "damageId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "DamageRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "InitialPaddyRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "InitialPaddyUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "InitialRiceRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "InitialRiceUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "millingId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "inputPaddy",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "outputRice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "dateTime",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "dryingDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "MillingRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "riceDamageId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "RiceDamageRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "riceTxId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "RiceTransactionRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "txId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "productType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "TransactionRecorded",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "damageDateTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "damagePaddyType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "damageQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "damageReason",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "damageUserId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "damageId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getDamage",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getInitialPaddyRecord",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "recordId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getInitialRiceRecord",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "millingId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getMilling",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputPaddy",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "outputRice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dateTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dryingDuration",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "riceDamageId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRiceDamage",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "riceTxId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRiceTransaction",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "txId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTransaction",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "productType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialRiceRecordDate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialRiceRecordQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialRiceRecordRiceType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialRiceRecordStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialRiceRecordUserId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingDateTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingDryingDuration",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingInputPaddy",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingOutputRice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingPaddyType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "millingStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextDamageId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextInitialRiceRecordId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextMillingRecordId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextPaddyRecordId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextRiceDamageId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextRiceTxId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextTxId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "paddyRecordDate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "paddyRecordPaddyType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "paddyRecordQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "paddyRecordStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "paddyRecordUserId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "receivedRiceTxs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "receivedTxs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "recordDamage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "inputPaddy",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "outputRice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dateTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dryingDuration",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "recordMilling",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "damageDate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "recordRiceDamage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "recordRiceTransaction",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "fromParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "toParty",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "productType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "recordTransaction",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceDamageDateTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceDamageQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceDamageReason",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceDamageType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceDamageUserId",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxFromParty",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxRiceType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "riceTxToParty",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "paddyType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "saveInitialPaddyRecord",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "userId",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "riceType",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "date",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "saveInitialRiceRecord",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "sentRiceTxs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "sentTxs",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txFromParty",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txProductType",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txQuantity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txStatus",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "txToParty",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60808060405234601557612f11908161001a8239f35b5f80fdfe60806040526004361015610011575f80fd5b5f3560e01c806302600f39146129475780630b7162e21461291d5780630f49d670146128f3578063109d3ad91461249e578063134d951b1461248157806314350a1c14612457578063190cea031461243a5780631b718aa6146124105780631e8335ff146120575780631fe185ab1461201757806320f603bc14611fed57806330a5c20014611fc357806330efcc3d14611f9957806333ea3dc814611ed95780633627e51514611eaf5780633831783214611e855780633b8d804014611e5b5780633c03162114611e31578063536c808a14611df157806353bbdbb214611a1157806353da7ea8146119e75780635513172b146119b8578063589d272e1461198957806359788b281461195f5780635a37951c14611935578063607e03981461191857806362b8c53a1461183f5780637104bd631461181557806373435500146117eb5780637cd7f3bb1461173f5780638aff87b2146117225780638bb61c83146116f85780638f57f41c1461167f578063962f72bc146111ee5780639a97d56a146111c55780639bcae772146111855780639cbbbba51461115b578063a67c08f614611131578063a9e3a74f14611107578063aca3a27014610e1d578063b114ad9c14610df3578063b5c14ff814610d2f578063b96d25e614610c41578063be9c675d14610c17578063c2143b5714610bed578063c59d278e14610bbe578063c5d3a742146108c0578063c859adb414610891578063cd9cb55514610804578063d40b5dfd146107da578063dceb896c146107be578063df7bd30914610794578063e294518d1461076a578063e2ed3c4514610740578063e3ab27db14610716578063e42966ae146106f9578063e48e7be1146106ca578063e4b071ce146106a0578063e7954a0e14610676578063f212655314610627578063f3661cba1461060a578063f53c3c20146105e0578063f95858281461059e578063fc89f616146105745763fed7eca1146102e4575f80fd5b346105705760c0366003190112610570576024356004356044356064356001600160401b0381116105705761031d903690600401612a8e565b60a435949160843591861515919082880361057057600c548061054857506001956002600c555b5f878152600d602090815260408083208b9055600e8252808320899055600f825280832084905560109091529020986001600160401b0383116105345761038b8a54612971565b99601f8b116104ef575b60209a505f601f851160011461045e579261041b7f6f525088b25489716739cf725ae1a014149f1f56186962098e90eca3b9088a7b9998969386938c9d999761043d975f91610453575b508560011b905f198760031b1c19161790555b8b5f5260118e528760405f20558b5f5260128e5260405f209060ff801983541691151516179055565b60405197889788528c880152604087015260c0606087015260c0860191612dd5565b91608084015260a08301520390a2604051908152f35b90508601355f6103df565b601f19851690825f528c5f20915f5b8181106104d8575093869361043d969361041b938e9f9b997f6f525088b25489716739cf725ae1a014149f1f56186962098e90eca3b9088a7b9e9d9b98106104bf575b5050600185811b0190556103f2565b8701355f19600388901b60f8161c191690555f806104b0565b91928e60018192868c01358155019401920161046d565b805f5260205f20601f850160051c81019b6020861061052a575b601f0160051c019a5b8b811061051f5750610395565b5f8155600101610512565b909b508b90610509565b634e487b7160e01b5f52604160045260245ffd5b956001870180881161055c57600c55610344565b634e487b7160e01b5f52601160045260245ffd5b5f80fd5b34610570576020366003190112610570576004355f52602d602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260026020526105dc6105c860405f206129ca565b604051918291602083526020830190612a6a565b0390f35b34610570576020366003190112610570576004355f526003602052602060405f2054604051908152f35b34610570575f366003190112610570576020600654604051908152f35b346105705760208061063836612bbc565b9290604051928184925191829101835e8101602881520301902080548210156105705760209161066791612c36565b90549060031b1c604051908152f35b34610570576020366003190112610570576004355f526009602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260076020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526026602052602060ff60405f2054166040519015158152f35b34610570575f366003190112610570576020601354604051908152f35b34610570576020366003190112610570576004355f52600b6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52601d602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526011602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52600d602052602060405f2054604051908152f35b34610570575f3660031901126105705760205f54604051908152f35b34610570576020366003190112610570576004355f52601a6020526105dc6105c860405f206129ca565b346105705760203660031901126105705760043580151580610886575b61082a90612e6e565b5f9081526014602090815260408083206015835281842060168452828520546017855283862054601890955292909420549193926105dc9260ff169161087990610873906129ca565b946129ca565b9460405195869586612cfa565b506013548110610821565b34610570576020366003190112610570576004355f526030602052602060ff60405f2054166040519015158152f35b34610570576108ce36612d37565b915f969395965480155f14610bab575060019560025f555b865f52600160205260405f206001600160401b0389116105345761090a8154612971565b601f8111610b66575b50885f601f8211600114610b02575f91610af7575b508960011b905f198b60031b1c19161790555b865f52600260205260405f20956001600160401b038211610534576109608754612971565b601f8111610ab2575b50918795939160209995935f98601f8311600114610a2457908291610a0e969594937faa8868e9dc181c2bbfec7c299eb216101eacc8fb0fdd8702ca9b633401557f349a9b5f91610a19575b508360011b905f198560031b1c19161790555b895f5260038c528260405f2055895f5260048c528360405f2055895f5260058c52610a028560405f209060ff801983541691151516179055565b60405197889788612eae565b0390a2604051908152f35b90508201358e6109b5565b601f19831699815f528c5f209a5f5b818110610a9857509a84939291610a0e989796957faa8868e9dc181c2bbfec7c299eb216101eacc8fb0fdd8702ca9b633401557f349c9d10610a7f575b5050600183811b0190556109c8565b8301355f19600386901b60f8161c191690558d80610a70565b848301358d556001909c019b8d9b50918e01918e01610a33565b875f5260205f20601f840160051c81019160208510610aed575b601f0160051c01905b818110610ae25750610969565b5f8155600101610ad5565b9091508190610acc565b90508601358a610928565b5f8381526020812092508b90601f198216905b818110610b4b575010610b32575b5050600189811b01905561093b565b8701355f1960038c901b60f8161c191690558980610b23565b8a84013585556001909401936020938401938e935001610b15565b815f5260205f20601f8b0160051c81019160208c10610ba1575b601f0160051c01905b818110610b965750610913565b5f8155600101610b89565b9091508190610b80565b956001870180881161055c575f556108e6565b34610570576020366003190112610570576004355f526018602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f52600a602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52601c602052602060405f2054604051908152f35b346105705760203660031901126105705760043580151580610d24575b15610cea575f908152600d6020908152604080832054600e835281842054600f84528285205460108552838620601186528487205460129096529390952054909491939260ff90911691610cd991610cb5906129ca565b9060405196879687526020870152604086015260c0606086015260c0850190612a6a565b916080840152151560a08301520390f35b60405162461bcd60e51b8152602060048201526012602482015271125b9d985b1a59081b5a5b1b1a5b99c8125160721b6044820152606490fd5b50600c548110610c5e565b346105705760203660031901126105705760043580151580610de8575b15610daa575f908152601a60209081526040808320601b8352818420601c845282852054601d855283862054601e9095529290942093926105dc9291610d9d90610d979081906129ca565b956129ca565b9160405195869586612cb4565b60405162461bcd60e51b8152602060048201526016602482015275125b9d985b1a59081c9a58d94819185b5859d948125160521b6044820152606490fd5b506019548110610d4c565b34610570576020366003190112610570576004355f5260106020526105dc6105c860405f206129ca565b3461057057610e2b36612d37565b916013969395965480155f146110f3575060019560026013555b865f52601460205260405f206001600160401b03891161053457610e698154612971565b601f81116110ae575b50885f601f821160011461104a575f9161103f575b508960011b905f198b60031b1c19161790555b865f52601560205260405f20956001600160401b03821161053457610ebf8754612971565b601f8111610ffa575b50918795939160209995935f98601f8311600114610f6c57908291610a0e969594937fa4e2ebeddbcba352328832a73e925bf16ff0b27214f897d8ca07812105528cda9a9b5f91610f61575b508360011b905f198560031b1c19161790555b895f5260168c528260405f2055895f5260178c528360405f2055895f5260188c52610a028560405f209060ff801983541691151516179055565b90508201358e610f14565b601f19831699815f528c5f209a5f5b818110610fe057509a84939291610a0e989796957fa4e2ebeddbcba352328832a73e925bf16ff0b27214f897d8ca07812105528cda9c9d10610fc7575b5050600183811b019055610f27565b8301355f19600386901b60f8161c191690558d80610fb8565b848301358d556001909c019b8d9b50918e01918e01610f7b565b875f5260205f20601f840160051c81019160208510611035575b601f0160051c01905b81811061102a5750610ec8565b5f815560010161101d565b9091508190611014565b90508601358a610e87565b5f8381526020812092508b90601f198216905b81811061109357501061107a575b5050600189811b019055610e9a565b8701355f1960038c901b60f8161c19169055898061106b565b8a84013585556001909401936020938401938e93500161105d565b815f5260205f20601f8b0160051c81019160208c106110e9575b601f0160051c01905b8181106110de5750610e72565b5f81556001016110d1565b90915081906110c8565b956001870180881161055c57601355610e45565b34610570576020366003190112610570576004355f52602e602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260086020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526024602052602060405f2054604051908152f35b346105705760208061119636612bbc565b9290604051928184925191829101835e8101603281520301902080548210156105705760209161066791612c36565b34610570576020366003190112610570576004355f52602080526105dc6105c860405f206129ca565b34610570576111fc36612abb565b919793909594601f5480155f1461166b57506001976002601f555b885f526020805260405f206001600160401b0382116105345761123a8154612971565b601f8111611626575b50815f601f82116001146115c1575f916115b6575b508260011b905f198460031b1c19161790555b885f52602160205260405f206001600160401b0383116105345761128f8154612971565b601f8111611571575b50825f601f821160011461150c575f91611501575b508360011b905f198560031b1c19161790555b885f52602260205260405f20956001600160401b038611610534576112e58754612971565b601f81116114bc575b50918995939160209b95935f98601f871160011461141957906114039594939291877ff08880a9b74b5e00389c6e6b5140ba9801a98a6888c8e7cc8652153a8999ab379a9b5f9161140e575b508860011b905f198a60031b1c19161790555b895f5260238e528760405f2055895f5260248e528b60405f2055895f5260258e524260405f2055895f5260268e526113948560405f209060ff801983541691151516179055565b6113b28a604051848482376020818681016027815203019020612d9c565b6113d18a8c856040519182376020818781016028815203019020612d9c565b81604051928392833781015f81520390209881604051928392833781015f815203902098604051958695429387612df5565b0390a4604051908152f35b90508501355f61133a565b601f19871699815f528e5f209a5f5b81811061148d57509a61140397969594939291897ff08880a9b74b5e00389c6e6b5140ba9801a98a6888c8e7cc8652153a8999ab379c9d10611474575b5050600188811b01905561134d565b8601355f1960038b901b60f8161c191690558f80611465565b929496989a5090929496989a8f60018192868c013581550194019201908e9a98969492919b999795939b611428565b875f5260205f20601f880160051c810191602089106114f7575b601f0160051c01905b8181106114ec57506112ee565b5f81556001016114df565b90915081906114d6565b90508801358c6112ad565b5f8381526020812092508590601f198216905b8c8282106115575750501061153e575b5050600183811b0190556112c0565b8901355f19600386901b60f8161c191690558b8061152f565b84013585556001909401936020938401938893500161151f565b815f5260205f20601f850160051c810191602086106115ac575b601f0160051c01905b8181106115a15750611298565b5f8155600101611594565b909150819061158b565b90508701358c611258565b5f8381526020812092508490601f198216905b8b82821061160c575050106115f3575b5050600182811b01905561126b565b8801355f19600385901b60f8161c191690558b806115e4565b8401358555600190940193602093840193879350016115d4565b815f5260205f20601f840160051c81019160208510611661575b601f0160051c01905b8181106116565750611243565b5f8155600101611649565b9091508190611640565b9760018901808a1161055c57601f55611217565b3461057057602036600319011261057057600435801515806116ee575b6116a590612e6e565b5f9081526001602090815260408083206002835281842060038452828520546004855283862054600590955292909420549193926105dc9260ff169161087990610873906129ca565b505f54811061169c565b34610570576020366003190112610570576004355f5260226020526105dc6105c860405f206129ca565b34610570575f366003190112610570576020601f54604051908152f35b3461057057602036600319011261057057600435801515806117e0575b156117a7575f908152600760209081526040808320600883528184206009845282852054600a855283862054600b9095529290942093926105dc9291610d9d90610d979081906129ca565b60405162461bcd60e51b8152602060048201526011602482015270125b9d985b1a590819185b5859d9481251607a1b6044820152606490fd5b50600654811061175c565b34610570576020366003190112610570576004355f5260216020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f5260146020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004358015158061190d575b156118d3575f908152602a60209081526040808320602b8352818420602c8452828520602d855283862054602e865284872054602f87528588205460309097529490962054909591946105dc9460ff909216939092906118c7906118c19081906129ca565b976129ca565b60405197889788612c5f565b60405162461bcd60e51b8152602060048201526012602482015271125b9d985b1a59081c9a58d9481d1e08125160721b6044820152606490fd5b50602954811061185c565b34610570575f366003190112610570576020602954604051908152f35b34610570576020366003190112610570576004355f52602c6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52602a6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526012602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f526005602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f5260016020526105dc6105c860405f206129ca565b3461057057611a1f36612b42565b91959394969260065480155f14611ddd575060019560026006555b865f52600760205260405f206001600160401b03871161053457611a5e8154612971565b601f8111611d98575b50865f601f8211600114611d34575f91611d29575b508760011b905f198960031b1c19161790555b865f52600860205260405f206001600160401b03821161053457611ab38154612971565b601f8111611ce4575b50815f601f8211600114611c7e575f91611c73575b508260011b905f198460031b1c19161790555b865f5260096020528160405f2055865f52600a6020528760405f2055865f52600b60205260405f20986001600160401b03851161053457611b258a54612971565b99601f8b11611c2e575b60209a505f601f8711600114611ba05792899a928795927f149b7b390f2b2dff19c277c1837598497b3a00d887bbbbc783479e305cee6e4b9a9998610a0e98965f91611b95575b508760011b905f198960031b1c19161790555b60405198899889612e28565b90508601358f611b76565b601f19871690825f528c5f20915f5b818110611c17575092610a0e9795928c9d95928a7f149b7b390f2b2dff19c277c1837598497b3a00d887bbbbc783479e305cee6e4b9d9c9b999610611bfe575b5050600187811b019055611b89565b8701355f1960038a901b60f8161c191690558e80611bef565b91928e60018192868c013581550194019201611baf565b805f5260205f20601f870160051c81019b60208810611c69575b601f0160051c019a5b8b8110611c5e5750611b2f565b5f8155600101611c51565b909b508b90611c48565b90508a01358b611ad1565b5f8381526020812092508490601f198216908e5b828210611cc957505010611cb0575b5050600182811b019055611ae4565b8b01355f19600385901b60f8161c191690558a80611ca1565b8401358555600190940193602093840193879350018e611c92565b815f5260205f20601f840160051c81019160208510611d1f575b601f0160051c01905b818110611d145750611abc565b5f8155600101611d07565b9091508190611cfe565b90508601358b611a7c565b5f8381526020812092508990601f198216905b818110611d7d575010611d64575b5050600187811b019055611a8f565b8701355f1960038a901b60f8161c191690558a80611d55565b8a84013585556001909401936020938401938c935001611d47565b815f5260205f20601f890160051c81019160208a10611dd3575b601f0160051c01905b818110611dc85750611a67565b5f8155600101611dbb565b9091508190611db2565b956001870180881161055c57600655611a3a565b3461057057602080611e0236612bbc565b9290604051928184925191829101835e8101602781520301902080548210156105705760209161066791612c36565b34610570576020366003190112610570576004355f526017602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526023602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260156020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52600e602052602060405f2054604051908152f35b346105705760203660031901126105705760043580151580611f8e575b15611f59575f90815260208080526040808320602183528184206022845282852060238552838620546024865284872054602587528588205460269097529490962054909591946105dc9460ff909216939092906118c7906118c19081906129ca565b60405162461bcd60e51b815260206004820152600d60248201526c125b9d985b1a59081d1e081251609a1b6044820152606490fd5b50601f548110611ef6565b34610570576020366003190112610570576004355f52602b6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52602f602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526004602052602060405f2054604051908152f35b346105705760208061202836612bbc565b9290604051928184925191829101835e8101603181520301902080548210156105705760209161066791612c36565b346105705761206536612b42565b91959394969260195480155f146123fc575060019560026019555b865f52601a60205260405f206001600160401b038711610534576120a48154612971565b601f81116123b7575b50865f601f8211600114612353575f91612348575b508760011b905f198960031b1c19161790555b865f52601b60205260405f206001600160401b038211610534576120f98154612971565b601f8111612303575b50815f601f821160011461229d575f91612292575b508260011b905f198460031b1c19161790555b865f52601c6020528160405f2055865f52601d6020528760405f2055865f52601e60205260405f20986001600160401b0385116105345761216b8a54612971565b99601f8b1161224d575b60209a505f601f87116001146121d95792899a928795927f39bd910d09b2f87d33e7f8e331db9eb48ca0ec8b0519ce2cc0392dee6f69521c9a9998610a0e98965f91611b9557508760011b905f198960031b1c191617905560405198899889612e28565b601f19871690825f528c5f20915f5b818110612236575092610a0e9795928c9d95928a7f39bd910d09b2f87d33e7f8e331db9eb48ca0ec8b0519ce2cc0392dee6f69521c9d9c9b999610611bfe575050600187811b019055611b89565b91928e60018192868c0135815501940192016121e8565b805f5260205f20601f870160051c81019b60208810612288575b601f0160051c019a5b8b811061227d5750612175565b5f8155600101612270565b909b508b90612267565b90508a01358b612117565b5f8381526020812092508490601f198216908e5b8282106122e8575050106122cf575b5050600182811b01905561212a565b8b01355f19600385901b60f8161c191690558a806122c0565b8401358555600190940193602093840193879350018e6122b1565b815f5260205f20601f840160051c8101916020851061233e575b601f0160051c01905b8181106123335750612102565b5f8155600101612326565b909150819061231d565b90508601358b6120c2565b5f8381526020812092508990601f198216905b81811061239c575010612383575b5050600187811b0190556120d5565b8701355f1960038a901b60f8161c191690558a80612374565b8a84013585556001909401936020938401938c935001612366565b815f5260205f20601f890160051c81019160208a106123f2575b601f0160051c01905b8181106123e757506120ad565b5f81556001016123da565b90915081906123d1565b956001870180881161055c57601955612080565b34610570576020366003190112610570576004355f526016602052602060405f2054604051908152f35b34610570575f366003190112610570576020601954604051908152f35b34610570576020366003190112610570576004355f52601b6020526105dc6105c860405f206129ca565b34610570575f366003190112610570576020600c54604051908152f35b34610570576124ac36612abb565b91979390959460295480155f146128df575060019760026029555b885f52602a60205260405f206001600160401b038211610534576124eb8154612971565b601f811161289a575b50815f601f8211600114612835575f9161282a575b508260011b905f198460031b1c19161790555b885f52602b60205260405f206001600160401b038311610534576125408154612971565b601f81116127e5575b50825f601f8211600114612780575f91612775575b508360011b905f198560031b1c19161790555b885f52602c60205260405f20956001600160401b038611610534576125968754612971565b601f8111612730575b50918995939160209b95935f98601f871160011461268d57906114039594939291877f28961030162340d8e7d128a4dc7c306d25a4efc9783f27c9612a54a1b6bd3dff9a9b5f91612682575b508860011b905f198a60031b1c19161790555b895f52602d8e528760405f2055895f52602e8e528b60405f2055895f52602f8e524260405f2055895f5260308e526126458560405f209060ff801983541691151516179055565b6126638a604051848482376020818681016031815203019020612d9c565b6113d18a8c856040519182376020818781016032815203019020612d9c565b90508501355f6125eb565b601f19871699815f528e5f209a5f5b81811061270157509a61140397969594939291897f28961030162340d8e7d128a4dc7c306d25a4efc9783f27c9612a54a1b6bd3dff9c9d106126e8575b5050600188811b0190556125fe565b8601355f1960038b901b60f8161c191690558f806126d9565b929496989a5090929496989a8f60018192868c013581550194019201908e9a98969492919b999795939b61269c565b875f5260205f20601f880160051c8101916020891061276b575b601f0160051c01905b818110612760575061259f565b5f8155600101612753565b909150819061274a565b90508801358c61255e565b5f8381526020812092508590601f198216905b8c8282106127cb575050106127b2575b5050600183811b019055612571565b8901355f19600386901b60f8161c191690558b806127a3565b840135855560019094019360209384019388935001612793565b815f5260205f20601f850160051c81019160208610612820575b601f0160051c01905b8181106128155750612549565b5f8155600101612808565b90915081906127ff565b90508701358c612509565b5f8381526020812092508490601f198216905b8b82821061288057505010612867575b5050600182811b01905561251c565b8801355f19600385901b60f8161c191690558b80612858565b840135855560019094019360209384019387935001612848565b815f5260205f20601f840160051c810191602085106128d5575b601f0160051c01905b8181106128ca57506124f4565b5f81556001016128bd565b90915081906128b4565b9760018901808a1161055c576029556124c7565b34610570576020366003190112610570576004355f52600f602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526025602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52601e6020526105dc6105c860405f206129ca565b90600182811c9216801561299f575b602083101461298b57565b634e487b7160e01b5f52602260045260245ffd5b91607f1691612980565b90601f801991011681019081106001600160401b0382111761053457604052565b9060405191825f8254926129dd84612971565b8084529360018116908115612a485750600114612a04575b50612a02925003836129a9565b565b90505f9291925260205f20905f915b818310612a2c575050906020612a02928201015f6129f5565b6020919350806001915483858901015201910190918492612a13565b905060209250612a0294915060ff191682840152151560051b8201015f6129f5565b805180835260209291819084018484015e5f828201840152601f01601f1916010190565b9181601f84011215610570578235916001600160401b038311610570576020838186019501011161057057565b60c0600319820112610570576004356001600160401b0381116105705781612ae591600401612a8e565b929092916024356001600160401b0381116105705781612b0791600401612a8e565b92909291604435906001600160401b03821161057057612b2991600401612a8e565b9091606435906084359060a43580151581036105705790565b60a0600319820112610570576004356001600160401b0381116105705781612b6c91600401612a8e565b929092916024356001600160401b0381116105705781612b8e91600401612a8e565b929092916044359160643591608435906001600160401b03821161057057612bb891600401612a8e565b9091565b6040600319820112610570576004356001600160401b0381116105705781602382011215610570578060040135906001600160401b0382116105345760405192612c10601f8401601f1916602001856129a9565b8284526024838301011161057057815f9260246020930183860137830101529060243590565b8054821015612c4b575f5260205f2001905f90565b634e487b7160e01b5f52603260045260245ffd5b9592612c8f60c09693612c81612c9d949b9a979b60e08b5260e08b0190612a6a565b9089820360208b0152612a6a565b908782036040890152612a6a565b966060860152608085015260a08401521515910152565b91612cdf90612cd1612cf79795969360a0865260a0860190612a6a565b908482036020860152612a6a565b93604083015260608201526080818403910152612a6a565b90565b9390608093969592612d17612d259260a0885260a0880190612a6a565b908682036020880152612a6a565b95604085015260608401521515910152565b60a0600319820112610570576004356001600160401b0381116105705781612d6191600401612a8e565b92909291602435906001600160401b03821161057057612d8391600401612a8e565b9091604435906064359060843580151581036105705790565b80546801000000000000000081101561053457612dbe91600182018155612c36565b819291549060031b91821b915f19901b1916179055565b908060209392818452848401375f828201840152601f01601f1916010190565b949160809491612e11919897949860a0885260a0880191612dd5565b966020860152604085015260608401521515910152565b93612e48612cf799979492612e569499979960a0885260a0880191612dd5565b918583036020870152612dd5565b94604083015260608201526080818503910152612dd5565b15612e7557565b60405162461bcd60e51b8152602060048201526011602482015270125b9d985b1a59081c9958dbdc99081251607a1b6044820152606490fd5b95929093612ecd608096999895612d259460a08a5260a08a0191612dd5565b918783036020890152612dd556fea2646970667358221220087d43991244367e4a9cce22813bb9cbf5ece930c2d8ad785e11f52ae439432064736f6c634300081c0033",
+  "deployedBytecode": "0x60806040526004361015610011575f80fd5b5f3560e01c806302600f39146129475780630b7162e21461291d5780630f49d670146128f3578063109d3ad91461249e578063134d951b1461248157806314350a1c14612457578063190cea031461243a5780631b718aa6146124105780631e8335ff146120575780631fe185ab1461201757806320f603bc14611fed57806330a5c20014611fc357806330efcc3d14611f9957806333ea3dc814611ed95780633627e51514611eaf5780633831783214611e855780633b8d804014611e5b5780633c03162114611e31578063536c808a14611df157806353bbdbb214611a1157806353da7ea8146119e75780635513172b146119b8578063589d272e1461198957806359788b281461195f5780635a37951c14611935578063607e03981461191857806362b8c53a1461183f5780637104bd631461181557806373435500146117eb5780637cd7f3bb1461173f5780638aff87b2146117225780638bb61c83146116f85780638f57f41c1461167f578063962f72bc146111ee5780639a97d56a146111c55780639bcae772146111855780639cbbbba51461115b578063a67c08f614611131578063a9e3a74f14611107578063aca3a27014610e1d578063b114ad9c14610df3578063b5c14ff814610d2f578063b96d25e614610c41578063be9c675d14610c17578063c2143b5714610bed578063c59d278e14610bbe578063c5d3a742146108c0578063c859adb414610891578063cd9cb55514610804578063d40b5dfd146107da578063dceb896c146107be578063df7bd30914610794578063e294518d1461076a578063e2ed3c4514610740578063e3ab27db14610716578063e42966ae146106f9578063e48e7be1146106ca578063e4b071ce146106a0578063e7954a0e14610676578063f212655314610627578063f3661cba1461060a578063f53c3c20146105e0578063f95858281461059e578063fc89f616146105745763fed7eca1146102e4575f80fd5b346105705760c0366003190112610570576024356004356044356064356001600160401b0381116105705761031d903690600401612a8e565b60a435949160843591861515919082880361057057600c548061054857506001956002600c555b5f878152600d602090815260408083208b9055600e8252808320899055600f825280832084905560109091529020986001600160401b0383116105345761038b8a54612971565b99601f8b116104ef575b60209a505f601f851160011461045e579261041b7f6f525088b25489716739cf725ae1a014149f1f56186962098e90eca3b9088a7b9998969386938c9d999761043d975f91610453575b508560011b905f198760031b1c19161790555b8b5f5260118e528760405f20558b5f5260128e5260405f209060ff801983541691151516179055565b60405197889788528c880152604087015260c0606087015260c0860191612dd5565b91608084015260a08301520390a2604051908152f35b90508601355f6103df565b601f19851690825f528c5f20915f5b8181106104d8575093869361043d969361041b938e9f9b997f6f525088b25489716739cf725ae1a014149f1f56186962098e90eca3b9088a7b9e9d9b98106104bf575b5050600185811b0190556103f2565b8701355f19600388901b60f8161c191690555f806104b0565b91928e60018192868c01358155019401920161046d565b805f5260205f20601f850160051c81019b6020861061052a575b601f0160051c019a5b8b811061051f5750610395565b5f8155600101610512565b909b508b90610509565b634e487b7160e01b5f52604160045260245ffd5b956001870180881161055c57600c55610344565b634e487b7160e01b5f52601160045260245ffd5b5f80fd5b34610570576020366003190112610570576004355f52602d602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260026020526105dc6105c860405f206129ca565b604051918291602083526020830190612a6a565b0390f35b34610570576020366003190112610570576004355f526003602052602060405f2054604051908152f35b34610570575f366003190112610570576020600654604051908152f35b346105705760208061063836612bbc565b9290604051928184925191829101835e8101602881520301902080548210156105705760209161066791612c36565b90549060031b1c604051908152f35b34610570576020366003190112610570576004355f526009602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260076020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526026602052602060ff60405f2054166040519015158152f35b34610570575f366003190112610570576020601354604051908152f35b34610570576020366003190112610570576004355f52600b6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52601d602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526011602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52600d602052602060405f2054604051908152f35b34610570575f3660031901126105705760205f54604051908152f35b34610570576020366003190112610570576004355f52601a6020526105dc6105c860405f206129ca565b346105705760203660031901126105705760043580151580610886575b61082a90612e6e565b5f9081526014602090815260408083206015835281842060168452828520546017855283862054601890955292909420549193926105dc9260ff169161087990610873906129ca565b946129ca565b9460405195869586612cfa565b506013548110610821565b34610570576020366003190112610570576004355f526030602052602060ff60405f2054166040519015158152f35b34610570576108ce36612d37565b915f969395965480155f14610bab575060019560025f555b865f52600160205260405f206001600160401b0389116105345761090a8154612971565b601f8111610b66575b50885f601f8211600114610b02575f91610af7575b508960011b905f198b60031b1c19161790555b865f52600260205260405f20956001600160401b038211610534576109608754612971565b601f8111610ab2575b50918795939160209995935f98601f8311600114610a2457908291610a0e969594937faa8868e9dc181c2bbfec7c299eb216101eacc8fb0fdd8702ca9b633401557f349a9b5f91610a19575b508360011b905f198560031b1c19161790555b895f5260038c528260405f2055895f5260048c528360405f2055895f5260058c52610a028560405f209060ff801983541691151516179055565b60405197889788612eae565b0390a2604051908152f35b90508201358e6109b5565b601f19831699815f528c5f209a5f5b818110610a9857509a84939291610a0e989796957faa8868e9dc181c2bbfec7c299eb216101eacc8fb0fdd8702ca9b633401557f349c9d10610a7f575b5050600183811b0190556109c8565b8301355f19600386901b60f8161c191690558d80610a70565b848301358d556001909c019b8d9b50918e01918e01610a33565b875f5260205f20601f840160051c81019160208510610aed575b601f0160051c01905b818110610ae25750610969565b5f8155600101610ad5565b9091508190610acc565b90508601358a610928565b5f8381526020812092508b90601f198216905b818110610b4b575010610b32575b5050600189811b01905561093b565b8701355f1960038c901b60f8161c191690558980610b23565b8a84013585556001909401936020938401938e935001610b15565b815f5260205f20601f8b0160051c81019160208c10610ba1575b601f0160051c01905b818110610b965750610913565b5f8155600101610b89565b9091508190610b80565b956001870180881161055c575f556108e6565b34610570576020366003190112610570576004355f526018602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f52600a602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52601c602052602060405f2054604051908152f35b346105705760203660031901126105705760043580151580610d24575b15610cea575f908152600d6020908152604080832054600e835281842054600f84528285205460108552838620601186528487205460129096529390952054909491939260ff90911691610cd991610cb5906129ca565b9060405196879687526020870152604086015260c0606086015260c0850190612a6a565b916080840152151560a08301520390f35b60405162461bcd60e51b8152602060048201526012602482015271125b9d985b1a59081b5a5b1b1a5b99c8125160721b6044820152606490fd5b50600c548110610c5e565b346105705760203660031901126105705760043580151580610de8575b15610daa575f908152601a60209081526040808320601b8352818420601c845282852054601d855283862054601e9095529290942093926105dc9291610d9d90610d979081906129ca565b956129ca565b9160405195869586612cb4565b60405162461bcd60e51b8152602060048201526016602482015275125b9d985b1a59081c9a58d94819185b5859d948125160521b6044820152606490fd5b506019548110610d4c565b34610570576020366003190112610570576004355f5260106020526105dc6105c860405f206129ca565b3461057057610e2b36612d37565b916013969395965480155f146110f3575060019560026013555b865f52601460205260405f206001600160401b03891161053457610e698154612971565b601f81116110ae575b50885f601f821160011461104a575f9161103f575b508960011b905f198b60031b1c19161790555b865f52601560205260405f20956001600160401b03821161053457610ebf8754612971565b601f8111610ffa575b50918795939160209995935f98601f8311600114610f6c57908291610a0e969594937fa4e2ebeddbcba352328832a73e925bf16ff0b27214f897d8ca07812105528cda9a9b5f91610f61575b508360011b905f198560031b1c19161790555b895f5260168c528260405f2055895f5260178c528360405f2055895f5260188c52610a028560405f209060ff801983541691151516179055565b90508201358e610f14565b601f19831699815f528c5f209a5f5b818110610fe057509a84939291610a0e989796957fa4e2ebeddbcba352328832a73e925bf16ff0b27214f897d8ca07812105528cda9c9d10610fc7575b5050600183811b019055610f27565b8301355f19600386901b60f8161c191690558d80610fb8565b848301358d556001909c019b8d9b50918e01918e01610f7b565b875f5260205f20601f840160051c81019160208510611035575b601f0160051c01905b81811061102a5750610ec8565b5f815560010161101d565b9091508190611014565b90508601358a610e87565b5f8381526020812092508b90601f198216905b81811061109357501061107a575b5050600189811b019055610e9a565b8701355f1960038c901b60f8161c19169055898061106b565b8a84013585556001909401936020938401938e93500161105d565b815f5260205f20601f8b0160051c81019160208c106110e9575b601f0160051c01905b8181106110de5750610e72565b5f81556001016110d1565b90915081906110c8565b956001870180881161055c57601355610e45565b34610570576020366003190112610570576004355f52602e602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260086020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526024602052602060405f2054604051908152f35b346105705760208061119636612bbc565b9290604051928184925191829101835e8101603281520301902080548210156105705760209161066791612c36565b34610570576020366003190112610570576004355f52602080526105dc6105c860405f206129ca565b34610570576111fc36612abb565b919793909594601f5480155f1461166b57506001976002601f555b885f526020805260405f206001600160401b0382116105345761123a8154612971565b601f8111611626575b50815f601f82116001146115c1575f916115b6575b508260011b905f198460031b1c19161790555b885f52602160205260405f206001600160401b0383116105345761128f8154612971565b601f8111611571575b50825f601f821160011461150c575f91611501575b508360011b905f198560031b1c19161790555b885f52602260205260405f20956001600160401b038611610534576112e58754612971565b601f81116114bc575b50918995939160209b95935f98601f871160011461141957906114039594939291877ff08880a9b74b5e00389c6e6b5140ba9801a98a6888c8e7cc8652153a8999ab379a9b5f9161140e575b508860011b905f198a60031b1c19161790555b895f5260238e528760405f2055895f5260248e528b60405f2055895f5260258e524260405f2055895f5260268e526113948560405f209060ff801983541691151516179055565b6113b28a604051848482376020818681016027815203019020612d9c565b6113d18a8c856040519182376020818781016028815203019020612d9c565b81604051928392833781015f81520390209881604051928392833781015f815203902098604051958695429387612df5565b0390a4604051908152f35b90508501355f61133a565b601f19871699815f528e5f209a5f5b81811061148d57509a61140397969594939291897ff08880a9b74b5e00389c6e6b5140ba9801a98a6888c8e7cc8652153a8999ab379c9d10611474575b5050600188811b01905561134d565b8601355f1960038b901b60f8161c191690558f80611465565b929496989a5090929496989a8f60018192868c013581550194019201908e9a98969492919b999795939b611428565b875f5260205f20601f880160051c810191602089106114f7575b601f0160051c01905b8181106114ec57506112ee565b5f81556001016114df565b90915081906114d6565b90508801358c6112ad565b5f8381526020812092508590601f198216905b8c8282106115575750501061153e575b5050600183811b0190556112c0565b8901355f19600386901b60f8161c191690558b8061152f565b84013585556001909401936020938401938893500161151f565b815f5260205f20601f850160051c810191602086106115ac575b601f0160051c01905b8181106115a15750611298565b5f8155600101611594565b909150819061158b565b90508701358c611258565b5f8381526020812092508490601f198216905b8b82821061160c575050106115f3575b5050600182811b01905561126b565b8801355f19600385901b60f8161c191690558b806115e4565b8401358555600190940193602093840193879350016115d4565b815f5260205f20601f840160051c81019160208510611661575b601f0160051c01905b8181106116565750611243565b5f8155600101611649565b9091508190611640565b9760018901808a1161055c57601f55611217565b3461057057602036600319011261057057600435801515806116ee575b6116a590612e6e565b5f9081526001602090815260408083206002835281842060038452828520546004855283862054600590955292909420549193926105dc9260ff169161087990610873906129ca565b505f54811061169c565b34610570576020366003190112610570576004355f5260226020526105dc6105c860405f206129ca565b34610570575f366003190112610570576020601f54604051908152f35b3461057057602036600319011261057057600435801515806117e0575b156117a7575f908152600760209081526040808320600883528184206009845282852054600a855283862054600b9095529290942093926105dc9291610d9d90610d979081906129ca565b60405162461bcd60e51b8152602060048201526011602482015270125b9d985b1a590819185b5859d9481251607a1b6044820152606490fd5b50600654811061175c565b34610570576020366003190112610570576004355f5260216020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f5260146020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004358015158061190d575b156118d3575f908152602a60209081526040808320602b8352818420602c8452828520602d855283862054602e865284872054602f87528588205460309097529490962054909591946105dc9460ff909216939092906118c7906118c19081906129ca565b976129ca565b60405197889788612c5f565b60405162461bcd60e51b8152602060048201526012602482015271125b9d985b1a59081c9a58d9481d1e08125160721b6044820152606490fd5b50602954811061185c565b34610570575f366003190112610570576020602954604051908152f35b34610570576020366003190112610570576004355f52602c6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52602a6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f526012602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f526005602052602060ff60405f2054166040519015158152f35b34610570576020366003190112610570576004355f5260016020526105dc6105c860405f206129ca565b3461057057611a1f36612b42565b91959394969260065480155f14611ddd575060019560026006555b865f52600760205260405f206001600160401b03871161053457611a5e8154612971565b601f8111611d98575b50865f601f8211600114611d34575f91611d29575b508760011b905f198960031b1c19161790555b865f52600860205260405f206001600160401b03821161053457611ab38154612971565b601f8111611ce4575b50815f601f8211600114611c7e575f91611c73575b508260011b905f198460031b1c19161790555b865f5260096020528160405f2055865f52600a6020528760405f2055865f52600b60205260405f20986001600160401b03851161053457611b258a54612971565b99601f8b11611c2e575b60209a505f601f8711600114611ba05792899a928795927f149b7b390f2b2dff19c277c1837598497b3a00d887bbbbc783479e305cee6e4b9a9998610a0e98965f91611b95575b508760011b905f198960031b1c19161790555b60405198899889612e28565b90508601358f611b76565b601f19871690825f528c5f20915f5b818110611c17575092610a0e9795928c9d95928a7f149b7b390f2b2dff19c277c1837598497b3a00d887bbbbc783479e305cee6e4b9d9c9b999610611bfe575b5050600187811b019055611b89565b8701355f1960038a901b60f8161c191690558e80611bef565b91928e60018192868c013581550194019201611baf565b805f5260205f20601f870160051c81019b60208810611c69575b601f0160051c019a5b8b8110611c5e5750611b2f565b5f8155600101611c51565b909b508b90611c48565b90508a01358b611ad1565b5f8381526020812092508490601f198216908e5b828210611cc957505010611cb0575b5050600182811b019055611ae4565b8b01355f19600385901b60f8161c191690558a80611ca1565b8401358555600190940193602093840193879350018e611c92565b815f5260205f20601f840160051c81019160208510611d1f575b601f0160051c01905b818110611d145750611abc565b5f8155600101611d07565b9091508190611cfe565b90508601358b611a7c565b5f8381526020812092508990601f198216905b818110611d7d575010611d64575b5050600187811b019055611a8f565b8701355f1960038a901b60f8161c191690558a80611d55565b8a84013585556001909401936020938401938c935001611d47565b815f5260205f20601f890160051c81019160208a10611dd3575b601f0160051c01905b818110611dc85750611a67565b5f8155600101611dbb565b9091508190611db2565b956001870180881161055c57600655611a3a565b3461057057602080611e0236612bbc565b9290604051928184925191829101835e8101602781520301902080548210156105705760209161066791612c36565b34610570576020366003190112610570576004355f526017602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526023602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f5260156020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52600e602052602060405f2054604051908152f35b346105705760203660031901126105705760043580151580611f8e575b15611f59575f90815260208080526040808320602183528184206022845282852060238552838620546024865284872054602587528588205460269097529490962054909591946105dc9460ff909216939092906118c7906118c19081906129ca565b60405162461bcd60e51b815260206004820152600d60248201526c125b9d985b1a59081d1e081251609a1b6044820152606490fd5b50601f548110611ef6565b34610570576020366003190112610570576004355f52602b6020526105dc6105c860405f206129ca565b34610570576020366003190112610570576004355f52602f602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526004602052602060405f2054604051908152f35b346105705760208061202836612bbc565b9290604051928184925191829101835e8101603181520301902080548210156105705760209161066791612c36565b346105705761206536612b42565b91959394969260195480155f146123fc575060019560026019555b865f52601a60205260405f206001600160401b038711610534576120a48154612971565b601f81116123b7575b50865f601f8211600114612353575f91612348575b508760011b905f198960031b1c19161790555b865f52601b60205260405f206001600160401b038211610534576120f98154612971565b601f8111612303575b50815f601f821160011461229d575f91612292575b508260011b905f198460031b1c19161790555b865f52601c6020528160405f2055865f52601d6020528760405f2055865f52601e60205260405f20986001600160401b0385116105345761216b8a54612971565b99601f8b1161224d575b60209a505f601f87116001146121d95792899a928795927f39bd910d09b2f87d33e7f8e331db9eb48ca0ec8b0519ce2cc0392dee6f69521c9a9998610a0e98965f91611b9557508760011b905f198960031b1c191617905560405198899889612e28565b601f19871690825f528c5f20915f5b818110612236575092610a0e9795928c9d95928a7f39bd910d09b2f87d33e7f8e331db9eb48ca0ec8b0519ce2cc0392dee6f69521c9d9c9b999610611bfe575050600187811b019055611b89565b91928e60018192868c0135815501940192016121e8565b805f5260205f20601f870160051c81019b60208810612288575b601f0160051c019a5b8b811061227d5750612175565b5f8155600101612270565b909b508b90612267565b90508a01358b612117565b5f8381526020812092508490601f198216908e5b8282106122e8575050106122cf575b5050600182811b01905561212a565b8b01355f19600385901b60f8161c191690558a806122c0565b8401358555600190940193602093840193879350018e6122b1565b815f5260205f20601f840160051c8101916020851061233e575b601f0160051c01905b8181106123335750612102565b5f8155600101612326565b909150819061231d565b90508601358b6120c2565b5f8381526020812092508990601f198216905b81811061239c575010612383575b5050600187811b0190556120d5565b8701355f1960038a901b60f8161c191690558a80612374565b8a84013585556001909401936020938401938c935001612366565b815f5260205f20601f890160051c81019160208a106123f2575b601f0160051c01905b8181106123e757506120ad565b5f81556001016123da565b90915081906123d1565b956001870180881161055c57601955612080565b34610570576020366003190112610570576004355f526016602052602060405f2054604051908152f35b34610570575f366003190112610570576020601954604051908152f35b34610570576020366003190112610570576004355f52601b6020526105dc6105c860405f206129ca565b34610570575f366003190112610570576020600c54604051908152f35b34610570576124ac36612abb565b91979390959460295480155f146128df575060019760026029555b885f52602a60205260405f206001600160401b038211610534576124eb8154612971565b601f811161289a575b50815f601f8211600114612835575f9161282a575b508260011b905f198460031b1c19161790555b885f52602b60205260405f206001600160401b038311610534576125408154612971565b601f81116127e5575b50825f601f8211600114612780575f91612775575b508360011b905f198560031b1c19161790555b885f52602c60205260405f20956001600160401b038611610534576125968754612971565b601f8111612730575b50918995939160209b95935f98601f871160011461268d57906114039594939291877f28961030162340d8e7d128a4dc7c306d25a4efc9783f27c9612a54a1b6bd3dff9a9b5f91612682575b508860011b905f198a60031b1c19161790555b895f52602d8e528760405f2055895f52602e8e528b60405f2055895f52602f8e524260405f2055895f5260308e526126458560405f209060ff801983541691151516179055565b6126638a604051848482376020818681016031815203019020612d9c565b6113d18a8c856040519182376020818781016032815203019020612d9c565b90508501355f6125eb565b601f19871699815f528e5f209a5f5b81811061270157509a61140397969594939291897f28961030162340d8e7d128a4dc7c306d25a4efc9783f27c9612a54a1b6bd3dff9c9d106126e8575b5050600188811b0190556125fe565b8601355f1960038b901b60f8161c191690558f806126d9565b929496989a5090929496989a8f60018192868c013581550194019201908e9a98969492919b999795939b61269c565b875f5260205f20601f880160051c8101916020891061276b575b601f0160051c01905b818110612760575061259f565b5f8155600101612753565b909150819061274a565b90508801358c61255e565b5f8381526020812092508590601f198216905b8c8282106127cb575050106127b2575b5050600183811b019055612571565b8901355f19600386901b60f8161c191690558b806127a3565b840135855560019094019360209384019388935001612793565b815f5260205f20601f850160051c81019160208610612820575b601f0160051c01905b8181106128155750612549565b5f8155600101612808565b90915081906127ff565b90508701358c612509565b5f8381526020812092508490601f198216905b8b82821061288057505010612867575b5050600182811b01905561251c565b8801355f19600385901b60f8161c191690558b80612858565b840135855560019094019360209384019387935001612848565b815f5260205f20601f840160051c810191602085106128d5575b601f0160051c01905b8181106128ca57506124f4565b5f81556001016128bd565b90915081906128b4565b9760018901808a1161055c576029556124c7565b34610570576020366003190112610570576004355f52600f602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f526025602052602060405f2054604051908152f35b34610570576020366003190112610570576004355f52601e6020526105dc6105c860405f206129ca565b90600182811c9216801561299f575b602083101461298b57565b634e487b7160e01b5f52602260045260245ffd5b91607f1691612980565b90601f801991011681019081106001600160401b0382111761053457604052565b9060405191825f8254926129dd84612971565b8084529360018116908115612a485750600114612a04575b50612a02925003836129a9565b565b90505f9291925260205f20905f915b818310612a2c575050906020612a02928201015f6129f5565b6020919350806001915483858901015201910190918492612a13565b905060209250612a0294915060ff191682840152151560051b8201015f6129f5565b805180835260209291819084018484015e5f828201840152601f01601f1916010190565b9181601f84011215610570578235916001600160401b038311610570576020838186019501011161057057565b60c0600319820112610570576004356001600160401b0381116105705781612ae591600401612a8e565b929092916024356001600160401b0381116105705781612b0791600401612a8e565b92909291604435906001600160401b03821161057057612b2991600401612a8e565b9091606435906084359060a43580151581036105705790565b60a0600319820112610570576004356001600160401b0381116105705781612b6c91600401612a8e565b929092916024356001600160401b0381116105705781612b8e91600401612a8e565b929092916044359160643591608435906001600160401b03821161057057612bb891600401612a8e565b9091565b6040600319820112610570576004356001600160401b0381116105705781602382011215610570578060040135906001600160401b0382116105345760405192612c10601f8401601f1916602001856129a9565b8284526024838301011161057057815f9260246020930183860137830101529060243590565b8054821015612c4b575f5260205f2001905f90565b634e487b7160e01b5f52603260045260245ffd5b9592612c8f60c09693612c81612c9d949b9a979b60e08b5260e08b0190612a6a565b9089820360208b0152612a6a565b908782036040890152612a6a565b966060860152608085015260a08401521515910152565b91612cdf90612cd1612cf79795969360a0865260a0860190612a6a565b908482036020860152612a6a565b93604083015260608201526080818403910152612a6a565b90565b9390608093969592612d17612d259260a0885260a0880190612a6a565b908682036020880152612a6a565b95604085015260608401521515910152565b60a0600319820112610570576004356001600160401b0381116105705781612d6191600401612a8e565b92909291602435906001600160401b03821161057057612d8391600401612a8e565b9091604435906064359060843580151581036105705790565b80546801000000000000000081101561053457612dbe91600182018155612c36565b819291549060031b91821b915f19901b1916179055565b908060209392818452848401375f828201840152601f01601f1916010190565b949160809491612e11919897949860a0885260a0880191612dd5565b966020860152604085015260608401521515910152565b93612e48612cf799979492612e569499979960a0885260a0880191612dd5565b918583036020870152612dd5565b94604083015260608201526080818503910152612dd5565b15612e7557565b60405162461bcd60e51b8152602060048201526011602482015270125b9d985b1a59081c9958dbdc99081251607a1b6044820152606490fd5b95929093612ecd608096999895612d259460a08a5260a08a0191612dd5565b918783036020890152612dd556fea2646970667358221220087d43991244367e4a9cce22813bb9cbf5ece930c2d8ad785e11f52ae439432064736f6c634300081c0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "immutableReferences": {},
+  "inputSourceName": "project/contracts/Operations.sol",
+  "buildInfoId": "solc-0_8_28-bccfa06ebadc34f77290fe794b06e326b74ee881"
+}

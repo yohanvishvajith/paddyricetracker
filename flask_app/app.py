@@ -114,9 +114,9 @@ def init_db():
             except mysql.connector.Error:
                 pass  # Column already exists
             try:
-                cursor.execute("ALTER TABLE `transaction` ADD COLUMN is_reverted TINYINT(1) DEFAULT 0 AFTER `status`")
+                cursor.execute("ALTER TABLE `transaction` DROP COLUMN is_reverted")
             except mysql.connector.Error:
-                pass  # Column already exists
+                pass  # Column doesn't exist
         except mysql.connector.Error as e:
             # Log and continue; table creation is best-effort
             print('Could not create transaction table:', e)
@@ -300,17 +300,17 @@ def init_db():
             except mysql.connector.Error:
                 pass  # Column already exists
             try:
-                cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN status TINYINT(1) DEFAULT 1 AFTER `quantity`")
-            except mysql.connector.Error:
-                pass  # Column already exists
-            try:
                 cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN price DECIMAL(14,3) AFTER `quantity`")
             except mysql.connector.Error:
                 pass  # Column already exists
             try:
-                cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN is_reverted TINYINT(1) DEFAULT 0 AFTER `status`")
+                cursor.execute("ALTER TABLE `rice_transaction` ADD COLUMN reverted TINYINT(1) DEFAULT 0 AFTER `price`")
             except mysql.connector.Error:
                 pass  # Column already exists
+            try:
+                cursor.execute("ALTER TABLE `rice_transaction` DROP COLUMN is_reverted")
+            except mysql.connector.Error:
+                pass  # Column doesn't exist
         except mysql.connector.Error as e:
             print('Could not create rice_transaction table:', e)
         finally:
@@ -370,7 +370,7 @@ def init_db():
             user_id VARCHAR(255),
             paddy_type VARCHAR(128),
             quantity DECIMAL(14,3),
-            status BOOLEAN DEFAULT TRUE,
+            reverted TINYINT DEFAULT 0,
             block_number INT,
             transaction_id VARCHAR(255),
             block_hash VARCHAR(255),
@@ -382,6 +382,11 @@ def init_db():
         '''
         try:
             cursor.execute(create_initial_paddy)
+            # Migrate status column to reverted if it exists
+            try:
+                cursor.execute("ALTER TABLE `initial_paddy` CHANGE COLUMN status reverted TINYINT DEFAULT 0")
+            except mysql.connector.Error:
+                pass  # Column doesn't exist or already renamed
             # Add paddy_type column if it doesn't exist (for existing tables)
             try:
                 cursor.execute("ALTER TABLE `initial_paddy` ADD COLUMN paddy_type VARCHAR(128) AFTER user_id")
@@ -392,14 +397,19 @@ def init_db():
                 cursor.execute("ALTER TABLE `initial_paddy` CHANGE COLUMN initial_paddy quantity DECIMAL(14,3)")
             except mysql.connector.Error:
                 pass  # Column already renamed or doesn't exist
-            # Add status column if missing
+            # Add reverted column if missing (replacing old status)
             try:
-                cursor.execute("ALTER TABLE `initial_paddy` ADD COLUMN status BOOLEAN DEFAULT TRUE AFTER quantity")
+                cursor.execute("ALTER TABLE `initial_paddy` ADD COLUMN reverted TINYINT DEFAULT 0 AFTER quantity")
             except mysql.connector.Error:
                 pass  # Column already exists
+            # Drop original_reverted column if it exists
+            try:
+                cursor.execute("ALTER TABLE `initial_paddy` DROP COLUMN `original_reverted`")
+            except mysql.connector.Error:
+                pass  # Column doesn't exist
             # Add blockchain columns if missing
             try:
-                cursor.execute("ALTER TABLE `initial_paddy` ADD COLUMN block_number INT AFTER status")
+                cursor.execute("ALTER TABLE `initial_paddy` ADD COLUMN block_number INT AFTER reverted")
             except mysql.connector.Error:
                 pass  # Column already exists
             try:
@@ -789,21 +799,21 @@ def api_get_initial_paddy():
             
             # Insert the new initial paddy record with blockchain data
             if blockchain_result:
-                query = 'INSERT INTO initial_paddy (id, user_id, paddy_type, quantity, status, block_number, transaction_id, block_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+                query = 'INSERT INTO initial_paddy (id, user_id, paddy_type, quantity, reverted, block_number, transaction_id, block_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
                 cursor.execute(query, (
                     blockchain_result.get('record_id'),
                     user_id, 
                     paddy_type, 
                     quantity, 
-                    bool(status) if status is not None else True,
+                    0,
                     blockchain_result.get('block_number'),
                     blockchain_result.get('transaction_hash'),
                     blockchain_result.get('block_hash')
                 ))
             else:
                 # Still insert even if blockchain fails
-                query = 'INSERT INTO initial_paddy (user_id, paddy_type, quantity, status) VALUES (%s, %s, %s, %s)'
-                cursor.execute(query, (user_id, paddy_type, quantity, bool(status) if status is not None else True))
+                query = 'INSERT INTO initial_paddy (user_id, paddy_type, quantity, reverted) VALUES (%s, %s, %s, %s)'
+                cursor.execute(query, (user_id, paddy_type, quantity, 0))
             
             conn.commit()
             
@@ -854,7 +864,7 @@ def api_get_initial_paddy():
         
         if user_type:
             query = '''
-                SELECT ip.id, ip.user_id, u.full_name, u.company_name, u.user_type, u.district, ip.paddy_type, ip.quantity, ip.status, ip.block_number, ip.transaction_id, ip.block_hash, ip.created_at
+                SELECT ip.id, ip.user_id, u.full_name, u.company_name, u.user_type, u.district, ip.paddy_type, ip.quantity, ip.reverted, ip.block_number, ip.transaction_id, ip.block_hash, ip.created_at
                 FROM initial_paddy ip
                 JOIN users u ON ip.user_id = u.id
                 WHERE u.user_type = %s
@@ -863,7 +873,7 @@ def api_get_initial_paddy():
             cursor.execute(query, (user_type,))
         else:
             query = '''
-                SELECT ip.id, ip.user_id, u.full_name, u.company_name, u.user_type, u.district, ip.paddy_type, ip.quantity, ip.status, ip.block_number, ip.transaction_id, ip.block_hash, ip.created_at
+                SELECT ip.id, ip.user_id, u.full_name, u.company_name, u.user_type, u.district, ip.paddy_type, ip.quantity, ip.reverted, ip.block_number, ip.transaction_id, ip.block_hash, ip.created_at
                 FROM initial_paddy ip
                 JOIN users u ON ip.user_id = u.id
                 WHERE u.user_type IN ('Collecter', 'Miller')
@@ -1104,7 +1114,7 @@ def api_update_initial_paddy(paddy_id):
 
 @app.route('/api/initial_paddy/<int:paddy_id>/revert', methods=['POST'])
 def api_revert_initial_paddy(paddy_id):
-    """Revert initial paddy: add new record with status = 0 (inactive) and deduct from stock"""
+    """Revert initial paddy: add new record with reverted = 1 and deduct from stock"""
     try:
         data = request.get_json()
         user_id = data.get('user_id')
@@ -1125,11 +1135,11 @@ def api_revert_initial_paddy(paddy_id):
         conn = get_connection(MYSQL_DATABASE)
         cursor = conn.cursor()
         
-        # Add new record with status = 0 (inactive/reverted) and blockchain data
+        # Add new record with reverted = 1 (reverted) and blockchain data
         if blockchain_result:
             insert_query = '''INSERT INTO initial_paddy 
-                (id, user_id, paddy_type, quantity, status, block_number, transaction_id, block_hash) 
-                VALUES (%s, %s, %s, %s, 0, %s, %s, %s)'''
+                (id, user_id, paddy_type, quantity, reverted, block_number, transaction_id, block_hash) 
+                VALUES (%s, %s, %s, %s, 1, %s, %s, %s)'''
             cursor.execute(insert_query, (
                 blockchain_result.get('record_id'),
                 user_id, 
@@ -1141,8 +1151,12 @@ def api_revert_initial_paddy(paddy_id):
             ))
         else:
             # Still insert even if blockchain fails
-            insert_query = 'INSERT INTO initial_paddy (user_id, paddy_type, quantity, status) VALUES (%s, %s, %s, 0)'
+            insert_query = 'INSERT INTO initial_paddy (user_id, paddy_type, quantity, reverted) VALUES (%s, %s, %s, 1)'
             cursor.execute(insert_query, (user_id, paddy_type, qty_float))
+        
+        # Update the original record to set reverted = 1 to prevent further reversions
+        update_original_query = 'UPDATE initial_paddy SET reverted = 1 WHERE id = %s'
+        cursor.execute(update_original_query, (paddy_id,))
         
         # Deduct quantity from stock
         stock_query = 'UPDATE stock SET amount = amount - %s WHERE user_id = %s AND type = %s AND amount >= %s'
@@ -1156,21 +1170,21 @@ def api_revert_initial_paddy(paddy_id):
         if blockchain_result:
             if stock_rows_affected == 0:
                 return jsonify({
-                    'message': 'Initial paddy reversal recorded on blockchain (status = 0). Note: stock may have been insufficient for full deduction.',
+                    'message': 'Initial paddy reversal recorded on blockchain (reverted = 1). Note: stock may have been insufficient for full deduction.',
                     'blockchain': blockchain_result
                 }), 200
             return jsonify({
-                'message': 'Initial paddy reversal recorded successfully on blockchain (status = 0) and stock deducted',
+                'message': 'Initial paddy reversal recorded successfully on blockchain (reverted = 1) and stock deducted',
                 'blockchain': blockchain_result
             }), 200
         else:
             if stock_rows_affected == 0:
                 return jsonify({
-                    'message': 'Initial paddy reversal record added (status = 0), but blockchain recording failed. Note: stock may have been insufficient for full deduction.',
+                    'message': 'Initial paddy reversal record added (reverted = 1), but blockchain recording failed. Note: stock may have been insufficient for full deduction.',
                     'warning': 'Blockchain recording failed'
                 }), 200
             return jsonify({
-                'message': 'Initial paddy reversal record added (status = 0) and stock deducted, but blockchain recording failed',
+                'message': 'Initial paddy reversal record added (reverted = 1) and stock deducted, but blockchain recording failed',
                 'warning': 'Blockchain recording failed'
             }), 200
         
@@ -1202,6 +1216,10 @@ def api_revert_initial_rice(rice_id):
         
         conn = get_connection(MYSQL_DATABASE)
         cursor = conn.cursor()
+        
+        # Mark the original rice record as reverted (status = 0) to prevent multiple reversions
+        update_original_query = 'UPDATE rice SET status = 0 WHERE id = %s'
+        cursor.execute(update_original_query, (rice_id,))
         
         # Add new record with status = 0 (inactive/reverted) and blockchain data
         if blockchain_result:
@@ -1910,29 +1928,28 @@ def api_add_transaction():
                 blockchain_transaction_id = None
             
             # Insert into appropriate table based on transaction type
-            # Set is_reverted to 1 if this is a revert transaction (status == 0)
-            is_reverted_val = 1 if is_revert else 0
-            
             if is_rice_transaction:
-                # Insert into rice_transaction table with status and blockchain transaction_id
+                # Insert into rice_transaction table with reverted and blockchain transaction_id
+                # For rice_transaction: status=0 means revert (reverted=1), status=1 means normal (reverted=0)
+                reverted_value = 1 if status == 0 else 0
                 if blockchain_transaction_id:
-                    print(f"DEBUG: Inserting rice transaction with blockchain_transaction_id = {blockchain_transaction_id}")
-                    insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
+                    print(f"DEBUG: Inserting rice transaction with blockchain_transaction_id = {blockchain_transaction_id}, reverted = {reverted_value}")
+                    insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, reverted_value, dt, block_hash, block_number, transaction_hash))
                 else:
-                    print(f"DEBUG: Inserting rice transaction WITHOUT blockchain_transaction_id")
-                    insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
+                    print(f"DEBUG: Inserting rice transaction WITHOUT blockchain_transaction_id, reverted = {reverted_value}")
+                    insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, reverted_value, dt, block_hash, block_number, transaction_hash))
             else:
                 # Insert into regular transaction table (paddy) with status and blockchain transaction_id
                 if blockchain_transaction_id:
                     print(f"DEBUG: Inserting paddy transaction with blockchain_transaction_id = {blockchain_transaction_id}")
-                    insert_sql = 'INSERT INTO `transaction` (id, `from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `transaction` (id, `from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (blockchain_transaction_id, str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
                 else:
                     print(f"DEBUG: Inserting paddy transaction WITHOUT blockchain_transaction_id")
-                    insert_sql = 'INSERT INTO `transaction` (`from`, `to`, `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), is_reverted_val, dt, block_hash, block_number, transaction_hash))
+                    insert_sql = 'INSERT INTO `transaction` (`from`, `to`, `type`, quantity, price, status, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                    cur.execute(insert_sql, (str(from_val), str(to_val), ttype, qty, price, int(status), dt, block_hash, block_number, transaction_hash))
             last_id = cur.lastrowid
         except mysql.connector.Error as e:
             try:
@@ -1943,18 +1960,29 @@ def api_add_transaction():
             conn.close()
             return jsonify({'ok': False, 'error': 'Failed inserting transaction: ' + str(e)}), 500
 
-        # If this is a revert transaction, mark the original transaction as reverted
+        # If this is a revert transaction, mark the original transaction with status = 0
         original_transaction_id = payload.get('original_transaction_id')
+        print(f"DEBUG: is_revert={is_revert}, original_transaction_id={original_transaction_id}")
         if is_revert and original_transaction_id:
             try:
-                # Update the original transaction's is_reverted field to 1
-                if is_rice_transaction:
-                    update_sql = 'UPDATE `rice_transaction` SET is_reverted = 1 WHERE id = %s'
+                # Extract numeric ID from strings like 'srv-8' or just '8'
+                if isinstance(original_transaction_id, str):
+                    # Remove any prefix like 'srv-', 'tx-', etc.
+                    numeric_id = original_transaction_id.split('-')[-1]
                 else:
-                    update_sql = 'UPDATE `transaction` SET is_reverted = 1 WHERE id = %s'
-                cur.execute(update_sql, (int(original_transaction_id),))
+                    numeric_id = original_transaction_id
+                
+                # Update the original transaction's reverted to 1
+                if is_rice_transaction:
+                    update_sql = 'UPDATE `rice_transaction` SET reverted = 1 WHERE id = %s'
+                else:
+                    update_sql = 'UPDATE `transaction` SET status = 0 WHERE id = %s'
+                print(f"DEBUG: Executing UPDATE for original transaction id={numeric_id}")
+                cur.execute(update_sql, (int(numeric_id),))
+                affected_rows = cur.rowcount
+                print(f"DEBUG: Updated {affected_rows} row(s) for original transaction")
             except Exception as e:
-                print(f"Failed to mark original transaction as reverted: {e}")
+                print(f"ERROR: Failed to mark original transaction as reverted: {e}")
                 # Continue anyway - revert transaction was created
 
         # commit both transaction insert and stock update
@@ -2141,7 +2169,7 @@ def api_get_transactions():
         # Query paddy transactions with user details
         paddy_transactions = []
         if to_param:
-            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status, t.is_reverted, 
+            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status, 
                      t.`datetime`, t.block_hash, t.block_number, t.transaction_hash, t.created_at,
                      u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
                      u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
@@ -2151,7 +2179,7 @@ def api_get_transactions():
                      WHERE t.`to` = %s ORDER BY t.id DESC'''
             cur.execute(sql, (str(to_param),))
         elif from_param:
-            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status, t.is_reverted, 
+            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status,
                      t.`datetime`, t.block_hash, t.block_number, t.transaction_hash, t.created_at,
                      u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
                      u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
@@ -2161,7 +2189,7 @@ def api_get_transactions():
                      WHERE t.`from` = %s ORDER BY t.id DESC'''
             cur.execute(sql, (str(from_param),))
         elif user_param:
-            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status, t.is_reverted, 
+            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status,
                      t.`datetime`, t.block_hash, t.block_number, t.transaction_hash, t.created_at,
                      u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
                      u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
@@ -2171,7 +2199,7 @@ def api_get_transactions():
                      WHERE t.`from` = %s OR t.`to` = %s ORDER BY t.id DESC'''
             cur.execute(sql, (str(user_param), str(user_param)))
         else:
-            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status, t.is_reverted, 
+            sql = '''SELECT t.id, t.`from`, t.`to`, t.`type`, t.quantity, t.price, t.status,
                      t.`datetime`, t.block_hash, t.block_number, t.transaction_hash, t.created_at,
                      u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
                      u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
@@ -2185,16 +2213,44 @@ def api_get_transactions():
         # Query rice transactions
         rice_transactions = []
         if to_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `to` = %s ORDER BY id DESC'
+            sql = '''SELECT rt.id, rt.`from`, rt.`to`, rt.rice_type as `type`, rt.quantity, rt.price, rt.reverted, 
+                     rt.`datetime`, rt.block_hash, rt.block_number, rt.transaction_hash, rt.created_at,
+                     u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
+                     u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
+                     FROM `rice_transaction` rt
+                     LEFT JOIN users u_from ON rt.`from` = u_from.id
+                     LEFT JOIN users u_to ON rt.`to` = u_to.id
+                     WHERE rt.`to` = %s ORDER BY rt.id DESC'''
             cur.execute(sql, (str(to_param),))
         elif from_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s ORDER BY id DESC'
+            sql = '''SELECT rt.id, rt.`from`, rt.`to`, rt.rice_type as `type`, rt.quantity, rt.price, rt.reverted, 
+                     rt.`datetime`, rt.block_hash, rt.block_number, rt.transaction_hash, rt.created_at,
+                     u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
+                     u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
+                     FROM `rice_transaction` rt
+                     LEFT JOIN users u_from ON rt.`from` = u_from.id
+                     LEFT JOIN users u_to ON rt.`to` = u_to.id
+                     WHERE rt.`from` = %s ORDER BY rt.id DESC'''
             cur.execute(sql, (str(from_param),))
         elif user_param:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` WHERE `from` = %s OR `to` = %s ORDER BY id DESC'
+            sql = '''SELECT rt.id, rt.`from`, rt.`to`, rt.rice_type as `type`, rt.quantity, rt.price, rt.reverted, 
+                     rt.`datetime`, rt.block_hash, rt.block_number, rt.transaction_hash, rt.created_at,
+                     u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
+                     u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
+                     FROM `rice_transaction` rt
+                     LEFT JOIN users u_from ON rt.`from` = u_from.id
+                     LEFT JOIN users u_to ON rt.`to` = u_to.id
+                     WHERE rt.`from` = %s OR rt.`to` = %s ORDER BY rt.id DESC'''
             cur.execute(sql, (str(user_param), str(user_param)))
         else:
-            sql = 'SELECT id, `from`, `to`, rice_type as `type`, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash, created_at FROM `rice_transaction` ORDER BY id DESC LIMIT 200'
+            sql = '''SELECT rt.id, rt.`from`, rt.`to`, rt.rice_type as `type`, rt.quantity, rt.price, rt.reverted, 
+                     rt.`datetime`, rt.block_hash, rt.block_number, rt.transaction_hash, rt.created_at,
+                     u_from.full_name as from_name, u_from.address as from_address, u_from.contact_number as from_contact,
+                     u_to.full_name as to_name, u_to.address as to_address, u_to.contact_number as to_contact
+                     FROM `rice_transaction` rt
+                     LEFT JOIN users u_from ON rt.`from` = u_from.id
+                     LEFT JOIN users u_to ON rt.`to` = u_to.id
+                     ORDER BY rt.id DESC LIMIT 200'''
             cur.execute(sql)
         rice_transactions = cur.fetchall()
         
@@ -2211,23 +2267,13 @@ def api_get_transactions():
 
 @app.route('/api/paddy_types', methods=['GET'])
 def api_get_paddy_types():
-    """Return list of paddy types that have actual data in rice_stock."""
+    """Return list of all paddy types from paddy_type table."""
     try:
         conn = get_connection(MYSQL_DATABASE)
         cur = conn.cursor(dictionary=True)
-        # Only return paddy types that exist in rice_stock table
-        cur.execute('''
-            SELECT DISTINCT rs.paddy_type as name
-            FROM rice_stock rs
-            WHERE rs.paddy_type IS NOT NULL AND rs.paddy_type != ''
-            ORDER BY rs.paddy_type
-        ''')
+        # Get all paddy types from paddy_type table
+        cur.execute('SELECT id, name FROM paddy_type ORDER BY id')
         rows = cur.fetchall()
-        
-        # If no data in rice_stock, get from paddy_type table
-        if not rows:
-            cur.execute('SELECT id, name FROM paddy_type ORDER BY id')
-            rows = cur.fetchall()
         
         cur.close()
         conn.close()
@@ -2451,15 +2497,25 @@ def api_revert_rice_transaction(transaction_id):
             print(f"Failed to record revert on blockchain: {e}")
             # Continue with database update even if blockchain fails
         
+        # Mark the original transaction as reverted
+        try:
+            print(f"DEBUG: Marking original transaction {transaction_id} as reverted")
+            cur.execute('UPDATE `rice_transaction` SET reverted = 1 WHERE id = %s', (transaction_id,))
+        except mysql.connector.Error as e:
+            print(f"Warning: Failed to mark original transaction as reverted: {e}")
+            # Continue anyway
+        
         # Insert revert transaction record
         try:
             print(f"DEBUG: Inserting revert with price={price}")
+            # Use UTC time string to match the format sent from clients (new Date().toISOString())
+            revert_time = datetime.datetime.utcnow().isoformat() + "Z"
             if revert_transaction_id:
-                insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (revert_transaction_id, str(to_party), str(from_party), rice_type, quantity, price, 0, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_transaction` (id, `from`, `to`, rice_type, quantity, price, reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (revert_transaction_id, str(to_party), str(from_party), rice_type, quantity, price, 1, revert_time, block_hash, block_number, transaction_hash))
             else:
-                insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, status, is_reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(to_party), str(from_party), rice_type, quantity, price, 0, 0, datetime.datetime.now().isoformat(), block_hash, block_number, transaction_hash))
+                insert_sql = 'INSERT INTO `rice_transaction` (`from`, `to`, rice_type, quantity, price, reverted, `datetime`, block_hash, block_number, transaction_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+                cur.execute(insert_sql, (str(to_party), str(from_party), rice_type, quantity, price, 1, revert_time, block_hash, block_number, transaction_hash))
             
             conn.commit()
         except mysql.connector.Error as e:
@@ -3044,19 +3100,19 @@ def api_revert_damage(damage_id):
             transaction_hash = None
             damage_id_result = None
         
-        # Insert a new reversal record with reason "revert" and reverted=0
+        # Insert a new reversal record with reason "revert" and reverted=1
         if table_name == 'rice_damage' and damage_id_result is not None:
             # For rice damage, use blockchain id if available
             insert_sql = f'INSERT INTO `{table_name}` (id, user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
+            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 1))
         elif table_name == 'damage' and damage_id_result is not None:
             # For paddy damage, use blockchain id if available
             insert_sql = f'INSERT INTO `{table_name}` (id, user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
+            cur.execute(insert_sql, (damage_id_result, str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 1))
         else:
             # Fallback: use auto-increment if blockchain id not available
             insert_sql = f'INSERT INTO `{table_name}` (user_id, {type_column}, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-            cur.execute(insert_sql, (str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 0))
+            cur.execute(insert_sql, (str(user_id), item_type, quantity, 'revert', damage_date, block_hash, block_number, transaction_hash, 1))
         
         conn.commit()
         cur.close()
@@ -4338,6 +4394,14 @@ def api_revert_milling(milling_id):
             else:
                 cur.execute('UPDATE `rice_stock` SET quantity = %s WHERE id = %s', (new_qty, rice_row['id']))
         
+        # Update the original milling record's status to 0 (reverted)
+        try:
+            update_sql = 'UPDATE `milling` SET status = 0 WHERE id = %s'
+            cur.execute(update_sql, (milling_id,))
+            print(f"DEBUG: Updated original milling record {milling_id} to status = 0")
+        except Exception as e:
+            print(f"ERROR: Failed to update original milling record status: {e}")
+        
         # Record reversal on blockchain with status = 0 (False)
         milling_id_blockchain = None
         block_hash = None
@@ -4395,6 +4459,7 @@ def api_update_user(user_id):
     payload = request.get_json() or {}
     
     # Extract fields from payload
+    nic = payload.get('nic')
     full_name = payload.get('fullName')
     company_register_number = payload.get('companyRegisterNumber')
     company_name = payload.get('companyName')
@@ -4411,6 +4476,9 @@ def api_update_user(user_id):
         update_fields = []
         update_values = []
         
+        if nic is not None:
+            update_fields.append('nic = %s')
+            update_values.append(nic)
         if full_name is not None:
             update_fields.append('full_name = %s')
             update_values.append(full_name)
@@ -4455,6 +4523,7 @@ def api_update_user(user_id):
             return jsonify({'error': 'No fields to update'}), 400
 
         # Build merged values for blockchain call (payload overrides existing)
+        merged_nic = nic if nic is not None else (existing.get('nic') or '')
         merged_full_name = full_name if full_name is not None else (existing.get('full_name') or '')
         merged_company_reg = company_register_number if company_register_number is not None else (existing.get('company_register_number') or '')
         merged_company_name = company_name if company_name is not None else (existing.get('company_name') or '')

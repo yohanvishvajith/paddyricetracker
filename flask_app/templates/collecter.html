@@ -59,11 +59,8 @@
         border-color: white;
       }
 
-      .logout-float {
-        /* Floating logout removed — keep class available if needed later */
-      }
+   
 
-      /* Tab Navigation */
       .tabs {
         display: flex;
         gap: 8px;
@@ -941,6 +938,18 @@
         const recent = purchases.slice().reverse().slice(0, 10);
         recent.forEach((r) => {
           const tr = document.createElement("tr");
+
+          // Highlight reverted rows (status = 0)
+          if (
+            r.status === 0 ||
+            r.status === false ||
+            r.status === "0" ||
+            r.status === null
+          ) {
+            tr.style.backgroundColor = "#fee2e2"; // Light red background
+            tr.style.opacity = "0.7";
+          }
+
           const hashDisplay = r.block_hash
             ? String(r.block_hash).slice(0, 12) + "..."
             : "Not available";
@@ -999,6 +1008,18 @@
           .reverse()
           .forEach((r) => {
             const tr = document.createElement("tr");
+
+            // Highlight reverted rows (status = 0)
+            if (
+              r.status === 0 ||
+              r.status === false ||
+              r.status === "0" ||
+              r.status === null
+            ) {
+              tr.style.backgroundColor = "#fee2e2"; // Light red background
+              tr.style.opacity = "0.7";
+            }
+
             const hashDisplay = r.block_hash
               ? String(r.block_hash).slice(0, 12) + "..."
               : "Not available";
@@ -1232,7 +1253,10 @@
                   price: revertData.price,
                   datetime: new Date().toISOString(),
                   status: 0, // Mark as revert
+                  original_transaction_id: revertData.id, // Mark the original transaction to be updated
                 };
+
+                console.log("Revert payload:", payload);
 
                 const res = await fetch("/api/transactions", {
                   method: "POST",
@@ -1382,9 +1406,10 @@
               : "Not available";
             const kind = d.kind || "paddy";
 
-            // Highlight revert reason rows
-            if (d.reason === "revert") {
-              tr.classList.add("revert-row");
+            // Highlight reverted rows (reverted = 1 or reason = "revert")
+            if (d.reverted === 1 || d.reason === "revert") {
+              tr.style.backgroundColor = "#fee2e2"; // Light red background
+              tr.style.opacity = "0.7";
             }
 
             tr.innerHTML = `<td>${escapeHtml(
@@ -1401,7 +1426,7 @@
               kind
             )}" style="padding:4px 8px; margin-right:6px; background:#3b82f6; color:#fff;">👁️ View</button>
                             ${
-                              d.reverted !== 1 && d.reason !== "revert"
+                              d.reverted !== 1
                                 ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
                                     d.id
                                   )}" data-kind="${escapeHtml(
@@ -1412,7 +1437,7 @@
                                     d.paddy_type
                                   )}" data-user-id="${escapeHtml(
                                     d.user_id
-                                  )}" style="padding:4px 8px; background:#10b981; color:#fff;">↩️ Revert</button>`
+                                  )}" style="padding:4px 8px; background:#ef4444; color:#fff;">↩️ Revert</button>`
                                 : ""
                             }
                           </td>`;
@@ -1534,6 +1559,7 @@
 
         // Revert purchase: show confirmation modal and create reversal with status=0 on confirm
         if (e.target && e.target.classList.contains("revert-purchase-btn")) {
+          const id = e.target.dataset.id; // Transaction ID
           const txid = e.target.dataset.txid;
           const qty = parseFloat(e.target.dataset.qty) || 0;
           const paddy = e.target.dataset.paddy || "";
@@ -1546,6 +1572,7 @@
             modal.querySelector(
               "#confirm-revert-text"
             ).textContent = `Revert purchase of ${qty} kg ${paddy} from ${from}? This will create a reversal`;
+            modal.dataset.id = id || ""; // Store transaction ID
             modal.dataset.txid = txid || "";
             modal.dataset.qty = String(qty);
             modal.dataset.paddy = paddy;
@@ -2320,6 +2347,7 @@
           if (e.target.id === "confirm-revert") {
             const m = qs("#confirm-revert-modal");
             if (!m) return;
+            const id = m.dataset.id || ""; // Original transaction ID
             const txid = m.dataset.txid || "";
             const qty = parseFloat(m.dataset.qty) || 0;
             const paddy = m.dataset.paddy || "";
@@ -2333,6 +2361,7 @@
               qty: qty,
               price: price,
               txid: txid,
+              id: id, // Original transaction ID
             };
 
             // Close confirm modal

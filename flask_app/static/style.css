@@ -718,8 +718,7 @@ main {
 }
 
 .manage-user-table-container .table-wrap {
-  overflow: auto;
-  max-height: 600px;
+  overflow: visible;
 }
 
 .manage-user-table-container .data-table {

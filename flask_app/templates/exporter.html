@@ -384,6 +384,24 @@
             <button type="submit">💾 Purchase Rice</button>
           </form>
         </div>
+
+        <h3 style="margin-top: 18px">Recent Purchases</h3>
+        <div class="table-wrap">
+          <table class="data-table" id="recent-purchases-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Supplier</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (per kg)</th>
+                <th>Block ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- History Tab -->
@@ -421,6 +439,73 @@
             <tbody></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div
+      id="otp-verification-modal"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 1002;
+        "
+      >
+        <h2>Verify OTP</h2>
+        <p style="margin: 15px 0; color: #666">
+          Enter the OTP sent to
+          <strong>****<span id="otp-phone-digits"></span></strong>
+        </p>
+        <form id="otp-verification-form">
+          <input
+            type="password"
+            id="otp-input-field"
+            placeholder="Enter OTP"
+            required
+            autofocus
+            style="
+              width: 100%;
+              padding: 10px;
+              margin: 10px 0;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+              font-size: 16px;
+              box-sizing: border-box;
+            "
+          />
+          <div style="display: flex; gap: 10px; margin-top: 20px">
+            <button type="submit" class="btn primary" style="flex: 1">
+              Verify
+            </button>
+            <button
+              type="button"
+              id="close-otp-modal"
+              class="btn secondary"
+              style="flex: 1"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -517,10 +602,11 @@
               '<option value="">Select Supplier</option>';
             suppliers.forEach((s) => {
               const option = document.createElement("option");
-              option.value = s.id || s.user_code || "";
-              option.textContent = s.user_code
-                ? `${s.user_code} - ${s.full_name}`
-                : s.full_name || s.id || "Unknown";
+              option.value = s.user_code || s.id || "";
+              const displayName =
+                s.full_name || s.company_name || s.name || "Unknown";
+              const displayCode = s.user_code || s.id || "";
+              option.textContent = `${displayCode} - ${displayName}`;
               supplierSelect.appendChild(option);
             });
           } catch (err) {
@@ -531,7 +617,7 @@
           }
         });
 
-      // Purchase Form Submit
+      // Purchase Form Submit - trigger OTP verification
       document
         .getElementById("purchase-form")
         .addEventListener("submit", async (e) => {
@@ -543,7 +629,9 @@
           const riceTypeName = paddyMap[riceTypeId] || riceTypeId;
           const quantity = parseFloat(formData.get("quantity"));
           const price = parseFloat(formData.get("price")) || 0.0;
-          const payload = {
+
+          // Store purchase data for OTP verification
+          window.pendingPurchaseData = {
             from: supplierId,
             to: loggedInUser.user_code,
             type: riceTypeName,
@@ -552,6 +640,59 @@
             datetime: new Date().toISOString(),
           };
 
+          // Fetch exporter contact number for OTP
+          try {
+            const res = await fetch(
+              `/api/users/${encodeURIComponent(loggedInUser.user_id)}`
+            );
+            const user = res.ok ? await res.json() : null;
+            let phoneNumber = "****";
+            if (user && user.contact_number) {
+              const phone = String(user.contact_number).trim();
+              if (phone.length >= 4) {
+                phoneNumber = phone.slice(-4);
+              }
+            }
+
+            // Show OTP modal
+            document.getElementById("otp-phone-digits").textContent =
+              phoneNumber;
+            document.getElementById("otp-verification-modal").style.display =
+              "flex";
+            document.getElementById("otp-input-field").value = "";
+            document.getElementById("otp-input-field").focus();
+          } catch (err) {
+            console.error("Error fetching user details:", err);
+            alert("Error loading user details for OTP verification");
+          }
+        });
+
+      // OTP Verification Form Submit
+      document
+        .getElementById("otp-verification-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const otpValue = document.getElementById("otp-input-field").value;
+
+          // Verify OTP (hardcoded check)
+          if (otpValue !== "123456") {
+            alert("Invalid OTP. Transaction cancelled.");
+            document.getElementById("otp-verification-modal").style.display =
+              "none";
+            window.pendingPurchaseData = null;
+            return;
+          }
+
+          // OTP verified, close modal and submit purchase
+          document.getElementById("otp-verification-modal").style.display =
+            "none";
+
+          const payload = window.pendingPurchaseData;
+          if (!payload) {
+            alert("No pending purchase data");
+            return;
+          }
+
           try {
             const response = await fetch("/api/transactions", {
               method: "POST",
@@ -559,28 +700,100 @@
               body: JSON.stringify(payload),
             });
 
-            if (!response.ok) throw new Error("Failed to record purchase");
-            alert("Purchase recorded successfully!");
-            e.target.reset();
+            const respData = await response.json();
+            if (!response.ok)
+              throw new Error(respData.error || "Failed to record purchase");
+
+            if (respData.ok) {
+              alert(
+                `✓ Purchase recorded successfully!\nBlock Hash: ${
+                  respData.block_hash
+                    ? respData.block_hash.substring(0, 10) + "..."
+                    : "Processing..."
+                }`
+              );
+            } else {
+              alert(
+                `⚠ Purchase saved but blockchain recording may have failed: ${
+                  respData.error || "Unknown error"
+                }`
+              );
+            }
+
+            document.getElementById("purchase-form").reset();
             document.getElementById("supplier-select").innerHTML =
               '<option value="">First select source type</option>';
+            window.pendingPurchaseData = null;
             loadPurchases();
+            loadHistory();
           } catch (err) {
             console.error(err);
-            alert("Error recording purchase");
+            alert("Error recording purchase: " + err.message);
           }
+        });
+
+      // Close OTP modal button
+      document
+        .getElementById("close-otp-modal")
+        .addEventListener("click", () => {
+          document.getElementById("otp-verification-modal").style.display =
+            "none";
+          window.pendingPurchaseData = null;
         });
 
       async function loadPurchases() {
         try {
           const response = await fetch(
-            `/api/transactions?user=${loggedInUser.user_code}&type=Purchase`
+            `/api/transactions?to=${loggedInUser.user_code}`
           );
           if (!response.ok) throw new Error("Failed to load purchases");
-          const data = await response.json();
+          const purchases = await response.json();
 
-          // Purchase history removed from UI; nothing to render here
-          return;
+          const tbody = document.querySelector("#recent-purchases-table tbody");
+          tbody.innerHTML = "";
+
+          // Filter only incoming transactions (purchases) and sort by date
+          const recentPurchases = purchases
+            .filter((t) => t.to === loggedInUser.user_code)
+            .sort((a, b) => {
+              const dateA = new Date(a.datetime || a.created_at);
+              const dateB = new Date(b.datetime || b.created_at);
+              return dateB - dateA;
+            });
+
+          recentPurchases.forEach((t) => {
+            const row = tbody.insertRow();
+            const isReverted = t.status === 0 || t.reverted === 1;
+
+            // Highlight reverted records
+            if (isReverted) {
+              row.style.backgroundColor = "#fee2e2";
+              row.style.opacity = "0.7";
+            }
+
+            const dateValue = t.datetime || t.created_at;
+            const blockIdDisplay = t.block_hash
+              ? t.block_hash.substring(0, 10) + "..."
+              : "Not available";
+            const supplierName = t.from_name || t.from || "Unknown";
+
+            // Hide revert button if already reverted
+            const actionBtns = !isReverted
+              ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #ef4444;" onclick="revertTransaction(${t.id})">Revert</button>`
+              : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button>`;
+
+            row.innerHTML = `
+              <td>${
+                dateValue ? new Date(dateValue).toLocaleString() : "N/A"
+              }</td>
+              <td>${supplierName}</td>
+              <td>${t.type || t.rice_type || "-"}</td>
+              <td>${parseFloat(t.quantity).toFixed(2)}</td>
+              <td>${t.price ? Number(t.price).toFixed(2) : "-"}</td>
+              <td title="${t.block_hash || ""}">${blockIdDisplay}</td>
+              <td>${actionBtns}</td>
+            `;
+          });
         } catch (err) {
           console.error(err);
         }
@@ -618,31 +831,35 @@
 
             // Determine if this is a purchase (user is recipient) or revert (user is sender)
             const isPurchase = t.to === loggedInUser.user_code;
-            const isRevert =
-              t.from === loggedInUser.user_code && t.status === 0;
+            const isReverted = t.status === 0 || t.reverted === 1;
+
+            // Highlight reverted records
+            if (isReverted) {
+              row.style.backgroundColor = "#fee2e2";
+              row.style.opacity = "0.7";
+            }
 
             // Show appropriate party name
             let displayName = isPurchase
               ? t.from_name || t.from || "Unknown"
               : t.to_name || t.to || "Unknown";
-            let displayLabel = isPurchase ? "Purchase" : "Revert";
-            let displayQty = isPurchase
-              ? parseFloat(t.quantity)
-              : -parseFloat(t.quantity);
-            const qtyColor = isPurchase ? "black" : "red";
 
-            // Only show Revert button for purchases, not reverts
-            const actionBtns = isPurchase
-              ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #1565c0;" onclick="revertTransaction(${t.id})">Revert</button>`
-              : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button>`;
+            // Show quantity as positive value always in black color
+            let displayQty = Math.abs(parseFloat(t.quantity));
+
+            // Only show Revert button for purchases that are not already reverted
+            const actionBtns =
+              isPurchase && !isReverted
+                ? `<button class="btn small" style="margin-right: 5px; padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button> <button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #1565c0;" onclick="revertTransaction(${t.id})">Revert</button>`
+                : `<button class="btn small" style="padding: 4px 8px; font-size: 12px; background: #1e88e5;" onclick="viewTransaction(${t.id})">View</button>`;
 
             row.innerHTML = `
               <td>${
                 dateValue ? new Date(dateValue).toLocaleString() : "N/A"
               }</td>
-              <td>${displayName} <span style="font-size: 11px; color: #666;">(${displayLabel})</span></td>
+              <td>${displayName}</td>
               <td>${t.type}</td>
-              <td style="color: ${qtyColor};">${displayQty}</td>
+              <td>${displayQty}</td>
               <td>${t.price ? Number(t.price).toFixed(2) : "-"}</td>
               <td title="${t.block_hash || ""}">${blockIdDisplay}</td>
               <td>${actionBtns}</td>

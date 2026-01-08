@@ -28,10 +28,58 @@
           opacity: 1;
         }
       }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+
+      .notification {
+        padding: 12px 16px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: slideDown 0.3s ease-out;
+        pointer-events: auto;
+      }
+
+      .notification.success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #10b981;
+      }
+
+      .notification.success::before {
+        content: "✓";
+        font-weight: bold;
+        font-size: 16px;
+      }
     </style>
   </head>
 
   <body>
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
     <header class="site-header">
       <h1 class="site-title">
         Sri Lanka Rice Supply Chain<br />Blockchain Traceability System
@@ -272,6 +320,48 @@
               </tbody>
             </table>
           </div>
+          <div
+            id="manage-user-pagination"
+            class="pagination-controls"
+            style="
+              display: none;
+              margin-top: 20px;
+              text-align: center;
+              gap: 10px;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              id="manage-user-prev-btn"
+              class="btn-secondary"
+              style="
+                padding: 8px 12px;
+                background: linear-gradient(135deg, #0b3d91 0%, #1a5fc4 100%);
+                color: white;
+                border: none;
+              "
+            >
+              ← Previous
+            </button>
+            <div
+              id="manage-user-page-numbers"
+              style="display: flex; gap: 4px"
+            ></div>
+            <button
+              id="manage-user-next-btn"
+              class="btn-secondary"
+              style="
+                padding: 8px 12px;
+                background: linear-gradient(135deg, #0b3d91 0%, #1a5fc4 100%);
+                color: white;
+                border: none;
+              "
+            >
+              Next →
+            </button>
+          </div>
           <div id="manage-user-empty" class="empty-state" style="display: none">
             <div class="empty-icon">📭</div>
             <p class="empty-title">No users found</p>
@@ -321,7 +411,7 @@
           </div>
         </div>
 
-        <div id="initial-paddy-panel">
+        <div id="initial-paddy-panel" style="display: none">
           <div
             class="controls"
             style="
@@ -367,6 +457,21 @@
             </button>
           </div>
 
+          <div style="margin-bottom: 16px">
+            <input
+              type="text"
+              id="initial-paddy-search"
+              placeholder="Search by ID or Name..."
+              style="
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                width: 300px;
+                font-size: 14px;
+              "
+            />
+          </div>
+
           <div class="table-wrap">
             <table
               id="initial-paddy-table"
@@ -394,7 +499,7 @@
           </div>
         </div>
 
-        <div id="initial-rice-panel" style="display: none">
+        <div id="initial-rice-panel">
           <div
             class="controls"
             style="
@@ -440,6 +545,21 @@
             </button>
           </div>
 
+          <div style="margin-bottom: 16px">
+            <input
+              type="text"
+              id="initial-rice-search"
+              placeholder="Search by ID or Name..."
+              style="
+                padding: 8px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                width: 300px;
+                font-size: 14px;
+              "
+            />
+          </div>
+
           <div class="table-wrap">
             <table
               id="initial-rice-table"
@@ -447,7 +567,7 @@
               aria-describedby="initial-rice-table-desc"
             >
               <caption id="initial-rice-table-desc">
-                Initial Rice Inventory
+                Initial Rice (Millers & Wholesalers)
               </caption>
               <thead>
                 <tr>
@@ -4708,6 +4828,53 @@
         </div>
       </div>
 
+      <!-- OTP Verification Modal -->
+      <div
+        id="phone-validation-modal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        hidden
+        style="z-index: 2000"
+      >
+        <div class="modal-content" role="document" style="max-width: 400px">
+          <form id="phone-validation-form">
+            <div id="otp-section" style="margin-bottom: 16px">
+              <label style="display: block; margin-bottom: 16px">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px">
+                  Enter OTP Code
+                </h3>
+                <input
+                  type="text"
+                  id="otp-code"
+                  placeholder="Enter OTP (123456)"
+                  maxlength="6"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 4px;
+                    margin-top: 4px;
+                  "
+                />
+              </label>
+              <p style="font-size: 12px; color: #999; margin-bottom: 12px">
+                OTP expires in <span id="otp-timer">60</span> seconds
+              </p>
+            </div>
+            <div class="modal-actions">
+              <button type="button" id="close-phone-validation-btn" class="btn">
+                Close
+              </button>
+              <button type="button" id="verify-otp-btn" class="btn primary">
+                Verify OTP
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Add User Modal -->
       <div
         id="user-modal"
@@ -5358,6 +5525,10 @@
         }
 
         // Load users for Manage User section
+        let manageUserCurrentPage = 1;
+        const manageUserItemsPerPage = 25;
+        let manageUserAllFiltered = [];
+
         async function loadManageUsers() {
           const manageUserTableBody = document.querySelector(
             "#manage-user-table tbody"
@@ -5381,8 +5552,8 @@
             if (!resp.ok) throw new Error("Failed to fetch users");
             const users = await resp.json();
 
-            manageUserTableBody.innerHTML = "";
-            const filteredUsers = users.filter((u) => {
+            // Apply filters
+            manageUserAllFiltered = users.filter((u) => {
               // Filter by user type
               if (selectedType && u.user_type !== selectedType) return false;
               // Filter by search query (ID or name)
@@ -5401,70 +5572,226 @@
               return true;
             });
 
-            const emptyState = document.getElementById("manage-user-empty");
-            if (filteredUsers.length === 0) {
-              emptyState.style.display = "flex";
-            } else {
-              emptyState.style.display = "none";
-            }
+            // Reset to page 1 when filters change
+            manageUserCurrentPage = 1;
 
-            filteredUsers.forEach((u) => {
-              const tr = document.createElement("tr");
-              // For millers, wholesalers, retailers and company-type users, show company name instead of full name
-              const displayName =
-                u.user_type === "Miller" ||
-                u.user_type === "Wholesaler" ||
-                u.user_type === "Retailer" ||
-                u.user_type === "Beer" ||
-                u.user_type === "Animal Food" ||
-                u.user_type === "Exporter"
-                  ? u.company_name || ""
-                  : u.full_name || "";
-
-              const badgeClass = (u.user_type || "")
-                .toLowerCase()
-                .replace(" ", "-");
-
-              tr.innerHTML = `
-                <td style="font-weight: 500; color: #1f2937">${escapeHtml(
-                  u.id || ""
-                )}</td>
-                <td style="color: #374151">${escapeHtml(displayName)}</td>
-                <td><span class="user-type-badge badge-${badgeClass}">${escapeHtml(
-                u.user_type || ""
-              )}</span></td>
-                <td style="color: #6b7280">${escapeHtml(
-                  u.district || "N/A"
-                )}</td>
-                <td style="color: #6b7280; font-size: 13px">${escapeHtml(
-                  u.contact_number || "N/A"
-                )}</td>
-                <td style="text-align: center">
-                  <button class="btn-action btn-view view-user-btn" title="View Details">
-                    👁️ View
-                  </button>
-                  <button class="btn-action btn-edit edit-user-btn" title="Edit User">
-                    ✏️ Edit
-                  </button>
-                </td>
-              `;
-              tr.dataset.user = JSON.stringify(u);
-              tr.dataset.userId = u.id;
-
-              // Add click event listener to the view button
-              const viewBtn = tr.querySelector(".view-user-btn");
-              viewBtn.addEventListener("click", () => showUserDetail(u.id));
-
-              // Add click event listener to the edit button
-              const editBtn = tr.querySelector(".edit-user-btn");
-              editBtn.addEventListener("click", () => editUser(u));
-
-              manageUserTableBody.appendChild(tr);
-            });
+            // Render pagination
+            renderManageUserPagination();
           } catch (err) {
             console.error("Failed to load users", err);
           }
         }
+
+        function renderManageUserPagination() {
+          const manageUserTableBody = document.querySelector(
+            "#manage-user-table tbody"
+          );
+          const emptyState = document.getElementById("manage-user-empty");
+          const paginationDiv = document.getElementById(
+            "manage-user-pagination"
+          );
+
+          if (manageUserAllFiltered.length === 0) {
+            manageUserTableBody.innerHTML = "";
+            emptyState.style.display = "flex";
+            paginationDiv.style.display = "none";
+            return;
+          }
+
+          emptyState.style.display = "none";
+
+          // Calculate pagination
+          const totalPages = Math.ceil(
+            manageUserAllFiltered.length / manageUserItemsPerPage
+          );
+          const startIndex =
+            (manageUserCurrentPage - 1) * manageUserItemsPerPage;
+          const endIndex = startIndex + manageUserItemsPerPage;
+          const paginatedUsers = manageUserAllFiltered.slice(
+            startIndex,
+            endIndex
+          );
+
+          // Render table rows
+          manageUserTableBody.innerHTML = "";
+          paginatedUsers.forEach((u) => {
+            const tr = document.createElement("tr");
+            // For millers, wholesalers, retailers and company-type users, show company name instead of full name
+            const displayName =
+              u.user_type === "Miller" ||
+              u.user_type === "Wholesaler" ||
+              u.user_type === "Retailer" ||
+              u.user_type === "Beer" ||
+              u.user_type === "Animal Food" ||
+              u.user_type === "Exporter"
+                ? u.company_name || ""
+                : u.full_name || "";
+
+            const badgeClass = (u.user_type || "")
+              .toLowerCase()
+              .replace(" ", "-");
+
+            tr.innerHTML = `
+              <td style="font-weight: 500; color: #1f2937">${escapeHtml(
+                u.id || ""
+              )}</td>
+              <td style="color: #374151">${escapeHtml(displayName)}</td>
+              <td><span class="user-type-badge badge-${badgeClass}">${escapeHtml(
+              u.user_type || ""
+            )}</span></td>
+              <td style="color: #6b7280">${escapeHtml(u.district || "N/A")}</td>
+              <td style="color: #6b7280; font-size: 13px">${escapeHtml(
+                u.contact_number || "N/A"
+              )}</td>
+              <td style="text-align: center">
+                <button class="btn-action btn-view view-user-btn" title="View Details">
+                  👁️ View
+                </button>
+                <button class="btn-action btn-edit edit-user-btn" title="Edit User">
+                  ✏️ Edit
+                </button>
+              </td>
+            `;
+            tr.dataset.user = JSON.stringify(u);
+            tr.dataset.userId = u.id;
+
+            // Add click event listener to the view button
+            const viewBtn = tr.querySelector(".view-user-btn");
+            viewBtn.addEventListener("click", () => showUserDetail(u.id));
+
+            // Add click event listener to the edit button
+            const editBtn = tr.querySelector(".edit-user-btn");
+            editBtn.addEventListener("click", () => editUser(u));
+
+            manageUserTableBody.appendChild(tr);
+          });
+
+          // Update pagination controls
+          if (totalPages > 1) {
+            paginationDiv.style.display = "flex";
+            const prevBtn = document.getElementById("manage-user-prev-btn");
+            const nextBtn = document.getElementById("manage-user-next-btn");
+            const pageNumbersDiv = document.getElementById(
+              "manage-user-page-numbers"
+            );
+
+            // Clear previous page buttons
+            pageNumbersDiv.innerHTML = "";
+
+            // Generate page number buttons
+            const maxVisiblePages = 5;
+            let startPage = Math.max(
+              1,
+              manageUserCurrentPage - Math.floor(maxVisiblePages / 2)
+            );
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage + 1 < maxVisiblePages) {
+              startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            // Add first page button if not visible
+            if (startPage > 1) {
+              const firstBtn = document.createElement("button");
+              firstBtn.textContent = "1";
+              firstBtn.style.cssText =
+                "padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 4px; background: white; color: #374151; cursor: pointer; font-weight: 500; transition: all 0.2s;";
+              firstBtn.addEventListener("click", () => {
+                manageUserCurrentPage = 1;
+                renderManageUserPagination();
+              });
+              pageNumbersDiv.appendChild(firstBtn);
+
+              const dots = document.createElement("span");
+              dots.textContent = "...";
+              dots.style.cssText = "padding: 6px 4px; color: #9ca3af;";
+              pageNumbersDiv.appendChild(dots);
+            }
+
+            // Add page number buttons
+            for (let i = startPage; i <= endPage; i++) {
+              const btn = document.createElement("button");
+              btn.textContent = i;
+              if (i === manageUserCurrentPage) {
+                btn.style.cssText =
+                  "padding: 6px 10px; border: none; border-radius: 4px; background: linear-gradient(135deg, #0b3d91 0%, #1a5fc4 100%); color: white; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(11, 61, 145, 0.2);";
+              } else {
+                btn.style.cssText =
+                  "padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 4px; background: white; color: #374151; cursor: pointer; font-weight: 500; transition: all 0.2s;";
+                btn.addEventListener(
+                  "mouseover",
+                  () => (btn.style.borderColor = "#0b3d91")
+                );
+                btn.addEventListener(
+                  "mouseout",
+                  () => (btn.style.borderColor = "#d1d5db")
+                );
+              }
+              btn.addEventListener("click", () => {
+                manageUserCurrentPage = i;
+                renderManageUserPagination();
+              });
+              pageNumbersDiv.appendChild(btn);
+            }
+
+            // Add last page button if not visible
+            if (endPage < totalPages) {
+              const dots = document.createElement("span");
+              dots.textContent = "...";
+              dots.style.cssText = "padding: 6px 4px; color: #9ca3af;";
+              pageNumbersDiv.appendChild(dots);
+
+              const lastBtn = document.createElement("button");
+              lastBtn.textContent = totalPages;
+              lastBtn.style.cssText =
+                "padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 4px; background: white; color: #374151; cursor: pointer; font-weight: 500; transition: all 0.2s;";
+              lastBtn.addEventListener("click", () => {
+                manageUserCurrentPage = totalPages;
+                renderManageUserPagination();
+              });
+              pageNumbersDiv.appendChild(lastBtn);
+            }
+
+            prevBtn.disabled = manageUserCurrentPage === 1;
+            nextBtn.disabled = manageUserCurrentPage === totalPages;
+
+            prevBtn.style.opacity = manageUserCurrentPage === 1 ? "0.5" : "1";
+            nextBtn.style.opacity =
+              manageUserCurrentPage === totalPages ? "0.5" : "1";
+            prevBtn.style.cursor =
+              manageUserCurrentPage === 1 ? "not-allowed" : "pointer";
+            nextBtn.style.cursor =
+              manageUserCurrentPage === totalPages ? "not-allowed" : "pointer";
+          } else {
+            paginationDiv.style.display = "none";
+          }
+        }
+
+        // Pagination button event listeners
+        const manageUserPrevBtn = document.getElementById(
+          "manage-user-prev-btn"
+        );
+        const manageUserNextBtn = document.getElementById(
+          "manage-user-next-btn"
+        );
+
+        manageUserPrevBtn &&
+          manageUserPrevBtn.addEventListener("click", () => {
+            if (manageUserCurrentPage > 1) {
+              manageUserCurrentPage--;
+              renderManageUserPagination();
+            }
+          });
+
+        manageUserNextBtn &&
+          manageUserNextBtn.addEventListener("click", () => {
+            const totalPages = Math.ceil(
+              manageUserAllFiltered.length / manageUserItemsPerPage
+            );
+            if (manageUserCurrentPage < totalPages) {
+              manageUserCurrentPage++;
+              renderManageUserPagination();
+            }
+          });
 
         // Add event listeners for update and view buttons (using event delegation)
         document.addEventListener("click", function (e) {
@@ -5474,6 +5801,56 @@
           handleViewInitialRice(e);
           handleRevertInitialRice(e);
         });
+
+        // Filter initial paddy table by ID or Name
+        document
+          .getElementById("initial-paddy-search")
+          .addEventListener("input", function (e) {
+            const searchValue = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll(
+              "#initial-paddy-table tbody tr"
+            );
+
+            rows.forEach((row) => {
+              const userId =
+                row
+                  .querySelector("td:nth-child(1)")
+                  ?.textContent.toLowerCase() || "";
+              const userName =
+                row
+                  .querySelector("td:nth-child(2)")
+                  ?.textContent.toLowerCase() || "";
+
+              const matches =
+                userId.includes(searchValue) || userName.includes(searchValue);
+              row.style.display = matches ? "" : "none";
+            });
+          });
+
+        // Filter initial rice table by ID or Name
+        document
+          .getElementById("initial-rice-search")
+          .addEventListener("input", function (e) {
+            const searchValue = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll(
+              "#initial-rice-table tbody tr"
+            );
+
+            rows.forEach((row) => {
+              const userId =
+                row
+                  .querySelector("td:nth-child(1)")
+                  ?.textContent.toLowerCase() || "";
+              const userName =
+                row
+                  .querySelector("td:nth-child(2)")
+                  ?.textContent.toLowerCase() || "";
+
+              const matches =
+                userId.includes(searchValue) || userName.includes(searchValue);
+              row.style.display = matches ? "" : "none";
+            });
+          });
 
         // Add event listeners for modal cancel buttons
         document
@@ -5522,8 +5899,6 @@
             if (!resp.ok) throw new Error("Failed to fetch initial paddy data");
             const data = await resp.json();
 
-            console.log("Initial Paddy Data:", data); // Debug: Check what data we receive
-
             initialPaddyTableBody.innerHTML = "";
 
             if (data.length === 0) {
@@ -5538,25 +5913,12 @@
             }
 
             data.forEach((item) => {
-              console.log("Processing item:", {
-                id: item.id,
-                status: item.status,
-                statusType: typeof item.status,
-                statusValue: item.status,
-              }); // Debug: Check status value and type
-
               const tr = document.createElement("tr");
 
-              // Highlight rows with status = 0 (reverted)
-              // Check for 0, false, "0", and null/undefined
-              const isReverted =
-                item.status === 0 ||
-                item.status === false ||
-                item.status === "0" ||
-                item.status === null;
+              // Highlight rows with reverted = 1
+              const isReverted = item.reverted === 1;
 
               if (isReverted) {
-                console.log("Highlighting row for item:", item.id); // Debug: Confirm highlighting
                 tr.style.backgroundColor = "#fee2e2"; // Light red background
                 tr.style.opacity = "0.7";
               }
@@ -5578,6 +5940,15 @@
                 item.user_type === "Miller"
                   ? item.company_name || ""
                   : item.full_name || "";
+
+              const revertButtonPaddy =
+                item.reverted !== 1
+                  ? `<button class="btn revert-initial-paddy-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
+                      item.id
+                    }" data-user-id="${item.user_id}" data-paddy-type="${
+                      item.paddy_type || ""
+                    }" data-quantity="${item.quantity || 0}">↶ Revert</button>`
+                  : "";
 
               tr.innerHTML = `
                 <td>${escapeHtml(item.user_id || "")}</td>
@@ -5606,13 +5977,7 @@
               }" data-block-hash="${item.block_hash || ""}">
                       👁️ View
                     </button>
-                    <button class="btn revert-initial-paddy-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
-                      item.id
-                    }" data-user-id="${item.user_id}" data-paddy-type="${
-                item.paddy_type || ""
-              }" data-quantity="${item.quantity || 0}">
-                      ↶ Revert
-                    </button>
+                    ${revertButtonPaddy}
                   </td>
               `;
               initialPaddyTableBody.appendChild(tr);
@@ -5665,13 +6030,6 @@
             }
 
             data.forEach((item) => {
-              console.log("Processing rice item:", {
-                id: item.id,
-                status: item.status,
-                statusType: typeof item.status,
-                statusValue: item.status,
-              }); // Debug: Check status value and type
-
               const tr = document.createElement("tr");
 
               // Highlight rows with status = 0 (reverted)
@@ -5682,7 +6040,6 @@
                 item.status === null;
 
               if (isReverted) {
-                console.log("Highlighting rice row for item:", item.id); // Debug: Confirm highlighting
                 tr.style.backgroundColor = "#fee2e2"; // Light red background
                 tr.style.opacity = "0.7";
               }
@@ -5698,6 +6055,15 @@
                   dateStr = item.created_at;
                 }
               }
+
+              const revertButton =
+                item.status === 1
+                  ? `<button class="btn revert-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
+                      item.id
+                    }" data-user-id="${item.user_id}" data-rice-type="${
+                      item.rice_type || ""
+                    }" data-quantity="${item.quantity || 0}">↶ Revert</button>`
+                  : "";
 
               tr.innerHTML = `
                 <td>${escapeHtml(item.user_id || "")}</td>
@@ -5726,13 +6092,7 @@
               }" data-transaction-hash="${item.transaction_hash || ""}">
                     👁️ View
                   </button>
-                  <button class="btn revert-initial-rice-btn" style="padding: 4px 8px; font-size: 12px; background-color: #ef4444; color: white; margin-left: 4px;" data-id="${
-                    item.id
-                  }" data-user-id="${item.user_id}" data-rice-type="${
-                item.rice_type || ""
-              }" data-quantity="${item.quantity || 0}">
-                    ↶ Revert
-                  </button>
+                  ${revertButton}
                 </td>
               `;
               initialRiceTableBody.appendChild(tr);
@@ -6356,7 +6716,6 @@
         // Fetch paddy types on page load
         async function fetchPaddyTypesForModal() {
           try {
-            console.log("Fetching paddy types for modal..."); // Debug
             // Fetch from paddy_type table directly, or from stock table to get actual paddy types in use
             const resp = await fetch("/api/paddy_type_list");
             if (!resp.ok) {
@@ -6367,7 +6726,6 @@
               throw new Error("Failed to fetch paddy types");
             }
             const types = await resp.json();
-            console.log("Paddy types received:", types); // Debug
 
             initialPaddyTypeSelect.innerHTML =
               '<option value="">Select Paddy Type</option>';
@@ -6377,11 +6735,6 @@
               opt.textContent = t.name || String(t.id || "");
               initialPaddyTypeSelect.appendChild(opt);
             });
-            console.log(
-              "Paddy types dropdown populated with",
-              types.length,
-              "types"
-            ); // Debug
           } catch (err) {
             console.error("Failed to fetch paddy types:", err);
           }
@@ -6506,33 +6859,44 @@
               return;
             }
 
-            try {
-              const resp = await fetch("/api/initial_paddy", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  user_id: userId,
-                  paddy_type: paddyType,
-                  quantity: parseFloat(quantity),
-                }),
-              });
+            // Get display names for confirmation
+            const userOption = initialPaddyUserSelect.querySelector(
+              `option[value="${userId}"]`
+            );
+            const userDisplay = userOption ? userOption.textContent : userId;
+            const paddyTypeOption = initialPaddyTypeSelect.querySelector(
+              `option[value="${paddyType}"]`
+            );
+            const paddyTypeDisplay = paddyTypeOption
+              ? paddyTypeOption.textContent
+              : paddyType;
 
-              if (!resp.ok) {
-                const error = await resp.json();
-                throw new Error(error.message || "Failed to add initial paddy");
-              }
+            // Show confirmation dialog
+            const confirmed = confirm(
+              `Are you sure you want to add ${quantity} units of ${paddyTypeDisplay} paddy for ${userDisplay}?`
+            );
 
-              const result = await resp.json();
-              alert("Initial paddy added successfully!");
-              addInitialPaddyModal.hidden = true;
-              addInitialPaddyForm.reset();
-              loadInitialPaddy();
-            } catch (err) {
-              console.error("Error adding initial paddy:", err);
-              alert(`Error: ${err.message}`);
+            if (!confirmed) {
+              return;
             }
+
+            // Store paddy data temporarily for OTP verification
+            window.__pendingPaddyData = {
+              user_id: userId,
+              paddy_type: paddyType,
+              quantity: parseFloat(quantity),
+            };
+
+            // Clear OTP input and show OTP modal
+            document.getElementById("otp-code").value = "";
+            phoneValidationModal.hidden = false;
+            phoneValidationModal.setAttribute("aria-hidden", "false");
+            document.getElementById("otp-code").focus();
           });
         }
+
+        // Handle OTP verification for initial paddy
+        // (OTP verification is handled in the main verifyOtpBtn handler below)
 
         // Get references to rice modal elements
         const addInitialRiceModal = document.getElementById(
@@ -7051,6 +7415,10 @@
           first && first.focus();
         }
 
+        function openUserModal() {
+          // This is no longer needed as openModal now directly shows the user form
+        }
+
         function closeModal() {
           modal.hidden = true;
           modal.setAttribute("aria-hidden", "true");
@@ -7071,6 +7439,113 @@
         modal &&
           modal.addEventListener("click", function (e) {
             if (e.target === modal) closeModal();
+          });
+
+        // Phone Validation Modal Handlers
+        const phoneValidationModal = document.getElementById(
+          "phone-validation-modal"
+        );
+        const closePhoneValidationBtn = document.getElementById(
+          "close-phone-validation-btn"
+        );
+        const verifyOtpBtn = document.getElementById("verify-otp-btn");
+        const otpSection = document.getElementById("otp-section");
+        const otpCode = document.getElementById("otp-code");
+        const otpTimer = document.getElementById("otp-timer");
+        let otpTimerInterval = null;
+        const CORRECT_OTP = "123456"; // Fixed OTP for testing
+
+        // Notification function
+        function showNotification(message, type = "success", duration = 3000) {
+          const container = document.getElementById("notification-container");
+          const notification = document.createElement("div");
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          notification.style.animation = "slideDown 0.3s ease-out";
+          container.appendChild(notification);
+
+          setTimeout(() => {
+            notification.style.animation = "slideDown 0.3s ease-out reverse";
+            notification.style.opacity = "0";
+            setTimeout(() => {
+              notification.remove();
+            }, 300);
+          }, duration);
+        }
+
+        function closePhoneValidationModal() {
+          // Blur any focused element before hiding modal
+          if (document.activeElement) document.activeElement.blur();
+          phoneValidationModal.setAttribute("aria-hidden", "true");
+          phoneValidationModal.hidden = true;
+          otpCode.value = "";
+          if (otpTimerInterval) clearInterval(otpTimerInterval);
+        }
+
+        closePhoneValidationBtn &&
+          closePhoneValidationBtn.addEventListener(
+            "click",
+            closePhoneValidationModal
+          );
+
+        verifyOtpBtn &&
+          verifyOtpBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const enteredOtp = otpCode.value.trim();
+
+            // Verify OTP
+            if (enteredOtp === CORRECT_OTP) {
+              if (otpTimerInterval) clearInterval(otpTimerInterval);
+              // Blur any focused element before hiding modal
+              if (document.activeElement) document.activeElement.blur();
+              phoneValidationModal.setAttribute("aria-hidden", "true");
+              phoneValidationModal.hidden = true;
+
+              // Check if this is a paddy submission or user submission
+              if (window.__pendingPaddyData) {
+                // Submit paddy data
+                const paddyData = window.__pendingPaddyData;
+                (async () => {
+                  try {
+                    const resp = await fetch("/api/initial_paddy", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(paddyData),
+                    });
+
+                    if (!resp.ok) {
+                      const error = await resp.json();
+                      throw new Error(
+                        error.message || "Failed to add initial paddy"
+                      );
+                    }
+
+                    const result = await resp.json();
+                    showNotification(
+                      "Initial paddy added successfully",
+                      "success",
+                      3000
+                    );
+                    addInitialPaddyModal.hidden = true;
+                    addInitialPaddyForm.reset();
+                    loadInitialPaddy();
+                    window.__pendingPaddyData = null;
+                    otpCode.value = "";
+                  } catch (err) {
+                    console.error("Error adding initial paddy:", err);
+                    alert(`Error: ${err.message}`);
+                  }
+                })();
+              } else if (window.__pendingUserPayload) {
+                // Submit user data (original behavior)
+                const payload = window.__pendingUserPayload;
+                const isEditing = window.__pendingIsEditing || false;
+                submitUserData(payload, isEditing);
+              }
+            } else {
+              otpCode.value = "";
+              otpCode.focus();
+            }
           });
 
         // Dynamic type-specific fields
@@ -7205,17 +7680,10 @@
               paddySection.style.display = "";
             }
           }
-          // Show rice stock section for Miller, Wholesaler, Retailer, Beer, Animal Food and Exporter
+          // Show rice stock section for Miller and Wholesaler only
           const riceSection = document.getElementById("rice-section");
           if (riceSection) {
-            if (
-              type === "Miller" ||
-              type === "Wholesaler" ||
-              type === "Retailer" ||
-              type === "Beer" ||
-              type === "Animal Food" ||
-              type === "Exporter"
-            ) {
+            if (type === "Miller" || type === "Wholesaler") {
               riceSection.style.display = "";
             } else {
               riceSection.style.display = "none";
@@ -7420,79 +7888,112 @@
               // ignore
             }
 
-            try {
-              // Show loading overlay
-              const loadingOverlay = document.getElementById("loading-overlay");
-              const loadingText = document.getElementById("loading-text");
-              if (loadingOverlay) {
-                loadingText.textContent = isEditing
-                  ? "Updating user..."
-                  : "Creating user...";
-                loadingOverlay.classList.add("active");
-              }
+            // Show phone validation modal before saving
+            if (!isEditing && contactNumber) {
+              // Clear previous OTP state
+              document.getElementById("otp-code").value = "";
 
-              let url = "/api/users";
-              let method = "POST";
+              // Store payload temporarily for submission after OTP verification
+              window.__pendingUserPayload = payload;
+              window.__pendingIsEditing = isEditing;
 
-              if (isEditing) {
-                // Edit mode - use PUT method and include user ID in URL
-                url = `/api/users/${encodeURIComponent(editingUserId)}`;
-                method = "PUT";
-              }
-
-              const res = await fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-              if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text || res.statusText);
-              }
-              const saved = await res.json();
-
-              // if server returned null/empty, fall back to locally computed values
-              let displayId2, displayName2, displayLocation2, savedUserType;
-              if (!saved || typeof saved !== "object") {
-                // use payload/local values as fallback
-                displayId2 =
-                  payload.user_code || nic || companyRegisterNumber || "";
-                displayName2 = fullName || companyName || "";
-                displayLocation2 = address || "";
-                savedUserType = userType;
-              } else {
-                displayId2 =
-                  saved.user_code ||
-                  saved.nic ||
-                  saved.company_register_number ||
-                  "";
-                displayName2 = saved.full_name || saved.company_name || "";
-                displayLocation2 = saved.address || "";
-                savedUserType = saved.user_type || userType;
-              }
-
-              const tr = document.createElement("tr");
-              tr.innerHTML = `<td>${escapeHtml(
-                displayId2
-              )}</td><td>${escapeHtml(displayName2)}</td><td>${escapeHtml(
-                savedUserType
-              )}</td><td>${escapeHtml(displayLocation2)}</td>`;
-              tbody.appendChild(tr);
-              closeModal();
-              // clear paddy rows after successful save
-              const pListEl = document.getElementById("paddy-list");
-              if (pListEl) pListEl.innerHTML = "";
-            } catch (err) {
-              console.error("Failed to save user", err);
-              alert("Failed to save user: " + (err.message || err));
-            } finally {
-              // Hide loading overlay
-              const loadingOverlay = document.getElementById("loading-overlay");
-              if (loadingOverlay) {
-                loadingOverlay.classList.remove("active");
-              }
+              // Show phone validation modal
+              const phoneValidationModal = document.getElementById(
+                "phone-validation-modal"
+              );
+              phoneValidationModal.hidden = false;
+              phoneValidationModal.setAttribute("aria-hidden", "false");
+              document.getElementById("otp-code").focus();
+              return;
             }
+
+            // If no contact number or editing mode, submit directly
+            await submitUserData(payload, isEditing);
           });
+
+        async function submitUserData(payload, isEditing) {
+          try {
+            // Show loading overlay
+            const loadingOverlay = document.getElementById("loading-overlay");
+            const loadingText = document.getElementById("loading-text");
+            if (loadingOverlay) {
+              loadingText.textContent = isEditing
+                ? "Updating user..."
+                : "Creating user...";
+              loadingOverlay.classList.add("active");
+            }
+
+            let url = "/api/users";
+            let method = "POST";
+
+            if (isEditing) {
+              // Edit mode - use PUT method and include user ID in URL
+              url = `/api/users/${encodeURIComponent(editingUserId)}`;
+              method = "PUT";
+            }
+
+            const res = await fetch(url, {
+              method: method,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(text || res.statusText);
+            }
+            const saved = await res.json();
+
+            // if server returned null/empty, fall back to locally computed values
+            let displayId2, displayName2, displayLocation2, savedUserType;
+            if (!saved || typeof saved !== "object") {
+              // use payload/local values as fallback
+              displayId2 =
+                payload.user_code ||
+                payload.nic ||
+                payload.companyRegisterNumber ||
+                "";
+              displayName2 = payload.fullName || payload.companyName || "";
+              displayLocation2 = payload.address || "";
+              savedUserType = payload.userType;
+            } else {
+              displayId2 =
+                saved.user_code ||
+                saved.nic ||
+                saved.company_register_number ||
+                "";
+              displayName2 = saved.full_name || saved.company_name || "";
+              displayLocation2 = saved.address || "";
+              savedUserType = saved.user_type || payload.userType;
+            }
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${escapeHtml(displayId2)}</td><td>${escapeHtml(
+              displayName2
+            )}</td><td>${escapeHtml(savedUserType)}</td><td>${escapeHtml(
+              displayLocation2
+            )}</td>`;
+            tbody.appendChild(tr);
+            closeModal();
+            // clear paddy rows after successful save
+            const pListEl = document.getElementById("paddy-list");
+            if (pListEl) pListEl.innerHTML = "";
+
+            // Show success notification
+            const successMessage = isEditing
+              ? "User updated successfully"
+              : "User created successfully";
+            showNotification(successMessage, "success", 3000);
+          } catch (err) {
+            console.error("Failed to save user", err);
+            alert("Failed to save user: " + (err.message || err));
+          } finally {
+            // Hide loading overlay
+            const loadingOverlay = document.getElementById("loading-overlay");
+            if (loadingOverlay) {
+              loadingOverlay.classList.remove("active");
+            }
+          }
+        }
 
         // Initialize manage user table with empty state
         // User must select user type and paddy type to load data

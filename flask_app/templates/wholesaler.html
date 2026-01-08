@@ -694,8 +694,8 @@
             block_hash: t.block_hash || null,
             block_number: t.block_number || null,
             transaction_hash: t.transaction_hash || null,
-            status: t.status || 1,
-            is_reverted: t.is_reverted || 0,
+            status: t.reverted === 1 ? 0 : 1, // Map reverted to status for display consistency
+            reverted: t.reverted || 0,
           }));
         } catch (e) {
           console.error("Could not load server transactions", e);
@@ -718,24 +718,32 @@
 
           // Determine if this is a purchase (user is recipient) or revert (user is sender)
           const isPurchase = r.to === userId;
-          const isRevert = r.from === userId && r.is_reverted === 1;
+          const isRevert = r.from === userId && r.status === 0;
+
+          // Highlight reverted rows (status = 0)
+          if (
+            r.status === 0 ||
+            r.status === false ||
+            r.status === "0" ||
+            r.status === null
+          ) {
+            tr.style.backgroundColor = "#fee2e2"; // Light red background
+            tr.style.opacity = "0.7";
+          }
 
           // Show appropriate party name and action buttons
           let displayName = isPurchase ? r.fromName : r.toName;
           let displayQty = isPurchase ? r.qty : -r.qty;
           let actionBtns = `<button class="btn small" onclick="viewPurchase(event, ${r.tx_id})">View</button>`;
-          if (isPurchase && r.is_reverted === 0) {
-            actionBtns += ` <button class="btn small" style="background-color: #ff9999; color: white;" onclick="revertPurchase(event, ${r.tx_id})">Revert</button>`;
+          if (isPurchase && r.status !== 0) {
+            actionBtns += ` <button class="btn small" style="background-color: #ef4444; color: white;" onclick="revertPurchase(event, ${r.tx_id}, '${r.id}')">Revert</button>`;
           }
 
           const qtyColor = isPurchase ? "black" : "red";
-          const bgColor =
-            r.is_reverted === 1 ? "background-color: #FFE6E6;" : "";
           const statusDisplay =
-            r.is_reverted === 1
+            r.status === 0
               ? '<span style="color: red; font-weight: bold;">Reverted</span>'
               : '<span style="color: green; font-weight: bold;">Normal</span>';
-          tr.style.cssText = bgColor;
           tr.innerHTML = `<td>${new Date(
             r.when
           ).toLocaleString()}</td><td>${displayName}</td><td>${
@@ -764,12 +772,24 @@
             const blockIdDisplay = d.block_hash
               ? d.block_hash.substring(0, 10) + "..."
               : "Not available";
-            const isReverted = d.reason === "revert";
+
+            // Highlight reverted rows (status = 0 or reverted = 1)
+            if (
+              d.status === 0 ||
+              d.status === false ||
+              d.status === "0" ||
+              d.status === null ||
+              d.reverted === 1
+            ) {
+              tr.style.backgroundColor = "#fee2e2"; // Light red background
+              tr.style.opacity = "0.7";
+            }
+
             const actionBtns = `<button class="btn small" onclick="viewDamage(event, ${
               d.id
             })">View</button>${
-              !isReverted
-                ? ` <button class="btn small" onclick="revertDamage(${d.id})">Revert</button>`
+              d.status !== 0 && d.reverted !== 1
+                ? ` <button class="btn small" style="background-color: #ef4444; color: white;" onclick="revertDamage(${d.id})">Revert</button>`
                 : ""
             }`;
             tr.innerHTML = `<td>${new Date(displayDate).toLocaleString()}</td>
@@ -1066,7 +1086,7 @@
         });
 
         // Revert rice purchase function
-        window.revertPurchase = function (event, transactionId) {
+        window.revertPurchase = function (event, transactionId, recordId) {
           event.preventDefault();
           event.stopPropagation();
 
@@ -1080,10 +1100,12 @@
           // Store revert data for OTP verification
           window.pendingRevertData = {
             transactionId: transactionId,
+            recordId: recordId, // Original transaction record ID
             from: purchase.from,
             to: purchase.to,
             quantity: purchase.qty,
             riceType: purchase.riceType,
+            price: purchase.price,
           };
 
           // Fetch user (wholesaler) contact number for OTP
@@ -1324,16 +1346,21 @@
 
             try {
               console.log(
-                `Reverting Rice Purchase: Transaction ID=${data.transactionId}`
+                `Reverting Rice Purchase: Transaction ID=${data.transactionId}, Record ID=${data.recordId}`
               );
               const payload = {
                 from: data.from,
                 to: data.to,
                 type: data.riceType,
                 quantity: data.quantity,
+                price: data.price,
                 datetime: new Date().toISOString(),
                 status: 0,
+                original_transaction_id: data.recordId, // Mark the original transaction to be updated
               };
+
+              console.log("Revert payload:", payload);
+
               const resp = await fetch("/api/transactions", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
