@@ -714,7 +714,9 @@
             r.riceType
           )}</td><td class="${revertedClass}" style="color: ${
             isReverted ? "#888" : qtyColor
-          };">${displayQty.toFixed(3)}</td><td class="${revertedClass}">${priceDisplay}</td><td class="${revertedClass}" title="${
+          };">${displayQty.toFixed(
+            3
+          )}</td><td class="${revertedClass}">${priceDisplay}</td><td class="${revertedClass}" title="${
             r.block_hash || ""
           }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
           pBody.appendChild(tr);
@@ -760,7 +762,9 @@
               r.riceType
             )}</td><td class="${revertedClass}" style="color: ${
               isReverted ? "#888" : qtyColor
-            };">${displayQty.toFixed(3)}</td><td class="${revertedClass}">${priceDisplay}</td><td class="${revertedClass}" title="${
+            };">${displayQty.toFixed(
+              3
+            )}</td><td class="${revertedClass}">${priceDisplay}</td><td class="${revertedClass}" title="${
               r.block_hash || ""
             }">${blockIdDisplay}</td><td>${actionBtns}</td>`;
             hBody.appendChild(tr);

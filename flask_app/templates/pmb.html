@@ -295,7 +295,8 @@
 
     <style>
       tr.status-zero {
-        background-color: #fef2f2;
+        background-color: #fff5f5;
+        color: #999;
       }
 
       /* Highlight revert reason rows in damage table */
@@ -392,7 +393,9 @@
             const hashDisplay = r.block_hash
               ? String(r.block_hash).slice(0, 12) + "..."
               : "Not available";
-            const fromDisplay = escapeHtml(String(r.from));
+            const fromDisplay = r.from_name
+              ? `${escapeHtml(String(r.from))} - ${escapeHtml(r.from_name)}`
+              : escapeHtml(String(r.from));
             const typeDisplay = escapeHtml(r.type || "");
             const priceDisplay = r.price ? Number(r.price).toFixed(2) : "-";
             const statusClass = r.status === 0 ? " status-zero" : "";
@@ -618,6 +621,7 @@
             otpModal.hidden = true;
             try {
               const payload = {
+                original_transaction_id: data.id,
                 from: data.from,
                 to: currentUser.user_id,
                 type: data.type,
@@ -849,9 +853,9 @@
               ? String(d.block_hash).slice(0, 12) + "..."
               : "Not available";
 
-            // Highlight revert reason rows
-            if (d.reason === "revert") {
-              tr.classList.add("revert-row");
+            // Highlight revert rows
+            if (d.reverted === 1 || d.status === 0 || d.reason === "revert") {
+              tr.classList.add("status-zero");
             }
 
             tr.innerHTML = `<td>${new Date(
@@ -875,7 +879,7 @@
               d.block_hash || ""
             }">View</button>
               ${
-                d.reason !== "revert"
+                d.reason !== "revert" && d.reverted !== 1 && d.status !== 0
                   ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
                       d.id
                     )}" data-kind="paddy" data-qty="${escapeHtml(
@@ -913,9 +917,9 @@
               ? String(d.block_hash).slice(0, 12) + "..."
               : "Not available";
 
-            // Highlight revert reason rows
-            if (d.reason === "revert") {
-              tr.classList.add("revert-row");
+            // Highlight revert rows
+            if (d.reverted === 1 || d.status === 0 || d.reason === "revert") {
+              tr.classList.add("status-zero");
             }
 
             tr.innerHTML = `<td>${new Date(
@@ -939,7 +943,7 @@
               d.block_hash || ""
             }">View</button>
               ${
-                d.reason !== "revert"
+                d.reason !== "revert" && d.reverted !== 1 && d.status !== 0
                   ? `<button class="btn revert-damage-btn" data-id="${escapeHtml(
                       d.id
                     )}" data-kind="rice" data-qty="${escapeHtml(
@@ -1162,6 +1166,7 @@
       // Revert damage handler
       document.addEventListener("click", async (e) => {
         if (e.target && e.target.classList.contains("revert-damage-btn")) {
+          const id = e.target.dataset.id;
           const qty = parseFloat(e.target.dataset.qty) || 0;
           const paddyType = e.target.dataset.paddyType || "";
           const userId = e.target.dataset.userId || "";
@@ -1179,31 +1184,21 @@
 
           if (
             !confirm(
-              `Revert damage of ${qty} kg ${paddyType}? This will create a new record with reason "revert".`
+              `Revert damage of ${qty} kg ${paddyType}? This will restore the stock and mark the record as reverted.`
             )
           ) {
             return;
           }
 
           try {
-            const payload = {
-              user_id: userId,
-              paddy_type: paddyType,
-              quantity: qty,
-              reason: "revert",
-              kind: kind,
-              damage_date: new Date().toISOString(),
-            };
-
-            const res = await fetch("/api/damages", {
+            const res = await fetch(`/api/damages/${id}/revert?kind=${kind}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
             });
 
             const result = await res.json();
             if (res.ok && result.ok) {
-              alert("Damage reverted successfully. New record created.");
+              alert("Damage reverted successfully.");
               if (kind === "rice") {
                 await renderRiceDamageTable();
               } else {
@@ -1297,6 +1292,7 @@
 
           // Store revert data for OTP verification
           window.pendingRevertData = {
+            id: id,
             from: from,
             type: type,
             quantity: quantity,
