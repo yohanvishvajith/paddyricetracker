@@ -23,6 +23,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd ${{ secrets.APP_PATH }}
             git pull origin main
+            cd flask_app
             source ../myenv/bin/activate
             pip install -r requirements.txt
             sudo systemctl restart gunicorn
