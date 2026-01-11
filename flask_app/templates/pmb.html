@@ -19,7 +19,8 @@
           <li class="tab active"><a href="#" data-index="0">📦 Overview</a></li>
           <li class="tab"><a href="#" data-index="1">⚙️ Milling</a></li>
           <li class="tab"><a href="#" data-index="2">⚠️ Damage</a></li>
-          <li class="tab"><a href="#" data-index="3">📊 Stock</a></li>
+          <li class="tab"><a href="#" data-index="3">� Sales</a></li>
+          <li class="tab"><a href="#" data-index="4">�📊 Stock</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -268,6 +269,25 @@
         </div>
       </section>
 
+      <section class="panel" id="sales-panel" hidden>
+        <h2>💰 Sales Records</h2>
+        <div class="table-wrap">
+          <table class="data-table" id="salesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>To</th>
+                <th>Rice Type</th>
+                <th>Qty (kg)</th>
+                <th>Price (LKR)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="panel" id="stock-panel" hidden>
         <h2>📊 Stock Management</h2>
 
@@ -292,6 +312,27 @@
         </div>
       </section>
     </main>
+
+    <!-- Transaction View Modal -->
+    <div id="transaction-view-modal" class="modal" hidden aria-hidden="true">
+      <div class="modal-content" style="max-width: 600px">
+        <div class="modal-header">
+          <h3>Transaction Details</h3>
+        </div>
+        <div class="modal-body" id="transaction-details">
+          <p class="loading">Loading...</p>
+        </div>
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn secondary"
+            id="close-transaction-modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
 
     <style>
       tr.status-zero {
@@ -446,12 +487,203 @@
         const sourceSel = qs("#sourceSelect");
         const pSel = qs("#paddyType");
 
+        // Function to load sales data (transactions where PMB is the sender)
+        async function loadSalesData() {
+          if (!currentUser || !currentUser.user_id) {
+            console.error("Current user not loaded");
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `/api/transactions?from=${encodeURIComponent(currentUser.user_id)}`
+            );
+            if (!res.ok) throw new Error("Failed to load sales");
+            const data = await res.json();
+
+            const salesBody = qs("#salesTable tbody");
+            salesBody.innerHTML = "";
+
+            if (!data || data.length === 0) {
+              salesBody.innerHTML =
+                '<tr><td colspan="6" style="text-align:center; padding:20px; color:#6b7280;">No sales records found</td></tr>';
+              return;
+            }
+
+            data.forEach((tx) => {
+              const tr = document.createElement("tr");
+
+              // Highlight rows where status equals 0 (paddy) or reverted equals 1 (rice)
+              if (
+                tx.status === 0 || tx.status === false || tx.status === "0" ||
+                tx.reverted === 1 || tx.reverted === true || tx.reverted === "1"
+              ) {
+                tr.style.backgroundColor = "#fee2e2";
+                tr.style.fontWeight = "500";
+                tr.style.opacity = "0.7";
+              }
+
+              const dateDisplay = tx.datetime
+                ? new Date(tx.datetime).toLocaleString()
+                : tx.created_at
+                ? new Date(tx.created_at).toLocaleString()
+                : "-";
+              const toDisplay = tx.to_name || tx.to || "-";
+              const typeDisplay = tx.type || "-";
+              const qtyDisplay = tx.quantity
+                ? parseFloat(tx.quantity).toFixed(2)
+                : "0";
+              const priceDisplay = tx.price
+                ? parseFloat(tx.price).toFixed(2)
+                : "0.00";
+
+              tr.innerHTML = `
+                <td>${escapeHtml(dateDisplay)}</td>
+                <td>${escapeHtml(toDisplay)}</td>
+                <td>${escapeHtml(typeDisplay)}</td>
+                <td>${escapeHtml(qtyDisplay)}</td>
+                <td>${escapeHtml(priceDisplay)}</td>
+                <td>
+                  <button class="btn view-transaction-btn" 
+                    data-id="${escapeHtml(tx.id)}" 
+                    style="padding:4px 8px; background:#3b82f6; color:#fff; cursor:pointer;">
+                    👁️ View
+                  </button>
+                </td>
+              `;
+
+              salesBody.appendChild(tr);
+            });
+
+            // Add event listeners to view buttons
+            document.querySelectorAll(".view-transaction-btn").forEach((btn) => {
+              btn.addEventListener("click", function () {
+                const txId = this.getAttribute("data-id");
+                showTransactionDetails(txId, data);
+              });
+            });
+          } catch (err) {
+            console.error("Failed to load sales:", err);
+            const salesBody = qs("#salesTable tbody");
+            salesBody.innerHTML =
+              '<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Error loading sales data</td></tr>';
+          }
+        }
+
+        // Function to show transaction details in modal
+        function showTransactionDetails(txId, transactions) {
+          const tx = transactions.find((t) => t.id == txId);
+          if (!tx) {
+            alert("Transaction not found");
+            return;
+          }
+
+          const modal = document.getElementById("transaction-view-modal");
+          const detailsDiv = document.getElementById("transaction-details");
+
+          // Check both status (for paddy) and reverted (for rice) fields
+          const isReverted = 
+            tx.status === 0 || tx.status === false || tx.status === "0" ||
+            tx.reverted === 1 || tx.reverted === true || tx.reverted === "1";
+          
+          const statusText = isReverted
+              ? '<span style="color:#ef4444; font-weight:600;">⚠️ Reverted</span>'
+              : '<span style="color:#10b981; font-weight:600;">✓ Active</span>';
+
+          detailsDiv.innerHTML = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Transaction ID</strong>
+                <p style="margin:4px 0 0 0; font-size:16px; color:#1f2937;">${escapeHtml(
+                  tx.id
+                )}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Date & Time</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937;">${escapeHtml(
+                  tx.datetime
+                    ? new Date(tx.datetime).toLocaleString()
+                    : new Date(tx.created_at).toLocaleString()
+                )}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">From (Seller)</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937;">${escapeHtml(
+                  tx.from_name || tx.from || "-"
+                )}</p>
+                <p style="margin:2px 0 0 0; font-size:13px; color:#6b7280;">ID: ${escapeHtml(
+                  tx.from || "-"
+                )}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">To (Buyer)</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937;">${escapeHtml(
+                  tx.to_name || tx.to || "-"
+                )}</p>
+                <p style="margin:2px 0 0 0; font-size:13px; color:#6b7280;">ID: ${escapeHtml(
+                  tx.to || "-"
+                )}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Rice Type</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937;">${escapeHtml(
+                  tx.type || "-"
+                )}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Status</strong>
+                <p style="margin:4px 0 0 0;">${statusText}</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Quantity</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937; font-size:18px; font-weight:600;">${escapeHtml(
+                  tx.quantity ? parseFloat(tx.quantity).toFixed(2) : "0"
+                )} kg</p>
+              </div>
+              <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Price</strong>
+                <p style="margin:4px 0 0 0; color:#1f2937; font-size:18px; font-weight:600;">LKR ${escapeHtml(
+                  tx.price ? parseFloat(tx.price).toFixed(2) : "0.00"
+                )}</p>
+              </div>
+              ${
+                tx.block_hash
+                  ? `
+                <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                  <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Block Hash</strong>
+                  <p style="margin:4px 0 0 0; color:#1f2937; font-size:11px; word-break:break-all;">${escapeHtml(
+                    tx.block_hash
+                  )}</p>
+                </div>
+              `
+                  : ""
+              }
+              ${
+                tx.block_number
+                  ? `
+                <div style="border-bottom:1px solid #e5e7eb; padding-bottom:12px;">
+                  <strong style="color:#6b7280; font-size:12px; text-transform:uppercase;">Block Number</strong>
+                  <p style="margin:4px 0 0 0; color:#1f2937;">${escapeHtml(
+                    tx.block_number
+                  )}</p>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          `;
+
+          modal.hidden = false;
+          modal.setAttribute("aria-hidden", "false");
+        }
+
         function setupTabs() {
           const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
           const panels = [
             qs("#purchase-panel"),
             qs("#milling-panel"),
             qs("#damage-panel"),
+            qs("#sales-panel"),
             qs("#stock-panel"),
           ];
           tabs.forEach((tab, i) => {
@@ -463,6 +695,9 @@
               if (panels[i]) {
                 panels[i].hidden = false;
                 // Load milling data when milling tab is shown
+                if (i === 1) loadMillingData();
+                // Load sales data when sales tab is shown
+                if (i === 3) loadSalesData();
                 if (i === 1) renderPmbMillingTable();
                 // Load stock data when stock tab is shown
                 if (i === 3) renderStockPanel();
@@ -1404,6 +1639,14 @@
 
       qs("#closeUpdatePurchase")?.addEventListener("click", () => {
         qs("#updatePurchaseModal").hidden = true;
+      });
+
+      qs("#close-transaction-modal")?.addEventListener("click", () => {
+        const modal = document.getElementById("transaction-view-modal");
+        if (modal) {
+          modal.setAttribute("hidden", "");
+          modal.setAttribute("aria-hidden", "true");
+        }
       });
 
       // Update purchase form submit

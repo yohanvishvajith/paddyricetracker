@@ -1702,16 +1702,32 @@ def api_add_transaction():
         except Exception:
             sender_type = None
 
+        # Determine recipient type
+        recipient_type = None
+        try:
+            cur.execute('SELECT user_type FROM users WHERE id = %s LIMIT 1', (str(to_val),))
+            urow = cur.fetchone()
+            recipient_type = urow[0] if urow else None
+        except Exception:
+            recipient_type = None
+
         # Check if sender is a farmer (farmers don't have stock tracking)
         is_sender_farmer = isinstance(sender_type, str) and sender_type.strip().lower().startswith('farmer')
 
-        # Determine if this is a rice transaction (sender is Miller, PMB, Wholesaler, or Retailer selling rice)
-        is_rice_transaction = isinstance(sender_type, str) and (
-            'miller' in sender_type.lower() or 
-            'pmb' in sender_type.lower() or 
-            'wholesaler' in sender_type.lower() or 
-            'retailer' in sender_type.lower()
-        )
+        # Determine if this is a rice transaction (sender OR recipient is Miller, PMB, Wholesaler, Retailer, Brewer, Animal Food, Exporter)
+        # Rice transactions involve anyone dealing with processed rice rather than raw paddy
+        is_rice_transaction = False
+        rice_users = ['miller', 'pmb', 'paddy marketing board', 'wholesaler', 'retailer', 'brewer', 'animal', 'exporter']
+        
+        if isinstance(sender_type, str):
+            sender_lower = sender_type.lower()
+            if any(role in sender_lower for role in rice_users):
+                is_rice_transaction = True
+        
+        if not is_rice_transaction and isinstance(recipient_type, str):
+            recipient_lower = recipient_type.lower()
+            if any(role in recipient_lower for role in rice_users):
+                is_rice_transaction = True
 
         # Check if this is a revert transaction (status == 0)
         is_revert = status == 0
@@ -2680,6 +2696,10 @@ def api_add_damage():
     reason = payload.get('reason')
     damage_date = payload.get('damage_date')
     reverted = payload.get('reverted', 0)  # Default to 0 (not reverted)
+    
+    # If reason is "revert", mark this as a reverted damage record
+    if reason and reason.lower().strip() == 'revert':
+        reverted = 1
 
     # basic validation
     if not user_id or not paddy_type or quantity is None or not reason:
@@ -2886,6 +2906,17 @@ def api_add_damage():
                 insert_sql = 'INSERT INTO `rice_damage` (user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
+            
+            # If this is a revert operation for rice damage, mark the original damage record as reverted
+            if reverted == 1:
+                # Find the most recent non-reverted damage record of the same rice type for this user
+                cur.execute('SELECT id FROM `rice_damage` WHERE user_id = %s AND rice_type = %s AND reverted = 0 ORDER BY id DESC LIMIT 1', 
+                           (str(user_id), paddy_type))
+                original_record = cur.fetchone()
+                if original_record:
+                    original_id = original_record[0]
+                    # Update the original record to mark it as reverted
+                    cur.execute('UPDATE `rice_damage` SET reverted = 1 WHERE id = %s', (original_id,))
         else:
             # Insert into regular damage table (paddy); include blockchain damage id if provided
             if damage_block_id is not None:
@@ -2896,6 +2927,17 @@ def api_add_damage():
                 insert_sql = 'INSERT INTO `damage` (user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
+            
+            # If this is a revert operation for paddy damage, mark the original damage record as reverted
+            if reverted == 1:
+                # Find the most recent non-reverted damage record of the same paddy type for this user
+                cur.execute('SELECT id FROM `damage` WHERE user_id = %s AND paddy_type = %s AND reverted = 0 ORDER BY id DESC LIMIT 1', 
+                           (str(user_id), paddy_type))
+                original_record = cur.fetchone()
+                if original_record:
+                    original_id = original_record[0]
+                    # Update the original record to mark it as reverted
+                    cur.execute('UPDATE `damage` SET reverted = 1 WHERE id = %s', (original_id,))
         
         # Commit transaction
         try:
