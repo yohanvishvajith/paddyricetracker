@@ -127,6 +127,16 @@
               >Analytics</a
             >
           </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-options"
+              role="tab"
+              aria-controls="options"
+              aria-selected="false"
+              >⚙️ Options</a
+            >
+          </li>
         </ul>
       </nav>
     </header>
@@ -5407,9 +5417,258 @@
           </div>
         </div>
       </div>
+
+      <!-- Options Tab Panel -->
+      <section
+        id="options"
+        class="tab-panel"
+        aria-labelledby="tab-options"
+        hidden
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 12px;
+          "
+        >
+          <div style="font-size: 28px">⚙️</div>
+          <h2
+            style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 700"
+          >
+            Options
+          </h2>
+        </div>
+
+        <!-- Add Paddy Type Card -->
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+          "
+        >
+          <h3
+            style="
+              margin-top: 0;
+              margin-bottom: 16px;
+              color: #1f2937;
+              font-size: 18px;
+              font-weight: 600;
+            "
+          >
+            🌾 Add New Paddy Type
+          </h3>
+          <form id="add-paddy-form" style="display: grid; gap: 16px">
+            <div>
+              <label
+                for="paddy-name-input"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                  color: #374151;
+                  font-size: 14px;
+                "
+                >Paddy Type Name</label
+              >
+              <input
+                type="text"
+                id="paddy-name-input"
+                placeholder="e.g., Basmati, Samba, Sudu..."
+                style="
+                  width: 100%;
+                  padding: 12px 16px;
+                  border: 2px solid #e5e7eb;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  background: #f9fafb;
+                "
+                required
+              />
+            </div>
+            <div>
+              <button
+                type="submit"
+                class="btn primary"
+                style="
+                  background: linear-gradient(135deg, #0b3d91 0%, #1a5fc4 100%);
+                  color: white;
+                  font-weight: 600;
+                  padding: 12px 24px;
+                "
+              >
+                ➕ Add Paddy Type
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Current Paddy Types Card -->
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <h3
+            style="
+              margin-top: 0;
+              margin-bottom: 16px;
+              color: #1f2937;
+              font-size: 18px;
+              font-weight: 600;
+            "
+          >
+            📋 Current Paddy Types
+          </h3>
+          <div style="overflow-x: auto">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr
+                  style="border-bottom: 2px solid #e5e7eb; background: #f9fafb"
+                >
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Paddy Type
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: center;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="paddy-types-table-body">
+                <tr>
+                  <td
+                    colspan="2"
+                    style="padding: 20px; text-align: center; color: #6b7280"
+                  >
+                    Loading paddy types...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </main>
 
+    <!-- Update Paddy Type Modal -->
+    <div
+      id="update-paddy-modal"
+      class="modal"
+      hidden
+      aria-hidden="true"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="modal-content"
+        style="
+          max-width: 500px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+          position: relative;
+        "
+      >
+        <div class="modal-header">
+          <h3>Update Paddy Type</h3>
+        </div>
+        <div class="modal-body">
+          <form id="update-paddy-form" style="display: grid; gap: 16px">
+            <div>
+              <label
+                for="update-paddy-name"
+                style="
+                  display: block;
+                  margin-bottom: 8px;
+                  font-weight: 600;
+                  color: #374151;
+                  font-size: 14px;
+                "
+                >Paddy Type Name</label
+              >
+              <input
+                type="text"
+                id="update-paddy-name"
+                style="
+                  width: 100%;
+                  padding: 12px 16px;
+                  border: 2px solid #e5e7eb;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  background: #f9fafb;
+                "
+                required
+              />
+            </div>
+            <input type="hidden" id="update-paddy-id" />
+          </form>
+        </div>
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn secondary"
+            id="close-update-paddy-modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn primary" id="confirm-update-paddy">
+            ✓ Update
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
+      // Global notification helper (defined outside DOMContentLoaded for accessibility)
+      function showNotification(message, type = "success", duration = 3000) {
+        const container = document.getElementById("notification-container");
+        if (!container) return; // Container not yet ready
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.animation = "slideDown 0.3s ease-out";
+        container.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = "slideDown 0.3s ease-out reverse";
+          notification.style.opacity = "0";
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        }, duration);
+      }
+
       // Tab switching + modal handling
       document.addEventListener("DOMContentLoaded", function () {
         const tabAnchors = document.querySelectorAll(".tabs .tab a");
@@ -7498,24 +7757,6 @@
         const otpTimer = document.getElementById("otp-timer");
         let otpTimerInterval = null;
         const CORRECT_OTP = "123456"; // Fixed OTP for testing
-
-        // Notification function
-        function showNotification(message, type = "success", duration = 3000) {
-          const container = document.getElementById("notification-container");
-          const notification = document.createElement("div");
-          notification.className = `notification ${type}`;
-          notification.textContent = message;
-          notification.style.animation = "slideDown 0.3s ease-out";
-          container.appendChild(notification);
-
-          setTimeout(() => {
-            notification.style.animation = "slideDown 0.3s ease-out reverse";
-            notification.style.opacity = "0";
-            setTimeout(() => {
-              notification.remove();
-            }, 300);
-          }, duration);
-        }
 
         function closePhoneValidationModal() {
           // Blur any focused element before hiding modal
@@ -11769,6 +12010,210 @@
           }, 50);
         };
       });
+
+      // Paddy Type Management Functions
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"]/g, function (m) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+          }[m];
+        });
+      }
+
+      async function loadPaddyTypes() {
+        try {
+          const res = await fetch("/api/paddy_types");
+          console.log("Paddy types response status:", res.status);
+          console.log("Paddy types response ok:", res.ok);
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Error response:", errorText);
+            throw new Error("Failed to load paddy types: " + errorText);
+          }
+
+          const paddyTypes = await res.json();
+          console.log("Paddy types loaded:", paddyTypes);
+
+          const tbody = document.getElementById("paddy-types-table-body");
+          tbody.innerHTML = "";
+
+          if (!paddyTypes || paddyTypes.length === 0) {
+            tbody.innerHTML =
+              '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #6b7280;">No paddy types found</td></tr>';
+            return;
+          }
+
+          paddyTypes.forEach((paddy) => {
+            const tr = document.createElement("tr");
+            tr.style.cssText = "border-bottom: 1px solid #e5e7eb;";
+            tr.innerHTML = `
+              <td style="padding: 12px; color: #1f2937; font-weight: 500;">${escapeHtml(
+                paddy.name || paddy
+              )}</td>
+              <td style="padding: 12px; text-align: center;">
+                <button class="btn edit-paddy-btn" data-name="${escapeHtml(
+                  paddy.name || paddy
+                )}" style="padding: 6px 12px; background: #0b84ff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">✏️ Edit</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          // Add event listeners to edit buttons
+          document.querySelectorAll(".edit-paddy-btn").forEach((btn) => {
+            btn.addEventListener("click", function () {
+              const name = this.getAttribute("data-name");
+              openUpdatePaddyModal(name);
+            });
+          });
+
+          // Delete button removed intentionally; editing only
+        } catch (err) {
+          console.error("Failed to load paddy types:", err);
+          const tbody = document.getElementById("paddy-types-table-body");
+          tbody.innerHTML =
+            '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #ef4444;">Error loading paddy types</td></tr>';
+        }
+      }
+
+      // Add new paddy type
+      const addPaddyForm = document.getElementById("add-paddy-form");
+      if (addPaddyForm) {
+        addPaddyForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("paddy-name-input").value.trim();
+
+          if (!name) {
+            alert("Paddy type name is required");
+            return;
+          }
+
+          try {
+            const res = await fetch("/api/paddy_types", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name }),
+            });
+
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.error || "Failed to add paddy type");
+            }
+
+            showNotification("Paddy type added successfully", "success", 3000);
+            document.getElementById("paddy-name-input").value = "";
+            loadPaddyTypes();
+          } catch (err) {
+            alert("Error: " + (err.message || err));
+          }
+        });
+      }
+
+      // Open update paddy modal
+      function openUpdatePaddyModal(name) {
+        const modal = document.getElementById("update-paddy-modal");
+        document.getElementById("update-paddy-name").value = name;
+        document.getElementById("update-paddy-id").value = name;
+        modal.removeAttribute("hidden");
+        modal.style.display = "flex";
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      // Close update paddy modal
+      const closeUpdatePaddyBtn = document.getElementById(
+        "close-update-paddy-modal"
+      );
+      if (closeUpdatePaddyBtn) {
+        closeUpdatePaddyBtn.addEventListener("click", function () {
+          const modal = document.getElementById("update-paddy-modal");
+          modal.setAttribute("hidden", "");
+          modal.style.display = "none";
+          modal.setAttribute("aria-hidden", "true");
+        });
+      }
+
+      // Confirm update paddy
+      const confirmUpdatePaddyBtn = document.getElementById(
+        "confirm-update-paddy"
+      );
+      if (confirmUpdatePaddyBtn) {
+        confirmUpdatePaddyBtn.addEventListener("click", async function () {
+          const oldName = document.getElementById("update-paddy-id").value;
+          const newName = document
+            .getElementById("update-paddy-name")
+            .value.trim();
+
+          if (!newName) {
+            alert("Paddy type name is required");
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              "/api/paddy_types/" + encodeURIComponent(oldName),
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newName }),
+              }
+            );
+
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.error || "Failed to update paddy type");
+            }
+
+            showNotification(
+              "Paddy type updated successfully",
+              "success",
+              3000
+            );
+            const modal = document.getElementById("update-paddy-modal");
+            modal.setAttribute("hidden", "");
+            modal.style.display = "none";
+            modal.setAttribute("aria-hidden", "true");
+            loadPaddyTypes();
+          } catch (err) {
+            alert("Error: " + (err.message || err));
+          }
+        });
+      }
+
+      // Delete paddy type
+      async function deletePaddyType(name) {
+        try {
+          const res = await fetch(
+            "/api/paddy_types/" + encodeURIComponent(name),
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || "Failed to delete paddy type");
+          }
+
+          showNotification("Paddy type deleted successfully", "success", 3000);
+          loadPaddyTypes();
+        } catch (err) {
+          alert("Error: " + (err.message || err));
+        }
+      }
+
+      // Load paddy types when options tab is shown
+      const optionsTab = document.getElementById("tab-options");
+      if (optionsTab) {
+        optionsTab.addEventListener("click", loadPaddyTypes);
+      }
+
+      // Load paddy types on page load
+      loadPaddyTypes();
     </script>
 
     <!-- Loading Overlay -->

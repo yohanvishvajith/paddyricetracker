@@ -2289,6 +2289,107 @@ def api_get_paddy_types():
         return jsonify({'error': str(err)}), 500
 
 
+@app.route('/api/paddy_types', methods=['POST'])
+def api_add_paddy_type():
+    """Add a new paddy type."""
+    try:
+        payload = request.get_json() or {}
+        name = payload.get('name', '').strip()
+        
+        if not name:
+            return jsonify({'error': 'Paddy type name is required'}), 400
+        
+        # Check if paddy type already exists
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor()
+        cur.execute('SELECT id FROM paddy_type WHERE LOWER(name) = %s LIMIT 1', (name.lower(),))
+        existing = cur.fetchone()
+        
+        if existing:
+            cur.close()
+            conn.close()
+            return jsonify({'error': f'Paddy type "{name}" already exists'}), 400
+        
+        # Add new paddy type
+        cur.execute('INSERT INTO paddy_type (name) VALUES (%s)', (name,))
+        cur.close()
+        conn.close()
+        
+        return jsonify({'ok': True, 'message': 'Paddy type added successfully'}), 201
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/paddy_types/<paddy_name>', methods=['PUT'])
+def api_update_paddy_type(paddy_name):
+    """Update an existing paddy type."""
+    try:
+        payload = request.get_json() or {}
+        new_name = payload.get('name', '').strip()
+        
+        if not new_name:
+            return jsonify({'error': 'Paddy type name is required'}), 400
+        
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor()
+        
+        # Check if new name already exists (if different from old name)
+        if new_name.lower() != paddy_name.lower():
+            cur.execute('SELECT id FROM paddy_type WHERE LOWER(name) = %s LIMIT 1', (new_name.lower(),))
+            existing = cur.fetchone()
+            if existing:
+                cur.close()
+                conn.close()
+                return jsonify({'error': f'Paddy type "{new_name}" already exists'}), 400
+        
+        # Update paddy type
+        cur.execute(
+            'UPDATE paddy_type SET name = %s WHERE LOWER(name) = %s',
+            (new_name, paddy_name.lower())
+        )
+        
+        if cur.rowcount == 0:
+            cur.close()
+            conn.close()
+            return jsonify({'error': f'Paddy type "{paddy_name}" not found'}), 404
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({'ok': True, 'message': 'Paddy type updated successfully'}), 200
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/paddy_types/<paddy_name>', methods=['DELETE'])
+def api_delete_paddy_type(paddy_name):
+    """Delete a paddy type."""
+    try:
+        conn = get_connection(MYSQL_DATABASE)
+        cur = conn.cursor()
+        
+        # Delete paddy type
+        cur.execute('DELETE FROM paddy_type WHERE LOWER(name) = %s', (paddy_name.lower(),))
+        
+        if cur.rowcount == 0:
+            cur.close()
+            conn.close()
+            return jsonify({'error': f'Paddy type "{paddy_name}" not found'}), 404
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({'ok': True, 'message': 'Paddy type deleted successfully'}), 200
+    except mysql.connector.Error as err:
+        return jsonify({'error': str(err)}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/paddy_type_list', methods=['GET'])
 def api_get_paddy_type_list():
     """Return list of all paddy types from paddy_type table."""
