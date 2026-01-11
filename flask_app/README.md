@@ -15,7 +15,7 @@ flask_app/
 ├── requirements.txt
 ├── .env
 └── README.md
-```
+```12
 
 ## Quick setup (cross-platform)
 - Windows
