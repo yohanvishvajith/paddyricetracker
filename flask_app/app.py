@@ -2867,25 +2867,34 @@ def api_add_damage():
         except Exception:
             damage_block_id = None
 
+        # Convert damage_date to MySQL datetime format if provided
+        mysql_damage_date = None
+        if damage_date:
+            try:
+                dt_obj = datetime.datetime.fromisoformat(damage_date.replace('Z', '+00:00'))
+                mysql_damage_date = dt_obj.strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                mysql_damage_date = None
+        
         if is_rice_damage:
             # Insert into rice_damage table; include blockchain damage id if provided
             if damage_block_id is not None:
                 insert_sql = 'INSERT INTO `rice_damage` (id, user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
+                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = int(damage_block_id)
             else:
                 insert_sql = 'INSERT INTO `rice_damage` (user_id, rice_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
+                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
         else:
             # Insert into regular damage table (paddy); include blockchain damage id if provided
             if damage_block_id is not None:
                 insert_sql = 'INSERT INTO `damage` (id, user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
+                cur.execute(insert_sql, (int(damage_block_id), str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = int(damage_block_id)
             else:
                 insert_sql = 'INSERT INTO `damage` (user_id, paddy_type, quantity, reason, damage_date, block_hash, block_number, transaction_hash, reverted) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, damage_date, block_hash, block_number, transaction_hash, reverted))
+                cur.execute(insert_sql, (str(user_id), paddy_type, qty, reason, mysql_damage_date, block_hash, block_number, transaction_hash, reverted))
                 last_id = cur.lastrowid
         
         # Commit transaction
