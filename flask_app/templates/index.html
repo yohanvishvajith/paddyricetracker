@@ -4848,7 +4848,7 @@
                 <input
                   type="text"
                   id="otp-code"
-                  placeholder="Enter OTP (123456)"
+                  placeholder="Enter OTP code sent to user's phone"
                   maxlength="6"
                   style="
                     width: 100%;
@@ -6173,6 +6173,14 @@
               return;
             }
 
+            // Show loading overlay
+            const loadingOverlay = document.getElementById("loading-overlay");
+            const loadingText = document.getElementById("loading-text");
+            if (loadingOverlay) {
+              loadingText.textContent = "Reverting paddy record...";
+              loadingOverlay.classList.add("active");
+            }
+
             try {
               const resp = await fetch(`/api/initial_paddy/${id}/revert`, {
                 method: "POST",
@@ -6191,11 +6199,21 @@
                 );
               }
 
-              alert("Initial paddy reverted successfully!");
+              showNotification(
+                "Initial paddy reverted successfully",
+                "success",
+                3000
+              );
               loadInitialPaddy();
             } catch (err) {
               console.error("Error reverting initial paddy:", err);
               alert(`Error: ${err.message}`);
+            } finally {
+              // Hide loading overlay
+              const loadingOverlay = document.getElementById("loading-overlay");
+              if (loadingOverlay) {
+                loadingOverlay.classList.remove("active");
+              }
             }
           }
         }
@@ -6216,6 +6234,14 @@
               return;
             }
 
+            // Show loading overlay
+            const loadingOverlay = document.getElementById("loading-overlay");
+            const loadingText = document.getElementById("loading-text");
+            if (loadingOverlay) {
+              loadingText.textContent = "Reverting rice record...";
+              loadingOverlay.classList.add("active");
+            }
+
             try {
               const resp = await fetch(`/api/initial_rice/${id}/revert`, {
                 method: "POST",
@@ -6234,11 +6260,21 @@
                 );
               }
 
-              alert("Initial rice reverted successfully!");
+              showNotification(
+                "Initial rice reverted successfully",
+                "success",
+                3000
+              );
               loadInitialRice();
             } catch (err) {
               console.error("Error reverting initial rice:", err);
               alert(`Error: ${err.message}`);
+            } finally {
+              // Hide loading overlay
+              const loadingOverlay = document.getElementById("loading-overlay");
+              if (loadingOverlay) {
+                loadingOverlay.classList.remove("active");
+              }
             }
           }
         }
@@ -7010,31 +7046,39 @@
               return;
             }
 
-            try {
-              const resp = await fetch("/api/initial_rice", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  user_id: userId,
-                  rice_type: riceType,
-                  quantity: parseFloat(quantity),
-                }),
-              });
+            // Get display names for confirmation
+            const userOption = initialRiceUserSelect.querySelector(
+              `option[value="${userId}"]`
+            );
+            const userDisplay = userOption ? userOption.textContent : userId;
+            const riceTypeOption = initialRiceTypeSelect.querySelector(
+              `option[value="${riceType}"]`
+            );
+            const riceTypeDisplay = riceTypeOption
+              ? riceTypeOption.textContent
+              : riceType;
 
-              if (!resp.ok) {
-                const error = await resp.json();
-                throw new Error(error.message || "Failed to add initial rice");
-              }
+            // Show confirmation dialog
+            const confirmed = confirm(
+              `Are you sure you want to add ${quantity} units of ${riceTypeDisplay} rice for ${userDisplay}?`
+            );
 
-              const result = await resp.json();
-              alert("Initial rice added successfully!");
-              addInitialRiceModal.hidden = true;
-              addInitialRiceForm.reset();
-              loadInitialRice();
-            } catch (err) {
-              console.error("Error adding initial rice:", err);
-              alert(`Error: ${err.message}`);
+            if (!confirmed) {
+              return;
             }
+
+            // Store rice data temporarily for OTP verification
+            window.__pendingRiceData = {
+              user_id: userId,
+              rice_type: riceType,
+              quantity: parseFloat(quantity),
+            };
+
+            // Clear OTP input and show OTP modal
+            document.getElementById("otp-code").value = "";
+            phoneValidationModal.hidden = false;
+            phoneValidationModal.setAttribute("aria-hidden", "false");
+            document.getElementById("otp-code").focus();
           });
         }
 
@@ -7480,6 +7524,11 @@
           phoneValidationModal.hidden = true;
           otpCode.value = "";
           if (otpTimerInterval) clearInterval(otpTimerInterval);
+          // Hide loading overlay
+          const loadingOverlay = document.getElementById("loading-overlay");
+          if (loadingOverlay) {
+            loadingOverlay.classList.remove("active");
+          }
         }
 
         closePhoneValidationBtn &&
@@ -7501,8 +7550,61 @@
               phoneValidationModal.setAttribute("aria-hidden", "true");
               phoneValidationModal.hidden = true;
 
-              // Check if this is a paddy submission or user submission
-              if (window.__pendingPaddyData) {
+              // Show loading overlay
+              const loadingOverlay = document.getElementById("loading-overlay");
+              const loadingText = document.getElementById("loading-text");
+              if (loadingOverlay) {
+                if (window.__pendingRiceData) {
+                  loadingText.textContent = "Processing rice data...";
+                } else {
+                  loadingText.textContent = "Processing paddy data...";
+                }
+                loadingOverlay.classList.add("active");
+              }
+
+              // Check if this is a rice, paddy submission or user submission
+              if (window.__pendingRiceData) {
+                // Submit rice data
+                const riceData = window.__pendingRiceData;
+                (async () => {
+                  try {
+                    const resp = await fetch("/api/initial_rice", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(riceData),
+                    });
+
+                    if (!resp.ok) {
+                      const error = await resp.json();
+                      throw new Error(
+                        error.message || "Failed to add initial rice"
+                      );
+                    }
+
+                    const result = await resp.json();
+                    showNotification(
+                      "Initial rice added successfully",
+                      "success",
+                      3000
+                    );
+                    addInitialRiceModal.hidden = true;
+                    addInitialRiceForm.reset();
+                    loadInitialRice();
+                    window.__pendingRiceData = null;
+                    otpCode.value = "";
+                  } catch (err) {
+                    console.error("Error adding initial rice:", err);
+                    alert(`Error: ${err.message}`);
+                  } finally {
+                    // Hide loading overlay
+                    const loadingOverlay =
+                      document.getElementById("loading-overlay");
+                    if (loadingOverlay) {
+                      loadingOverlay.classList.remove("active");
+                    }
+                  }
+                })();
+              } else if (window.__pendingPaddyData) {
                 // Submit paddy data
                 const paddyData = window.__pendingPaddyData;
                 (async () => {
@@ -7534,6 +7636,13 @@
                   } catch (err) {
                     console.error("Error adding initial paddy:", err);
                     alert(`Error: ${err.message}`);
+                  } finally {
+                    // Hide loading overlay
+                    const loadingOverlay =
+                      document.getElementById("loading-overlay");
+                    if (loadingOverlay) {
+                      loadingOverlay.classList.remove("active");
+                    }
                   }
                 })();
               } else if (window.__pendingUserPayload) {

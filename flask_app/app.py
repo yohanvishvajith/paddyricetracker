@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import os
 from dotenv import load_dotenv
 import mysql.connector
@@ -507,6 +507,13 @@ def home():
 def app_page():
     # serve the main application page
     return render_template('index.html')
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    """Clear the server-side session and redirect to the public home page."""
+    session.clear()
+    return redirect(url_for('home'))
 
 
 @app.route('/api/login', methods=['POST'])
@@ -3771,6 +3778,79 @@ def api_add_user():
             pass
         try:
             conn_chk.close()
+        except Exception:
+            pass
+   
+    # Validate: Prevent duplicate NIC, name, or contact number within the same user type
+    # Same user type cannot have duplicate NIC, name, or contact (e.g., Farmer vs Farmer)
+    # But different types can have same values (e.g., Farmer and Collector can have same name)
+    try:
+        if isinstance(user_type, str) and user_type.strip().lower() in ['farmer', 'collecter']:
+            conn_check = get_connection(MYSQL_DATABASE)
+            cur_check = conn_check.cursor()
+            conditions = []
+            params = [user_type.strip().lower()]
+            
+            # Check by NIC if provided
+            if nic:
+                conditions.append("LOWER(nic) = %s")
+                params.append(nic.lower())
+            # Check by full_name if provided
+            if full_name:
+                conditions.append("LOWER(full_name) = %s")
+                params.append(full_name.lower())
+            # Check by contact_number if provided
+            if contact_number:
+                conditions.append("LOWER(contact_number) = %s")
+                params.append(contact_number.lower())
+            
+            if conditions:
+                # Check for duplicates within the same user type only
+                query = "SELECT id FROM users WHERE LOWER(user_type) = %s AND (" + " OR ".join(conditions) + ") LIMIT 1"
+                cur_check.execute(query, params)
+                existing_user = cur_check.fetchone()
+                cur_check.close()
+                conn_check.close()
+                if existing_user:
+                    return jsonify({'ok': False, 'error': f'A {user_type} with the same NIC, name, or contact number already exists. Cannot add duplicate.'}), 400
+            else:
+                cur_check.close()
+                conn_check.close()
+    except Exception as e:
+        # if check fails for some reason, continue and let insert raise if needed
+        print(f"User validation error: {e}")
+        try:
+            cur_check.close()
+        except Exception:
+            pass
+        try:
+            conn_check.close()
+        except Exception:
+            pass
+    
+    # Validate: Company Register Number must be unique across ALL user types
+    try:
+        if company_register_number:
+            conn_check = get_connection(MYSQL_DATABASE)
+            cur_check = conn_check.cursor()
+            cur_check.execute(
+                "SELECT id, user_type FROM users WHERE LOWER(company_register_number) = %s LIMIT 1",
+                (company_register_number.lower(),)
+            )
+            existing_company = cur_check.fetchone()
+            cur_check.close()
+            conn_check.close()
+            if existing_company:
+                existing_type = existing_company[1] if isinstance(existing_company, tuple) else existing_company.get('user_type')
+                return jsonify({'ok': False, 'error': f'Company Register Number "{company_register_number}" already exists for a {existing_type}. Company Register Numbers must be unique.'}), 400
+    except Exception as e:
+        print(f"Company Register Number validation error: {e}")
+        try:
+            cur_check.close()
+        except Exception:
+            pass
+        try:
+            conn_check.close()
         except Exception:
             pass
    

@@ -9,44 +9,213 @@
       href="{{ url_for('static', filename='style.css') }}"
     />
     <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+
+      .notification {
+        padding: 12px 16px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: slideDown 0.3s ease-out;
+        pointer-events: auto;
+      }
+
+      .notification.success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #10b981;
+      }
+
+      .notification.success::before {
+        content: "✓";
+        font-weight: bold;
+        font-size: 16px;
+      }
+
       body {
         margin: 0;
-        padding: 20px;
+        padding: 0;
         font-family: Arial, sans-serif;
         background-color: #f3f4f6;
       }
+
+      .site-header {
+        background: linear-gradient(135deg, #0b3d91 0%, #1a5fc4 100%);
+        border-bottom: none;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(11, 61, 145, 0.15);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .site-title {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.5px;
+      }
+
+      .tabs {
+        flex: 1;
+        text-align: center;
+      }
+
+      .tabs ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: inline-flex;
+        gap: 12px;
+        flex: 1;
+        justify-content: center;
+      }
+
+      .tab a {
+        display: inline-block;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .tab a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+
+      .tab.active a {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        border-color: #fff;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        min-width: fit-content;
+      }
+
+      .logout-btn {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .logout-btn:hover {
+        background: rgba(239, 68, 68, 1);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        transform: translateY(-2px);
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .tab-panel {
+        animation: slideUp 0.3s ease-out;
+      }
+
+      .tab-panel[hidden] {
+        display: none;
+      }
+
+      .sub-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .sub-tab-btn {
+        padding: 10px 16px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .sub-tab-btn.active {
+        color: #0b3d91;
+        border-bottom-color: #0b3d91;
+      }
+
+      .sub-tab-btn:hover {
+        color: #0b3d91;
+      }
+
       .container {
         max-width: 1400px;
         margin: 0 auto;
       }
-      h1 {
-        color: #1f2937;
-        border-bottom: 3px solid #667eea;
-        padding-bottom: 12px;
-        margin-bottom: 24px;
-      }
-      .header-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      }
-      .logout-btn {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-      }
-      .logout-btn:hover {
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
-        transform: translateY(-2px);
-      }
+
       .welcome-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 40px;
@@ -55,22 +224,26 @@
         color: white;
         margin-bottom: 32px;
       }
+
       .welcome-card h2 {
         font-size: 32px;
         margin: 0 0 12px 0;
         font-weight: 700;
       }
+
       .welcome-card p {
         font-size: 16px;
         margin: 0;
         opacity: 0.95;
       }
+
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
         margin-bottom: 32px;
       }
+
       .stat-card {
         background: white;
         padding: 24px;
@@ -78,6 +251,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         border-left: 4px solid #667eea;
       }
+
       .stat-card h3 {
         font-size: 14px;
         font-weight: 600;
@@ -86,12 +260,14 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
+
       .stat-value {
         font-size: 28px;
         font-weight: 700;
         color: #1f2937;
         margin: 0;
       }
+
       .section {
         background: white;
         border-radius: 12px;
@@ -99,16 +275,19 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         margin-bottom: 24px;
       }
+
       .section h2 {
         font-size: 20px;
         font-weight: 700;
         color: #1f2937;
         margin: 0 0 20px 0;
       }
+
       table {
         width: 100%;
         border-collapse: collapse;
       }
+
       th {
         padding: 12px;
         text-align: left;
@@ -117,14 +296,17 @@
         background: #f3f4f6;
         border-bottom: 2px solid #e5e7eb;
       }
+
       td {
         padding: 12px;
         border-bottom: 1px solid #e5e7eb;
         color: #374151;
       }
+
       tr:hover {
         background: #f9fafb;
       }
+
       .badge {
         display: inline-block;
         padding: 4px 12px;
@@ -132,1267 +314,1202 @@
         font-size: 12px;
         font-weight: 600;
       }
+
       .badge-success {
         background: #d1fae5;
         color: #065f46;
       }
+
       .badge-warning {
         background: #fef3c7;
         color: #92400e;
       }
+
       .badge-info {
         background: #dbeafe;
         color: #1e40af;
       }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 16px;
+        background: #fff;
+        color: #0b3d91;
+        border: 2px solid #0b3d91;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .btn:hover {
+        background: #0b3d91;
+        color: white;
+      }
+
+      .btn.primary {
+        background: #0b3d91;
+        color: white;
+      }
+
+      .btn.primary:hover {
+        background: #0a3066;
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="header-section">
-        <h1>🏛️ Division Dashboard</h1>
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <header class="site-header">
+      <h1 class="site-title">Division Dashboard</h1>
+
+      <nav class="tabs" aria-label="Primary">
+        <ul>
+          <li class="tab active">
+            <a
+              href="#"
+              id="tab-dashboard"
+              role="tab"
+              aria-controls="dashboard-panel"
+              aria-selected="true"
+              >Dashboard</a
+            >
+          </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-users"
+              role="tab"
+              aria-controls="users-panel"
+              aria-selected="false"
+              >Users</a
+            >
+          </li>
+          <li class="tab">
+            <a
+              href="#"
+              id="tab-initial-pr"
+              role="tab"
+              aria-controls="initial-pr-panel"
+              aria-selected="false"
+              >Initial P/R</a
+            >
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
         <button class="logout-btn" onclick="logout()">🚪 Logout</button>
       </div>
+    </header>
 
-      <div class="welcome-card">
-        <h2>Welcome to Division Management</h2>
-        <p>
-          Monitor and manage paddy and rice supply chain operations across
-          divisions
-        </p>
-      </div>
-
-      <!-- Statistics Section -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Total Farmers</h3>
-          <p class="stat-value" id="stat-farmers">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Total Transactions</h3>
-          <p class="stat-value" id="stat-transactions">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Total Stock (kg)</h3>
-          <p class="stat-value" id="stat-stock">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>Active Users</h3>
-          <p class="stat-value" id="stat-users">0</p>
-        </div>
-      </div>
-
-      <!-- Overview Section -->
-      <div class="section">
-        <h2>📊 System Overview</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Count</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Farmers Registered</td>
-              <td id="farmers-count">--</td>
-              <td><span class="badge badge-success">Active</span></td>
-            </tr>
-            <tr>
-              <td>Collectors Active</td>
-              <td id="collectors-count">--</td>
-              <td><span class="badge badge-success">Active</span></td>
-            </tr>
-            <tr>
-              <td>Millers Registered</td>
-              <td id="millers-count">--</td>
-              <td><span class="badge badge-success">Active</span></td>
-            </tr>
-            <tr>
-              <td>Pending Inspections</td>
-              <td id="inspections-count">--</td>
-              <td><span class="badge badge-warning">Review</span></td>
-            </tr>
-            <tr>
-              <td>Completed Transactions</td>
-              <td id="completed-count">--</td>
-              <td><span class="badge badge-info">Archived</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Quick Actions Section -->
-      <div class="section">
-        <h2>⚡ Quick Actions</h2>
-        <div
-          style="
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-          "
-        >
-          <button
-            style="
-              padding: 12px 20px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
-          >
-            📋 View Reports
-          </button>
-          <button
-            style="
-              padding: 12px 20px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
-          >
-            👥 Manage Users
-          </button>
-          <button
-            style="
-              padding: 12px 20px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
-          >
-            📈 Analytics
-          </button>
-          <button
-            style="
-              padding: 12px 20px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              border: none;
-              border-radius: 8px;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(102,126,234,0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';"
-          >
-            ⚙️ Settings
-          </button>
-        </div>
-      </div>
-
-      <!-- Footer Note -->
-      <div
-        style="
-          background: #eff6ff;
-          border-left: 4px solid #3b82f6;
-          padding: 16px;
-          border-radius: 8px;
-          margin-top: 32px;
-          color: #1e40af;
-          font-size: 14px;
-        "
+    <main>
+      <!-- Dashboard Tab -->
+      <section
+        id="dashboard-panel"
+        class="tab-panel"
+        aria-labelledby="tab-dashboard"
       >
-        <strong>📌 Note:</strong> This is the Division Officer Dashboard. You
-        have access to monitor and manage operations across your assigned
-        division.
-      </div>
+        <!-- Welcome heading and top stat cards removed per request -->
 
-      <!-- User Count Cards by Type -->
-      <div class="stats-grid" style="margin-top: 32px">
-        <div class="stat-card">
-          <h3>👨‍🌾 Farmers</h3>
-          <p class="stat-value" id="count-farmer">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🏪 Collectors</h3>
-          <p class="stat-value" id="count-collector">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🏭 Millers</h3>
-          <p class="stat-value" id="count-miller">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🏢 Wholesalers</h3>
-          <p class="stat-value" id="count-wholesaler">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🛒 Retailers</h3>
-          <p class="stat-value" id="count-retailer">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🍺 Beer</h3>
-          <p class="stat-value" id="count-beer">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🐄 Animal Food</h3>
-          <p class="stat-value" id="count-animalfood">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>✈️ Exporters</h3>
-          <p class="stat-value" id="count-exporter">0</p>
-        </div>
-        <div class="stat-card">
-          <h3>🏛️ PMB</h3>
-          <p class="stat-value" id="count-pmb">0</p>
-        </div>
-      </div>
+        <!-- Overview Section removed per request -->
 
-      <!-- Manage Users Section -->
-      <div class="section" style="margin-top: 32px">
-        <h2>👥 Manage Users</h2>
+        <!-- Quick Actions and footer note removed per request -->
 
-        <!-- Filters -->
-        <div
-          style="
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            align-items: flex-end;
-          "
-        >
-          <label style="display: flex; flex-direction: column; gap: 6px">
-            <span style="font-size: 13px; font-weight: 500; color: #374151"
-              >User Type</span
-            >
-            <select
-              id="manage-user-type-filter"
-              style="
-                padding: 8px 12px;
-                font-size: 14px;
-                border: 1px solid #d1d5db;
-                border-radius: 8px;
-                background: white;
-                min-width: 150px;
-              "
-            >
-              <option value="Farmer">Farmer</option>
-              <option value="Collecter">Collector</option>
-              <option value="Miller">Miller</option>
-              <option value="Wholesaler">Wholesaler</option>
-              <option value="Retailer">Retailer</option>
-              <option value="Beer">Beer</option>
-              <option value="Animal Food">Animal Food</option>
-              <option value="Exporter">Exporter</option>
-              <option value="PMB">PMB</option>
-            </select>
-          </label>
-
-          <label style="display: flex; flex-direction: column; gap: 6px">
-            <span style="font-size: 13px; font-weight: 500; color: #374151"
-              >Search (ID / Name)</span
-            >
-            <input
-              type="search"
-              id="manage-user-search"
-              placeholder="Enter user ID or name"
-              style="
-                padding: 8px 12px;
-                font-size: 14px;
-                border: 1px solid #d1d5db;
-                border-radius: 8px;
-                min-width: 200px;
-              "
-            />
-          </label>
-
-          <button
-            id="add-user-btn"
-            style="
-              padding: 8px 16px;
-              font-size: 14px;
-              font-weight: 500;
-              border-radius: 8px;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              color: white;
-              border: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(16, 185, 129, 0.3)';"
-          >
-            + Add User
-          </button>
-
-          <button
-            id="manage-user-refresh"
-            style="
-              padding: 8px 16px;
-              font-size: 14px;
-              font-weight: 500;
-              border-radius: 8px;
-              background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-              color: white;
-              border: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
-            "
-            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
-          >
-            Refresh
-          </button>
-
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              margin-left: auto;
-            "
-          >
-            <span style="font-size: 14px; font-weight: 500; color: #6b7280"
-              >Total Users:</span
-            >
-            <span
-              id="user-count-display"
-              style="
-                font-size: 16px;
-                font-weight: 700;
-                color: #1f2937;
-                background: #f3f4f6;
-                padding: 6px 12px;
-                border-radius: 6px;
-              "
-              >0</span
-            >
+        <!-- User Count Cards by Type -->
+        <div class="stats-grid" style="margin-top: 32px">
+          <div class="stat-card">
+            <h3>👨‍🌾 Farmers</h3>
+            <p class="stat-value" id="count-farmer">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🏪 Collectors</h3>
+            <p class="stat-value" id="count-collector">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🏭 Millers</h3>
+            <p class="stat-value" id="count-miller">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🏢 Wholesalers</h3>
+            <p class="stat-value" id="count-wholesaler">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🛒 Retailers</h3>
+            <p class="stat-value" id="count-retailer">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🍺 Beer</h3>
+            <p class="stat-value" id="count-beer">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🐄 Animal Food</h3>
+            <p class="stat-value" id="count-animalfood">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>✈️ Exporters</h3>
+            <p class="stat-value" id="count-exporter">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>🏛️ PMB</h3>
+            <p class="stat-value" id="count-pmb">0</p>
           </div>
         </div>
+      </section>
 
-        <!-- Users Table -->
-        <div
-          style="
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-          "
-        >
-          <table
-            id="manage-user-table"
-            style="width: 100%; border-collapse: collapse; font-size: 14px"
-          >
-            <thead>
-              <tr
-                style="
-                  background-color: #f3f4f6;
-                  border-bottom: 2px solid #e5e7eb;
-                "
-              >
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #374151;
-                  "
-                >
-                  User ID
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #374151;
-                  "
-                >
-                  Full Name
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #374151;
-                  "
-                >
-                  District
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #374151;
-                  "
-                >
-                  Contact
-                </th>
-                <th
-                  style="
-                    padding: 12px;
-                    text-align: center;
-                    font-weight: 600;
-                    color: #374151;
-                  "
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody id="manage-user-table-body">
-              <!-- rows will be added here -->
-            </tbody>
-          </table>
-          <div
-            id="manage-user-pagination"
-            style="
-              padding: 12px 16px;
-              background: transparent;
-              display: block;
-              text-align: center;
-            "
-          ></div>
-        </div>
-      </div>
-
-      <!-- Initial Paddy/Rice Section -->
-      <div class="section" style="margin-top: 32px">
-        <h2>📦 Initial Paddy/Rice</h2>
-
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            border-bottom: 2px solid #e5e7eb;
-          "
-        >
-          <div style="display: flex; flex: 1; gap: 0">
-            <button
-              id="div-initial-pr-tab-paddy"
-              class="btn primary"
-              type="button"
-              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
-            >
-              Initial Paddy
-            </button>
-            <button
-              id="div-initial-pr-tab-rice"
-              class="btn"
-              type="button"
-              style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
-            >
-              Initial Rice
-            </button>
-          </div>
-        </div>
-
-        <!-- Initial Paddy Panel -->
-        <div id="div-initial-paddy-panel">
-          <div
-            style="
-              margin-bottom: 12px;
-              display: flex;
-              gap: 8px;
-              align-items: center;
-            "
-          >
-            <label
-              style="
-                display: flex;
-                flex-direction: column;
-                font-size: 13px;
-                min-width: 200px;
-              "
-            >
-              Filter by User (Collectors & Millers)
-              <select
-                id="div-initial-paddy-user-filter"
-                style="
-                  padding: 6px;
-                  border-radius: 6px;
-                  border: 1px solid #d1d5db;
-                "
-              >
-                <option value="">All Users</option>
-              </select>
-            </label>
-            <button
-              id="div-add-initial-paddy-btn"
-              class="btn primary"
-              style="margin-top: 18px"
-            >
-              + Add Paddy
-            </button>
-            <button
-              id="div-initial-paddy-refresh"
-              class="btn"
-              style="margin-top: 18px"
-            >
-              Refresh
-            </button>
-          </div>
-
-          <div class="table-wrap" style="overflow-x: auto">
-            <table
-              id="div-initial-paddy-table"
-              style="width: 100%; border-collapse: collapse"
-            >
-              <thead>
-                <tr
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      #f8fafc 0%,
-                      #e2e8f0 100%
-                    );
-                  "
-                >
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    User ID
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Name
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    District
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Paddy Type
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Quantity (kg)
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Date Created
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: center;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="div-initial-paddy-table-body">
-                <!-- rows will be added here -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Initial Rice Panel -->
-        <div id="div-initial-rice-panel" style="display: none">
-          <div
-            style="
-              margin-bottom: 12px;
-              display: flex;
-              gap: 8px;
-              align-items: center;
-            "
-          >
-            <label
-              style="
-                display: flex;
-                flex-direction: column;
-                font-size: 13px;
-                min-width: 200px;
-              "
-            >
-              Filter by User (Millers & Wholesalers)
-              <select
-                id="div-initial-rice-user-filter"
-                style="
-                  padding: 6px;
-                  border-radius: 6px;
-                  border: 1px solid #d1d5db;
-                "
-              >
-                <option value="">All Users</option>
-              </select>
-            </label>
-            <button
-              id="div-add-initial-rice-btn"
-              class="btn primary"
-              style="margin-top: 18px"
-            >
-              + Add Rice
-            </button>
-            <button
-              id="div-initial-rice-refresh"
-              class="btn"
-              style="margin-top: 18px"
-            >
-              Refresh
-            </button>
-          </div>
-
-          <div class="table-wrap" style="overflow-x: auto">
-            <table
-              id="div-initial-rice-table"
-              style="width: 100%; border-collapse: collapse"
-            >
-              <thead>
-                <tr
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      #f8fafc 0%,
-                      #e2e8f0 100%
-                    );
-                  "
-                >
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    User ID
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Name
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    District
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Rice Type
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Quantity (kg)
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: left;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Date Created
-                  </th>
-                  <th
-                    style="
-                      padding: 12px;
-                      text-align: center;
-                      font-weight: 600;
-                      color: #374151;
-                      border-bottom: 2px solid #e5e7eb;
-                    "
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="div-initial-rice-table-body">
-                <!-- rows will be added here -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add Initial Paddy Modal -->
-      <div
-        id="div-add-initial-paddy-modal"
-        style="
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: none;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-        "
+      <!-- Users Tab -->
+      <section
+        id="users-panel"
+        class="tab-panel"
+        aria-labelledby="tab-users"
+        hidden
       >
-        <div
-          style="
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-          "
-        >
+        <!-- Manage Users Section -->
+        <div class="section" style="margin-top: 0">
+          <h2>👥 Manage Users</h2>
+
+          <!-- Filters -->
           <div
             style="
               display: flex;
-              justify-content: space-between;
-              align-items: center;
+              flex-wrap: wrap;
+              gap: 12px;
               margin-bottom: 20px;
-              border-bottom: 2px solid #e5e7eb;
-              padding-bottom: 12px;
+              align-items: flex-end;
             "
           >
-            <h3
-              style="
-                margin: 0;
-                font-size: 18px;
-                font-weight: 700;
-                color: #1f2937;
-              "
-            >
-              Add Initial Paddy
-            </h3>
-            <button
-              id="div-add-paddy-close"
-              style="
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #6b7280;
-              "
-            >
-              ✕
-            </button>
-          </div>
-          <form id="div-add-initial-paddy-form">
-            <label style="display: block; margin-bottom: 12px">
-              User Type
-              <select
-                id="div-initial-paddy-user-type"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >User Type</span
               >
-                <option value="">Select User Type</option>
+              <select
+                id="manage-user-type-filter"
+                style="
+                  padding: 8px 12px;
+                  font-size: 14px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  background: white;
+                  min-width: 150px;
+                "
+              >
+                <option value="Farmer">Farmer</option>
                 <option value="Collecter">Collector</option>
                 <option value="Miller">Miller</option>
-              </select>
-            </label>
-            <label style="display: block; margin-bottom: 12px">
-              User Name
-              <select
-                id="div-initial-paddy-user-select"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
-              >
-                <option value="">Select User</option>
-              </select>
-            </label>
-            <label style="display: block; margin-bottom: 12px">
-              Paddy Type
-              <select
-                id="div-initial-paddy-type-select"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
-              >
-                <option value="">Select Paddy Type</option>
-              </select>
-            </label>
-            <label style="display: block; margin-bottom: 12px">
-              Quantity (kg)
-              <input
-                type="number"
-                id="div-initial-paddy-quantity"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                  box-sizing: border-box;
-                "
-                required
-                min="0"
-                step="0.01"
-              />
-            </label>
-            <div
-              style="
-                display: flex;
-                gap: 8px;
-                justify-content: flex-end;
-                margin-top: 16px;
-              "
-            >
-              <button type="button" id="div-add-paddy-cancel" class="btn">
-                Cancel
-              </button>
-              <button type="submit" class="btn primary">Add Paddy</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Add Initial Rice Modal -->
-      <div
-        id="div-add-initial-rice-modal"
-        style="
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: none;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-        "
-      >
-        <div
-          style="
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-          "
-        >
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 20px;
-              border-bottom: 2px solid #e5e7eb;
-              padding-bottom: 12px;
-            "
-          >
-            <h3
-              style="
-                margin: 0;
-                font-size: 18px;
-                font-weight: 700;
-                color: #1f2937;
-              "
-            >
-              Add Initial Rice
-            </h3>
-            <button
-              id="div-add-rice-close"
-              style="
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #6b7280;
-              "
-            >
-              ✕
-            </button>
-          </div>
-          <form id="div-add-initial-rice-form">
-            <label style="display: block; margin-bottom: 12px">
-              User Type
-              <select
-                id="div-initial-rice-user-type"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
-              >
-                <option value="">Select User Type</option>
-                <option value="Miller">Miller</option>
                 <option value="Wholesaler">Wholesaler</option>
+                <option value="Retailer">Retailer</option>
+                <option value="Beer">Beer</option>
+                <option value="Animal Food">Animal Food</option>
+                <option value="Exporter">Exporter</option>
+                <option value="PMB">PMB</option>
               </select>
             </label>
-            <label style="display: block; margin-bottom: 12px">
-              User Name
-              <select
-                id="div-initial-rice-user-select"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
+
+            <label style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 500; color: #374151"
+                >Search (ID / Name)</span
               >
-                <option value="">Select User</option>
-              </select>
-            </label>
-            <label style="display: block; margin-bottom: 12px">
-              Rice Type
-              <select
-                id="div-initial-rice-type-select"
-                style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
-                  border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                "
-                required
-              >
-                <option value="">Select Rice Type</option>
-              </select>
-            </label>
-            <label style="display: block; margin-bottom: 12px">
-              Quantity (kg)
               <input
-                type="number"
-                id="div-initial-rice-quantity"
+                type="search"
+                id="manage-user-search"
+                placeholder="Enter user ID or name"
                 style="
-                  width: 100%;
-                  padding: 8px;
-                  border-radius: 4px;
+                  padding: 8px 12px;
+                  font-size: 14px;
                   border: 1px solid #d1d5db;
-                  margin-top: 4px;
-                  box-sizing: border-box;
+                  border-radius: 8px;
+                  min-width: 200px;
                 "
-                required
-                min="0"
-                step="0.01"
               />
             </label>
+
+            <button
+              id="add-user-btn"
+              style="
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.4)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(16, 185, 129, 0.3)';"
+            >
+              + Add User
+            </button>
+
+            <button
+              id="manage-user-refresh"
+              style="
+                padding: 8px 16px;
+                font-size: 14px;
+                font-weight: 500;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.4)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(79, 70, 229, 0.3)';"
+            >
+              Refresh
+            </button>
+
             <div
               style="
                 display: flex;
+                align-items: center;
                 gap: 8px;
-                justify-content: flex-end;
-                margin-top: 16px;
+                margin-left: auto;
               "
             >
-              <button type="button" id="div-add-rice-cancel" class="btn">
-                Cancel
-              </button>
-              <button type="submit" class="btn primary">Add Rice</button>
+              <span style="font-size: 14px; font-weight: 500; color: #6b7280"
+                >Total Users:</span
+              >
+              <span
+                id="user-count-display"
+                style="
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: #1f2937;
+                  background: #f3f4f6;
+                  padding: 6px 12px;
+                  border-radius: 6px;
+                "
+                >0</span
+              >
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
 
-      <!-- View Initial Paddy Modal -->
-      <div
-        id="div-view-initial-paddy-modal"
-        style="
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: none;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-        "
+          <!-- Users Table -->
+          <div
+            style="
+              background-color: white;
+              border-radius: 10px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            "
+          >
+            <table
+              id="manage-user-table"
+              style="width: 100%; border-collapse: collapse; font-size: 14px"
+            >
+              <thead>
+                <tr
+                  style="
+                    background-color: #f3f4f6;
+                    border-bottom: 2px solid #e5e7eb;
+                  "
+                >
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    User ID
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Full Name
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    District
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: left;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Contact
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      text-align: center;
+                      font-weight: 600;
+                      color: #374151;
+                    "
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="manage-user-table-body">
+                <!-- rows will be added here -->
+              </tbody>
+            </table>
+            <div
+              id="manage-user-pagination"
+              style="
+                padding: 12px 16px;
+                background: transparent;
+                display: block;
+                text-align: center;
+              "
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Initial P/R Tab -->
+      <section
+        id="initial-pr-panel"
+        class="tab-panel"
+        aria-labelledby="tab-initial-pr"
+        hidden
       >
+        <!-- Initial Paddy/Rice Section -->
+        <div class="section" style="margin-top: 0">
+          <h2>📦 Initial Paddy/Rice</h2>
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              margin-bottom: 16px;
+              border-bottom: 2px solid #e5e7eb;
+            "
+          >
+            <div style="display: flex; flex: 1; gap: 0">
+              <button
+                id="div-initial-pr-tab-paddy"
+                class="btn primary sub-tab-btn active"
+                type="button"
+                style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+              >
+                Initial Paddy
+              </button>
+              <button
+                id="div-initial-pr-tab-rice"
+                class="btn sub-tab-btn"
+                type="button"
+                style="flex: 1; border-radius: 0; margin: 0; padding: 12px"
+              >
+                Initial Rice
+              </button>
+            </div>
+          </div>
+
+          <!-- Initial Paddy Panel -->
+          <div id="div-initial-paddy-panel">
+            <div
+              style="
+                margin-bottom: 12px;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 13px;
+                  min-width: 200px;
+                "
+              >
+                Filter by User (Collectors & Millers)
+                <select
+                  id="div-initial-paddy-user-filter"
+                  style="
+                    padding: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #d1d5db;
+                  "
+                >
+                  <option value="">All Users</option>
+                </select>
+              </label>
+              <button
+                id="div-add-initial-paddy-btn"
+                class="btn primary"
+                style="margin-top: 18px"
+              >
+                + Add Paddy
+              </button>
+              <button
+                id="div-initial-paddy-refresh"
+                class="btn"
+                style="margin-top: 18px"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div class="table-wrap" style="overflow-x: auto">
+              <table
+                id="div-initial-paddy-table"
+                style="width: 100%; border-collapse: collapse"
+              >
+                <thead>
+                  <tr
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        #f8fafc 0%,
+                        #e2e8f0 100%
+                      );
+                    "
+                  >
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      User ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Name
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      District
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Paddy Type
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Quantity (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Date Created
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: center;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="div-initial-paddy-table-body">
+                  <!-- rows will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Initial Rice Panel -->
+          <div id="div-initial-rice-panel" style="display: none">
+            <div
+              style="
+                margin-bottom: 12px;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  font-size: 13px;
+                  min-width: 200px;
+                "
+              >
+                Filter by User (Millers & Wholesalers)
+                <select
+                  id="div-initial-rice-user-filter"
+                  style="
+                    padding: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #d1d5db;
+                  "
+                >
+                  <option value="">All Users</option>
+                </select>
+              </label>
+              <button
+                id="div-add-initial-rice-btn"
+                class="btn primary"
+                style="margin-top: 18px"
+              >
+                + Add Rice
+              </button>
+              <button
+                id="div-initial-rice-refresh"
+                class="btn"
+                style="margin-top: 18px"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div class="table-wrap" style="overflow-x: auto">
+              <table
+                id="div-initial-rice-table"
+                style="width: 100%; border-collapse: collapse"
+              >
+                <thead>
+                  <tr
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        #f8fafc 0%,
+                        #e2e8f0 100%
+                      );
+                    "
+                  >
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      User ID
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Name
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      District
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Rice Type
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Quantity (kg)
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Date Created
+                    </th>
+                    <th
+                      style="
+                        padding: 12px;
+                        text-align: center;
+                        font-weight: 600;
+                        color: #374151;
+                        border-bottom: 2px solid #e5e7eb;
+                      "
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="div-initial-rice-table-body">
+                  <!-- rows will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Initial Paddy Modal -->
         <div
+          id="div-add-initial-paddy-modal"
           style="
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
           "
         >
           <div
             style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 20px;
-              border-bottom: 2px solid #e5e7eb;
-              padding-bottom: 12px;
+              background: white;
+              border-radius: 12px;
+              padding: 24px;
+              max-width: 500px;
+              width: 90%;
+              box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
             "
           >
-            <h3
+            <div
               style="
-                margin: 0;
-                font-size: 18px;
-                font-weight: 700;
-                color: #1f2937;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 12px;
               "
             >
-              Initial Paddy Details
-            </h3>
-            <button
-              id="div-view-paddy-close"
-              style="
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #6b7280;
-              "
-            >
-              ✕
-            </button>
-          </div>
-          <div
-            id="div-view-paddy-content"
-            style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
-          >
-            <strong>User ID:</strong><span id="div-view-paddy-user-id"></span>
-            <strong>Name:</strong><span id="div-view-paddy-user-name"></span>
-            <strong>District:</strong
-            ><span id="div-view-paddy-district"></span>
-            <strong>Paddy Type:</strong><span id="div-view-paddy-type"></span>
-            <strong>Quantity (kg):</strong
-            ><span id="div-view-paddy-quantity"></span> <strong>Date:</strong
-            ><span id="div-view-paddy-date"></span>
-            <strong>Block Number:</strong
-            ><span
-              id="div-view-paddy-block-number"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 12px;
-              "
-            ></span>
-            <strong>Transaction ID:</strong
-            ><span
-              id="div-view-paddy-transaction-id"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 11px;
-              "
-            ></span>
-            <strong>Block Hash:</strong
-            ><span
-              id="div-view-paddy-block-hash"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 11px;
-              "
-            ></span>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #1f2937;
+                "
+              >
+                Add Initial Paddy
+              </h3>
+              <button
+                id="div-add-paddy-close"
+                style="
+                  background: none;
+                  border: none;
+                  font-size: 24px;
+                  cursor: pointer;
+                  color: #6b7280;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <form id="div-add-initial-paddy-form">
+              <label style="display: block; margin-bottom: 12px">
+                User Type
+                <select
+                  id="div-initial-paddy-user-type"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select User Type</option>
+                  <option value="Collecter">Collector</option>
+                  <option value="Miller">Miller</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                User Name
+                <select
+                  id="div-initial-paddy-user-select"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select User</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                Paddy Type
+                <select
+                  id="div-initial-paddy-type-select"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select Paddy Type</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                Quantity (kg)
+                <input
+                  type="number"
+                  id="div-initial-paddy-quantity"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                    box-sizing: border-box;
+                  "
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </label>
+              <div
+                style="
+                  display: flex;
+                  gap: 8px;
+                  justify-content: flex-end;
+                  margin-top: 16px;
+                "
+              >
+                <button type="button" id="div-add-paddy-cancel" class="btn">
+                  Cancel
+                </button>
+                <button type="submit" class="btn primary">Add Paddy</button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
 
-      <!-- View Initial Rice Modal -->
-      <div
-        id="div-view-initial-rice-modal"
-        style="
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: none;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-        "
-      >
+        <!-- Add Initial Rice Modal -->
         <div
+          id="div-add-initial-rice-modal"
           style="
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
           "
         >
           <div
             style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 20px;
-              border-bottom: 2px solid #e5e7eb;
-              padding-bottom: 12px;
+              background: white;
+              border-radius: 12px;
+              padding: 24px;
+              max-width: 500px;
+              width: 90%;
+              box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
             "
           >
-            <h3
+            <div
               style="
-                margin: 0;
-                font-size: 18px;
-                font-weight: 700;
-                color: #1f2937;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 12px;
               "
             >
-              Initial Rice Details
-            </h3>
-            <button
-              id="div-view-rice-close"
-              style="
-                background: none;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                color: #6b7280;
-              "
-            >
-              ✕
-            </button>
-          </div>
-          <div
-            id="div-view-rice-content"
-            style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
-          >
-            <strong>User ID:</strong><span id="div-view-rice-user-id"></span>
-            <strong>Name:</strong><span id="div-view-rice-user-name"></span>
-            <strong>District:</strong><span id="div-view-rice-district"></span>
-            <strong>Rice Type:</strong><span id="div-view-rice-type"></span>
-            <strong>Quantity (kg):</strong
-            ><span id="div-view-rice-quantity"></span> <strong>Date:</strong
-            ><span id="div-view-rice-date"></span> <strong>Block ID:</strong
-            ><span
-              id="div-view-rice-block-id"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 12px;
-              "
-            ></span>
-            <strong>Block Hash:</strong
-            ><span
-              id="div-view-rice-block-hash"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 11px;
-              "
-            ></span>
-            <strong>Transaction Hash:</strong
-            ><span
-              id="div-view-rice-transaction-hash"
-              style="
-                word-break: break-all;
-                font-family: monospace;
-                font-size: 11px;
-              "
-            ></span>
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #1f2937;
+                "
+              >
+                Add Initial Rice
+              </h3>
+              <button
+                id="div-add-rice-close"
+                style="
+                  background: none;
+                  border: none;
+                  font-size: 24px;
+                  cursor: pointer;
+                  color: #6b7280;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <form id="div-add-initial-rice-form">
+              <label style="display: block; margin-bottom: 12px">
+                User Type
+                <select
+                  id="div-initial-rice-user-type"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select User Type</option>
+                  <option value="Miller">Miller</option>
+                  <option value="Wholesaler">Wholesaler</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                User Name
+                <select
+                  id="div-initial-rice-user-select"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select User</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                Rice Type
+                <select
+                  id="div-initial-rice-type-select"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                  "
+                  required
+                >
+                  <option value="">Select Rice Type</option>
+                </select>
+              </label>
+              <label style="display: block; margin-bottom: 12px">
+                Quantity (kg)
+                <input
+                  type="number"
+                  id="div-initial-rice-quantity"
+                  style="
+                    width: 100%;
+                    padding: 8px;
+                    border-radius: 4px;
+                    border: 1px solid #d1d5db;
+                    margin-top: 4px;
+                    box-sizing: border-box;
+                  "
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </label>
+              <div
+                style="
+                  display: flex;
+                  gap: 8px;
+                  justify-content: flex-end;
+                  margin-top: 16px;
+                "
+              >
+                <button type="button" id="div-add-rice-cancel" class="btn">
+                  Cancel
+                </button>
+                <button type="submit" class="btn primary">Add Rice</button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
 
-      <!-- User Detail Modal -->
+        <!-- View Initial Paddy Modal -->
+        <div
+          id="div-view-initial-paddy-modal"
+          style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+          "
+        >
+          <div
+            style="
+              background: white;
+              border-radius: 12px;
+              padding: 24px;
+              max-width: 600px;
+              width: 90%;
+              box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 12px;
+              "
+            >
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #1f2937;
+                "
+              >
+                Initial Paddy Details
+              </h3>
+              <button
+                id="div-view-paddy-close"
+                style="
+                  background: none;
+                  border: none;
+                  font-size: 24px;
+                  cursor: pointer;
+                  color: #6b7280;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              id="div-view-paddy-content"
+              style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
+            >
+              <strong>User ID:</strong
+              ><span id="div-view-paddy-user-id"></span> <strong>Name:</strong
+              ><span id="div-view-paddy-user-name"></span>
+              <strong>District:</strong
+              ><span id="div-view-paddy-district"></span>
+              <strong>Paddy Type:</strong
+              ><span id="div-view-paddy-type"></span>
+              <strong>Quantity (kg):</strong
+              ><span id="div-view-paddy-quantity"></span> <strong>Date:</strong
+              ><span id="div-view-paddy-date"></span>
+              <strong>Block Number:</strong
+              ><span
+                id="div-view-paddy-block-number"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 12px;
+                "
+              ></span>
+              <strong>Transaction ID:</strong
+              ><span
+                id="div-view-paddy-transaction-id"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 11px;
+                "
+              ></span>
+              <strong>Block Hash:</strong
+              ><span
+                id="div-view-paddy-block-hash"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 11px;
+                "
+              ></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- View Initial Rice Modal -->
+        <div
+          id="div-view-initial-rice-modal"
+          style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+          "
+        >
+          <div
+            style="
+              background: white;
+              border-radius: 12px;
+              padding: 24px;
+              max-width: 600px;
+              width: 90%;
+              box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 12px;
+              "
+            >
+              <h3
+                style="
+                  margin: 0;
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #1f2937;
+                "
+              >
+                Initial Rice Details
+              </h3>
+              <button
+                id="div-view-rice-close"
+                style="
+                  background: none;
+                  border: none;
+                  font-size: 24px;
+                  cursor: pointer;
+                  color: #6b7280;
+                "
+              >
+                ✕
+              </button>
+            </div>
+            <div
+              id="div-view-rice-content"
+              style="display: grid; grid-template-columns: 140px 1fr; gap: 8px"
+            >
+              <strong>User ID:</strong><span id="div-view-rice-user-id"></span>
+              <strong>Name:</strong><span id="div-view-rice-user-name"></span>
+              <strong>District:</strong
+              ><span id="div-view-rice-district"></span>
+              <strong>Rice Type:</strong><span id="div-view-rice-type"></span>
+              <strong>Quantity (kg):</strong
+              ><span id="div-view-rice-quantity"></span> <strong>Date:</strong
+              ><span id="div-view-rice-date"></span> <strong>Block ID:</strong
+              ><span
+                id="div-view-rice-block-id"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 12px;
+                "
+              ></span>
+              <strong>Block Hash:</strong
+              ><span
+                id="div-view-rice-block-hash"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 11px;
+                "
+              ></span>
+              <strong>Transaction Hash:</strong
+              ><span
+                id="div-view-rice-transaction-hash"
+                style="
+                  word-break: break-all;
+                  font-family: monospace;
+                  font-size: 11px;
+                "
+              ></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- User Detail Modal (Outside tab panels to avoid CSS stacking context issues) -->
       <div
         id="user-detail-modal"
         style="
@@ -1457,7 +1574,7 @@
         </div>
       </div>
 
-      <!-- Add/Edit User Modal -->
+      <!-- Add/Edit User Modal (Outside tab panels to avoid CSS stacking context issues) -->
       <div
         id="user-modal"
         style="
@@ -1601,30 +1718,103 @@
         </div>
       </div>
 
-      <!-- Loading Overlay -->
+      <!-- OTP Verification Modal for User Registration -->
       <div
-        id="loading-overlay"
+        id="user-otp-modal"
         style="
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(0, 0, 0, 0.7);
+          background-color: rgba(0, 0, 0, 0.5);
           display: none;
           align-items: center;
           justify-content: center;
-          z-index: 10000;
+          z-index: 9999;
         "
       >
-        <div style="text-align: center; color: white">
-          <div style="font-size: 48px; margin-bottom: 16px">⏳</div>
-          <p id="loading-text" style="font-size: 18px; font-weight: 600">
-            Processing...
+        <div
+          style="
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+          "
+        >
+          <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #1f2937">
+            Enter OTP Code
+          </h3>
+          <form id="user-otp-form">
+            <div style="margin-bottom: 16px">
+              <input
+                type="text"
+                id="user-otp-code"
+                placeholder="Enter OTP code sent to phone"
+                maxlength="6"
+                style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  border: 1px solid #d1d5db;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  box-sizing: border-box;
+                "
+              />
+              <p style="font-size: 12px; color: #666; margin: 8px 0 0 0">
+                OTP expires in <span id="user-otp-timer">60</span> seconds
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end">
+              <button
+                type="button"
+                id="user-otp-close-btn"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: #e5e7eb;
+                  color: #374151;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                id="user-otp-verify-btn"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+                  color: white;
+                  border: none;
+                  cursor: pointer;
+                "
+              >
+                Verify OTP
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+          <p>
+            <span class="loading-spinner"></span>
+            <span id="loading-text">Processing...</span>
           </p>
         </div>
       </div>
-    </div>
+    </main>
 
     <script>
       function logout() {
@@ -1634,6 +1824,53 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
+        // ==================== TAB HANDLING ====================
+        const tabButtons = document.querySelectorAll('[role="tab"]');
+        const tabPanels = document.querySelectorAll(".tab-panel");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            // Remove active class from all tabs and hide all panels
+            tabButtons.forEach((btn) => {
+              btn.parentElement.classList.remove("active");
+              btn.setAttribute("aria-selected", "false");
+            });
+            tabPanels.forEach((panel) => {
+              panel.setAttribute("hidden", "");
+            });
+
+            // Add active class to clicked tab and show corresponding panel
+            button.parentElement.classList.add("active");
+            button.setAttribute("aria-selected", "true");
+            const panelId = button.getAttribute("aria-controls");
+            const panel = document.getElementById(panelId);
+            if (panel) {
+              panel.removeAttribute("hidden");
+            }
+          });
+        });
+
+        // ==================== NOTIFICATION FUNCTION ====================
+        function showNotification(message, type = "success", duration = 3000) {
+          const container = document.getElementById("notification-container");
+          const notification = document.createElement("div");
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          notification.style.animation = "slideDown 0.3s ease-out";
+          container.appendChild(notification);
+
+          setTimeout(() => {
+            notification.style.animation = "slideDown 0.3s ease-out reverse";
+            notification.style.opacity = "0";
+            setTimeout(() => {
+              notification.remove();
+            }, 300);
+          }, duration);
+        }
+
+        // ==================== Load statistics ====================
         // Load statistics
         async function loadStatistics() {
           try {
@@ -1652,26 +1889,30 @@
               (u) => u.user_type === "MILLER"
             ).length;
 
-            document.getElementById("stat-farmers").textContent = farmersCount;
-            document.getElementById("stat-users").textContent = users.length;
-            document.getElementById("farmers-count").textContent = farmersCount;
-            document.getElementById("collectors-count").textContent =
-              collectorsCount;
-            document.getElementById("millers-count").textContent = millersCount;
+            // Update only elements that exist in division.html
+            const farmersElement = document.getElementById("farmers-count");
+            if (farmersElement) farmersElement.textContent = farmersCount;
+            const collectorsElement =
+              document.getElementById("collectors-count");
+            if (collectorsElement)
+              collectorsElement.textContent = collectorsCount;
+            const millersElement = document.getElementById("millers-count");
+            if (millersElement) millersElement.textContent = millersCount;
 
             // Load transactions count
             const txRes = await fetch("/api/transactions");
             if (txRes.ok) {
               const transactions = await txRes.json();
-              document.getElementById("stat-transactions").textContent =
-                transactions.length;
-              document.getElementById("completed-count").textContent =
-                transactions.length;
+              const completedElement =
+                document.getElementById("completed-count");
+              if (completedElement)
+                completedElement.textContent = transactions.length;
             }
 
-            // Placeholder values for other stats
-            document.getElementById("stat-stock").textContent = "0";
-            document.getElementById("inspections-count").textContent = "0";
+            // Placeholder values for inspections-count if it exists
+            const inspectionsElement =
+              document.getElementById("inspections-count");
+            if (inspectionsElement) inspectionsElement.textContent = "0";
           } catch (e) {
             console.error("Error loading statistics:", e);
           }
@@ -2168,7 +2409,18 @@
           userForm.reset();
 
           // Set user type and disable changing it
-          const userType = user.user_type;
+          // Convert database format (FARMER) to form format (Farmer)
+          let userType = user.user_type;
+          if (userType === "FARMER") userType = "Farmer";
+          else if (userType === "COLLECTER") userType = "Collecter";
+          else if (userType === "MILLER") userType = "Miller";
+          else if (userType === "WHOLESALER") userType = "Wholesaler";
+          else if (userType === "RETAILER") userType = "Retailer";
+          else if (userType === "BEER") userType = "Beer";
+          else if (userType === "ANIMAL FOOD") userType = "Animal Food";
+          else if (userType === "EXPORTER") userType = "Exporter";
+          // PMB stays as is
+
           userTypeSelect.value = userType;
           userTypeSelect.disabled = true;
           renderTypeFields(userType);
@@ -2279,12 +2531,106 @@
         });
 
         // Form submission handler
+        let pendingUserPayload = null;
+        let userOtpTimerInterval = null;
+        const CORRECT_USER_OTP = "123456";
+
+        function startUserOtpTimer() {
+          let timeLeft = 60;
+          const otpTimerElement = document.getElementById("user-otp-timer");
+          otpTimerElement.textContent = timeLeft;
+          userOtpTimerInterval = setInterval(() => {
+            timeLeft--;
+            otpTimerElement.textContent = timeLeft;
+            if (timeLeft <= 0) {
+              clearInterval(userOtpTimerInterval);
+            }
+          }, 1000);
+        }
+
+        function closeUserOtpModal() {
+          const userOtpModal = document.getElementById("user-otp-modal");
+          userOtpModal.style.display = "none";
+          document.getElementById("user-otp-code").value = "";
+          if (userOtpTimerInterval) clearInterval(userOtpTimerInterval);
+        }
+
+        document
+          .getElementById("user-otp-close-btn")
+          .addEventListener("click", closeUserOtpModal);
+
+        document
+          .getElementById("user-otp-verify-btn")
+          .addEventListener("click", async (e) => {
+            e.preventDefault();
+            const enteredOtp = document
+              .getElementById("user-otp-code")
+              .value.trim();
+
+            if (enteredOtp === CORRECT_USER_OTP) {
+              closeUserOtpModal();
+
+              // Submit the user registration or update
+              try {
+                const isUpdating = editingUserId !== null;
+                loadingText.textContent = isUpdating
+                  ? "Updating user..."
+                  : "Creating user...";
+                loadingOverlay.style.display = "flex";
+
+                let url = "/api/users";
+                let method = "POST";
+
+                if (isUpdating) {
+                  url = `/api/users/${encodeURIComponent(editingUserId)}`;
+                  method = "PUT";
+                }
+
+                const res = await fetch(url, {
+                  method: method,
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(pendingUserPayload),
+                });
+
+                if (!res.ok) {
+                  const text = await res.text();
+                  throw new Error(text || "Failed to save user");
+                }
+
+                alert(
+                  isUpdating
+                    ? "User updated successfully!"
+                    : "User created successfully!"
+                );
+                closeUserModal();
+                loadManageUsers();
+                loadStatistics();
+              } catch (err) {
+                console.error("Error saving user:", err);
+                alert("Error: " + err.message);
+              } finally {
+                loadingOverlay.style.display = "none";
+                pendingUserPayload = null;
+              }
+            } else {
+              alert("Invalid OTP. Please try again.");
+            }
+          });
+
         userForm.addEventListener("submit", async (e) => {
+          console.log("User form submitted");
           e.preventDefault();
 
           const isEditing = editingUserId !== null;
+          console.log("isEditing:", isEditing);
           const data = new FormData(userForm);
-          const userType = data.get("userType");
+
+          // Read userType directly from select since disabled inputs aren't included in FormData
+          let userType = userTypeSelect.value;
+          if (!userType) {
+            userType = data.get("userType");
+          }
+          console.log("userType:", userType);
 
           // Gather form data
           const nic = (data.get("nic") || "").trim();
@@ -2337,45 +2683,21 @@
             totalAreaOfPaddyLand,
           };
 
-          try {
-            // Show loading overlay
-            loadingText.textContent = isEditing
-              ? "Updating user..."
-              : "Creating user...";
-            loadingOverlay.style.display = "flex";
-
-            let url = "/api/users";
-            let method = "POST";
-
-            if (isEditing) {
-              url = `/api/users/${encodeURIComponent(editingUserId)}`;
-              method = "PUT";
+          console.log("Showing OTP modal...");
+          // For both new and editing users, show OTP modal
+          pendingUserPayload = payload;
+          const userOtpModal = document.getElementById("user-otp-modal");
+          console.log("userOtpModal:", userOtpModal);
+          if (userOtpModal) {
+            userOtpModal.style.display = "flex";
+            const otpCodeInput = document.getElementById("user-otp-code");
+            if (otpCodeInput) {
+              otpCodeInput.focus();
             }
-
-            const res = await fetch(url, {
-              method: method,
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (!res.ok) {
-              const text = await res.text();
-              throw new Error(text || "Failed to save user");
-            }
-
-            alert(
-              isEditing
-                ? "User updated successfully!"
-                : "User created successfully!"
-            );
-            closeUserModal();
-            loadManageUsers();
-            loadStatistics();
-          } catch (err) {
-            console.error("Error saving user:", err);
-            alert("Error: " + err.message);
-          } finally {
-            loadingOverlay.style.display = "none";
+            startUserOtpTimer();
+            console.log("OTP modal displayed");
+          } else {
+            console.error("OTP modal not found!");
           }
         });
 
