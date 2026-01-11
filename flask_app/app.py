@@ -1640,12 +1640,34 @@ def api_add_transaction():
     status: 1 = normal transaction, 0 = revert transaction (restores stock)
     price: optional price per unit
     """
+    from datetime import datetime as dt_class
+    
     payload = request.get_json() or {}
     from_val = payload.get('from')
     to_val = payload.get('to')
     ttype = payload.get('type')
     quantity = payload.get('quantity')
-    dt = payload.get('datetime')
+    dt_raw = payload.get('datetime')
+    
+    # Convert ISO 8601 datetime to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
+    dt = None
+    if dt_raw:
+        try:
+            # Handle ISO 8601 format with Z or +00:00 timezone indicator
+            if isinstance(dt_raw, str):
+                # Remove 'Z' or timezone info and convert to MySQL format
+                if dt_raw.endswith('Z'):
+                    dt_raw = dt_raw[:-1]  # Remove 'Z'
+                # Remove milliseconds if present
+                if '.' in dt_raw:
+                    dt_raw = dt_raw.split('.')[0]  # Keep only date and time
+                # Parse the datetime
+                dt_obj = dt_class.fromisoformat(dt_raw)
+                dt = dt_obj.strftime('%Y-%m-%d %H:%M:%S')  # Format for MySQL
+        except Exception as e:
+            # If conversion fails, try to use as-is (might already be in correct format)
+            dt = dt_raw
+    
     # Convert price to float with 2 decimal places
     price_raw = payload.get('price')
     price = float(price_raw) if price_raw else 0.0
